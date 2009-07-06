@@ -21,7 +21,9 @@ AC_CONFIG_FILES([
   Makefile
   m4/Makefile
   dune/Makefile
-  dune/multidomaingrid/Makefile
+  dune/grid/Makefile
+  dune/grid/multidomaingrid/Makefile
+  tests/Makefile
   dune-multidomaingrid.pc
 ])
 AC_OUTPUT
