@@ -1,4 +1,4 @@
-M4FILES = dune-vis.m4
+M4FILES = dune-multidomaingrid.m4
 
 aclocaldir = $(datadir)/aclocal
 aclocal_DATA = $(M4FILES)
