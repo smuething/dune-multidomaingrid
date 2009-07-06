@@ -1,4 +1,4 @@
 dunedir = $(includedir)/dune
-SUBDIRS = multidomaingrid 
+SUBDIRS = grid 
 
 include $(top_srcdir)/am/global-rules
