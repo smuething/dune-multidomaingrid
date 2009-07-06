@@ -22,10 +22,10 @@ configure
 depcomp
 dependencies.m4
 dune-multidomaingrid.pc
-dune_vis
 install-sh
 libtool
 ltmain.sh
 missing
 stamp-h1
 .libs
+*#
