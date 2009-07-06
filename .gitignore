@@ -21,7 +21,7 @@ config.sub
 configure
 depcomp
 dependencies.m4
-dune-vis.pc
+dune-multidomaingrid.pc
 dune_vis
 install-sh
 libtool
