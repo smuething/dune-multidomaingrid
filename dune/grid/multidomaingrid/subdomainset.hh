@@ -178,6 +178,7 @@ public:
   static const std::size_t maxSize = capacity;
   typedef std::size_t DomainType;
   typedef sds_detail::Iterator<DomainType,SetStorage> Iterator;
+  typedef IntegralTypeSubDomainSet<capacity> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
@@ -231,6 +232,10 @@ public:
   void set(DomainType domain) {
     assert(domain < maxSize);
     _set = base << domain;
+  }
+
+  void addAll(const This& rhs) {
+    _set |= rhs._set;
   }
 
   IntegralTypeSubDomainSet() :
