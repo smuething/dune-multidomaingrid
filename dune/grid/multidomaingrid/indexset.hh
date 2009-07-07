@@ -30,7 +30,7 @@ public:
   typedef typename HostGridView::template Codim<0>::Entity HostEntity;
   typedef typename HostIndexSet::IndexType IndexType;
   typedef typename SubDomainSet::DomainType DomainType;
-  typedef typename HostGridView::ctype ctype;
+  typedef typename HostGridView::Grid::ctype ctype;
   static const std::size_t maxSubDomains = SubDomainSet::maxSize;
   static const std::size_t dimension = HostGridView::dimension;
 
