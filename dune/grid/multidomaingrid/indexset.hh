@@ -39,62 +39,94 @@ public:
     IndexType index;
   };
 
-  typedef std::unordered_map<GeometryType,std::vector<MapEntry>,GeometryTypeHash> CellMap;
-  typedef std::unordered_map<GeometryType,std::vector<IndexType>,GeometryTypeHash> SubIndexMap;
-  typedef std::unordered_map<GeometryType,std::array<IndexType,maxSubDomains>,GeometryTypeHash> SizeMap;
+  typedef std::array<IndexType,maxSubDomains> SizeContainer;
+  typedef std::unordered_map<GeometryType,std::vector<MapEntry>,GeometryTypeHash> IndexMap;
+  typedef std::unordered_map<GeometryType,SizeContainer,GeometryTypeHash> SizeMap;
   typedef std::array<IndexType,maxSubDomains> MultiIndexContainer;
 
   void update(bool full) {
     const HostIndexSet& his = _gridView.indexSet();
-    const std::vector<GeometryType>& hgtList = his.geomTypes(0);
     if (full) {
-      _indexMap.swap(CellMap());
-      _indexMap.rehash(hgtList.size());
-      _sizeMap.swap(SizeMap());
-      _sizeMap.rehash(hgtList.size());
+      for (int codim = 0; codim <= dimension; ++codim) {
+	indexMap(codim).swap(IndexMap());
+	indexMap(codim).rehash(his.geomTypes(codim).size());
+	sizeMap(codim).swap(SizeMap());
+	sizeMap(codim).rehash(his.geomTypes(codim).size());
+      }
     }
-    for (std::vector<GeometryType>::const_iterator it = hgtList.begin(); it != hgtList.end(); ++it) {
-      _indexMap[*it].resize(his.size(*it));
-      _sizeMap[*it].assign(0);
+    for (int codim = 0; codim <= dimension; ++codim) {
+      for (std::vector<GeometryType>::const_iterator it = his.geomTypes(codim).begin(); it != his.geomTypes(codim).end(); ++it) {
+	indexMap(codim)[*it].resize(his.size(*it));
+	sizeMap(codim)[*it].assign(0);
+      }
     }
     _multiIndexMap.clear();
     HostEntityIterator end = _gridView.template end<0>();
+    IndexMap& im = indexMap(0);
+    SizeMap& sm = sizeMap(0);
     for (HostEntityIterator it  = _gridView.template begin<0>(); it != end; ++it) {
       const HostEntity& he = *it;
       const GeometryType hgt = he.type();
       IndexType hostIndex = his.index(he);
-      MapEntry& e = _indexMap[hgt][hostIndex];
-      switch (e.domains.state()) {
-      case SubDomainSet::simpleSet:
-	e.index = _sizeMap[hgt][*e.domains.begin()]++;
-	break;
-      case SubDomainSet::multipleSet:
-	e.index = _multiCellMap.size();
-	_multiCellMap.push_back(MultiIndexContainer());
-	MultiIndexContainer& mic = _multiIndexMap.back();
-	for (typename SubDomainSet::Iterator sdit = e.domains.begin(); sdit != e.domains.end(); ++sdit) {
-	  mic[*sdit] = _sizeMap[hgt][*sdit]++;
-	}
+      MapEntry& me = im[hgt][hostIndex];
+      updateMapEntry(me,sm[hgt]);
+      markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt),1);
+    }
+    updateSubIndices(1);
+  }
+
+  void updateMapEntry(MapEntry& me, SizeContainer& sizes) {
+    switch (me.domains.state()) {
+    case SubDomainSet::simpleSet:
+      me.index = sizes[*me.domains.begin()]++;
+      break;
+    case SubDomainSet::multipleSet:
+      me.index = _multiIndexMap.size();
+      _multiIndexMap.push_back(MultiIndexContainer());
+      MultiIndexContainer& mic = _multiIndexMap.back();
+      for (typename SubDomainSet::Iterator it = me.domains.begin(); it != me.domains.end(); ++it) {
+	mic[*it] = sizes[*it]++;
       }
     }
   }
 
-  template<int codim>
-  void updateSubIndices(const HostEntity& e, const GeometryType gt, const SubDomainSet& domains, const HostIndexSet& his) {
-    int count = GenericReferenceElements<ctype,dim-codim>::general(gt).size(codim);
-    for (int i = 0; i < count; ++i) {
+  void markSubIndices(const HostEntity& e, const SubDomainSet& domains, const HostIndexSet& his, const GenericReferenceElement<ctype,dimension>& refEl, int codim) {
+    const int size = refEl.size(codim);
+    IndexMap& im = indexMap(codim);
+    for (int i = 0; i < size; ++i) {
       IndexType hostIndex = his.subIndex(e,i,codim);
+      GeometryType gt = refEl.type(i,codim);
+      im[gt][hostIndex].domains.addAll(domains);
+    }
+    if (codim < dimension) {
+      markSubIndices(e,domains,his,refEl,codim+1);
+    }
+  }
+
+  void updateSubIndices(int codim) {
+    const typename IndexMap::iterator end = indexMap(codim).end();
+    for (typename IndexMap::iterator it = indexMap(codim).begin(); it != end; ++it) {
+      const GeometryType gt = it->first;
+      std::vector<MapEntry>& indices = it->second;
+      SizeContainer& sizes = sizeMap(codim)[gt];
+      const typename std::vector<MapEntry>::iterator end = indices.end();
+      for (typename std::vector<MapEntry>::iterator iit = indices.begin(); iit != end; ++iit) {
+	updateMapEntry(*iit,sizes);
+      }
+    }
+    if (codim < dimension) {
+      updateSubIndices(codim+1);
     }
   }
 
   SubDomainSet& subDomainSet(const HostEntity& e) {
-    return _indexMap[e.type()][_gridView.indexSet().index(e)].domains;
+    return indexMap(0)[e.type()][_gridView.indexSet().index(e)].domains;
   }
 
   IndexType indexForSubDomain(DomainType subDomain, const HostEntity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _gridView.indexSet().index(e);
-    const MapEntry& me = _indexMap[gt][hostIndex];
+    const MapEntry& me = indexMap(0)[gt][hostIndex];
     assert(me.domains.contains(subDomain));
     if (me.domains.simple()) {
       return me.index;
@@ -105,13 +137,26 @@ public:
 
   explicit IndexSet(HostGridView gv) :
     _gridView(gv)
-  {}
+  {
+    for (int codim = 0; codim <= dimension; ++codim) {
+      _indexMap[codim].reset(new IndexMap());
+      _sizeMap[codim].reset(new SizeMap());
+    }
+  }
 
 private:
-  CellMap _indexMap;
-  std::array<SizeMap,dimension+1> _sizeMap;
+  std::array<boost::scoped_ptr<IndexMap>,dimension+1> _indexMap;
+  std::array<boost::scoped_ptr<SizeMap>,dimension+1> _sizeMap;
   std::vector<MultiIndexContainer> _multiIndexMap;
   HostGridView _gridView;
+
+  IndexMap& indexMap(std::size_t codim) {
+    return *(_indexMap[codim]);
+  }
+
+  SizeMap& sizeMap(std::size_t codim) {
+    return *(_sizeMap[codim]);
+  }
 
 };
 
