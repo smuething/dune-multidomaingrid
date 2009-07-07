@@ -12,7 +12,8 @@ namespace multidomaingrid {
 struct GeometryTypeHash {
 
   std::size_t operator()(GeometryType gt) const {
-    return gt.dim() * 509 + static_cast<std::size_t>(gt.basicType());
+    std::size_t hash = gt.dim() * 509;
+    return gt.dim() < 2 ? hash : hash + static_cast<std::size_t>(gt.basicType());
   }
 
 };
