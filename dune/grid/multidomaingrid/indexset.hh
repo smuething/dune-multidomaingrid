@@ -150,6 +150,7 @@ public:
       markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt),1);
     }
     updateSubIndices(1);
+    updatePerCodimSizes();
   }
 
   void updateMapEntry(MapEntry& me, SizeContainer& sizes) {
@@ -196,14 +197,47 @@ public:
     }
   }
 
-  SubDomainSet& subDomainSet(const HostEntity& e) {
-    return indexMap(0)[e.type()][_gridView.indexSet().index(e)].domains;
+  void updatePerCodimSizes() {
+    for (int codim = 0; codim <= dimension; ++codim) {
+      _codimSizes[codim].assign(0);
+      std::for_each(pick_element<1>(sizeMap(codim).begin()),
+		    pick_element<1>(sizeMap(codim).end()),
+		    collect_elementwise(_codimSizes[codim]));
+    }
+  }
+
+  template<class EntityType>
+  SubDomainSet& subDomainSet(const EntityType& e) {
+    return subDomainSet<EntityType::codimension>(e);
+  }
+
+  template<int cc>
+  SubDomainSet& subDomainSet(const typename HostGridView::template Codim<cc>::Entity& e) {
+    return indexMap(cc)[e.type()][_gridView.indexSet().index(e)].domains;
   }
 
   IndexType indexForSubDomain(DomainType subDomain, const HostEntity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _gridView.indexSet().index(e);
     const MapEntry& me = indexMap(0)[gt][hostIndex];
+    assert(me.domains.contains(subDomain));
+    if (me.domains.simple()) {
+      return me.index;
+    } else {
+      return _multiIndexMap[me.index][subDomain];
+    }
+  }
+
+  template<class EntityType>
+  IndexType subIndexForSubDomain(DomainType subDomain, const EntityType& e) {
+    return subIndexForSubDomain<EntityType::codimension>(subDomain,e);
+  }
+
+  template<int cc>
+  IndexType subIndexForSubDomain(DomainType subDomain, const typename HostGridView::template Codim<cc>::Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _gridView.indexSet().index(e);
+    const MapEntry& me = indexMap(cc)[gt][hostIndex];
     assert(me.domains.contains(subDomain));
     if (me.domains.simple()) {
       return me.index;
@@ -224,6 +258,7 @@ public:
 private:
   std::array<boost::scoped_ptr<IndexMap>,dimension+1> _indexMap;
   std::array<boost::scoped_ptr<SizeMap>,dimension+1> _sizeMap;
+  std::array<std::array<IndexType,maxSubDomains>,dimension+1> _codimSizes;
   std::vector<MultiIndexContainer> _multiIndexMap;
   HostGridView _gridView;
 
