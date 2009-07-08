@@ -255,6 +255,12 @@ public:
     }
   }
 
+  std::size_t size(int codim, int subDomain) const {
+    assert(0 <= codim && codim <= dimension);
+    assert(0 <= subDomain && subDomain < maxSubDomains);
+    return _codimSizes[codim][subDomain];
+  }
+
 private:
   std::array<boost::scoped_ptr<IndexMap>,dimension+1> _indexMap;
   std::array<boost::scoped_ptr<SizeMap>,dimension+1> _sizeMap;
