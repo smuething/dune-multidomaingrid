@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     grid.globalRefine(5);
     typedef GridType::LeafGridView GridView;
     GridView gv = grid.leafView();
-    typedef Dune::multidomaingrid::IndexSet<GridView,Dune::multidomaingrid::IntegralTypeSubDomainSet<7> > IndexSet;
+    typedef Dune::multidomaingrid::IndexSet<GridView,Dune::multidomaingrid::IntegralTypeSubDomainSet<3> > IndexSet;
     IndexSet is(gv);
     is.update(true);
     typedef GridView::Codim<0>::Iterator Iterator;
