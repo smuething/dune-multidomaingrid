@@ -4,7 +4,11 @@
 #include <unordered_map>
 #include <vector>
 #include <array>
+#include <algorithm>
+#include <type_traits>
+#include <tuple>
 #include <boost/scoped_ptr.hpp>
+#include <dune/common/iteratorfacades.hh>
 
 namespace Dune {
 
@@ -18,6 +22,78 @@ struct GeometryTypeHash {
   }
 
 };
+
+template<typename T, std::size_t I>
+class TupleElementPickingIterator : public ForwardIteratorFacade<TupleElementPickingIterator<T,I>,
+								 typename std::tuple_element<I,typename T::value_type>::type,
+								 typename std::add_lvalue_reference<typename std::tuple_element<I,typename T::value_type>::type>::type,
+								 typename T::difference_type
+								 > {
+
+public:
+
+  typedef ForwardIteratorFacade<TupleElementPickingIterator<T,I>,
+				typename std::tuple_element<I,typename T::value_type>::type,
+				typename std::add_lvalue_reference<typename std::tuple_element<I,typename T::value_type>::type>::type,
+				typename T::difference_type
+				> BaseType;
+
+  typedef typename BaseType::Reference Reference;
+  typedef typename BaseType::Value Value;
+  typedef TupleElementPickingIterator<T,I> ThisType;
+
+  Reference dereference() const {
+    return std::get<I>(*_it);
+  }
+
+  bool equals(const ThisType& rhs) const {
+    return _it == rhs._it;
+  }
+
+  void increment() {
+    ++_it;
+  }
+
+private:
+
+  T _it;
+
+public:
+
+  TupleElementPickingIterator(T it) :
+    _it(it)
+  {}
+
+};
+
+template<std::size_t I, typename T>
+TupleElementPickingIterator<T,I> pick_element(T it) {
+  return TupleElementPickingIterator<T,I>(it);
+}
+
+template<typename T>
+struct collect_elementwise_struct {
+
+  T& result;
+
+  collect_elementwise_struct(T& r) :
+    result(r)
+  {}
+
+  void operator()(T& val) {
+    typedef typename T::iterator Iterator;
+    Iterator end = result.end();
+    Iterator rit = result.begin();
+    Iterator vit = val.begin();
+    for (; rit != end; ++rit, ++vit)
+      *rit += *vit;
+  }
+};
+
+template<typename T>
+collect_elementwise_struct<T> collect_elementwise(T& result) {
+  return collect_elementwise_struct<T>(result);
+}
 
 template<typename HostGridView, typename SubDomainSetType>
 class IndexSet {
