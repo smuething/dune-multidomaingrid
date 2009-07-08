@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     IndexSet is(gv);
     is.update(true);
     typedef GridView::Codim<0>::Iterator Iterator;
+    typedef GridView::Codim<2>::Iterator VIterator;
     typedef GridView::Codim<0>::Entity Entity;
     typedef GridView::Codim<0>::Geometry Geometry;
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
@@ -39,20 +40,33 @@ int main(int argc, char** argv) {
       }
     }
     is.update(false);
-    std::vector<int> hid(gv.indexSet().size(0),0);
-    std::vector<int> sd0(gv.indexSet().size(0),0);
-    std::vector<int> sd1(gv.indexSet().size(0),0);
+    std::vector<int> hcid(gv.indexSet().size(0),0);
+    std::vector<int> sdc0(gv.indexSet().size(0),0);
+    std::vector<int> sdc1(gv.indexSet().size(0),0);
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
       GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       const IndexSet::SubDomainSet& sds = is.subDomainSet(*it);
-      hid[idx] = idx;
-      sd0[idx] = sds.contains(0) ? is.indexForSubDomain(0,*it) : -1;
-      sd1[idx] = sds.contains(1) ? is.indexForSubDomain(1,*it) : -1;
+      hcid[idx] = idx;
+      sdc0[idx] = sds.contains(0) ? is.indexForSubDomain(0,*it) : -1;
+      sdc1[idx] = sds.contains(1) ? is.indexForSubDomain(1,*it) : -1;
+    }
+    std::vector<int> hvid(gv.indexSet().size(2),0);
+    std::vector<int> sdv0(gv.indexSet().size(2),0);
+    std::vector<int> sdv1(gv.indexSet().size(2),0);
+    for (VIterator it = gv.begin<2>(); it != gv.end<2>(); ++it) {
+      GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
+      const IndexSet::SubDomainSet& sds = is.subDomainSet(*it);
+      hvid[idx] = idx;
+      sdv0[idx] = sds.contains(0) ? is.subIndexForSubDomain(0,*it) : -1;
+      sdv1[idx] = sds.contains(1) ? is.subIndexForSubDomain(1,*it) : -1;
     }
     Dune::VTKWriter<GridView> vtkWriter(gv);
-    vtkWriter.addCellData(sd0,"subdomain0");
-    vtkWriter.addCellData(sd1,"subdomain1");
-    vtkWriter.addCellData(hid,"hostIndex");
+    vtkWriter.addCellData(sdc0,"cell_subdomain0");
+    vtkWriter.addCellData(sdc1,"cell_subdomain1");
+    vtkWriter.addCellData(hcid,"cell_hostIndex");
+    vtkWriter.addVertexData(sdv0,"vertex_subdomain0");
+    vtkWriter.addVertexData(sdv1,"vertex_subdomain1");
+    vtkWriter.addVertexData(hvid,"vertex_hostIndex");
     vtkWriter.write("testindexset",Dune::VTKOptions::binary);
   } catch (Dune::Exception& e) {
     std::cout << e << std::endl;
