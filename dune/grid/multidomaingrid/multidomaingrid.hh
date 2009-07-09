@@ -15,7 +15,7 @@ struct MultiDomainGridFamily {
     HostGrid::dimension,
     HostGrid::dimensionworld,
     MultiDomainGrid<HostGrid>,
-    Geometry,
+    GeometryWrapper,
     Entity,
     EntityPointer,
     LevelIterator,
