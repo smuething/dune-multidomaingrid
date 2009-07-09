@@ -1,82 +1,58 @@
-#ifndef DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
-#define DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
+#ifndef DUNE_MULTIDOMAINGRID_HH
+#define DUNE_MULTIDOMAINGRID_HH
 
-#include <vector>
-#include <string>
-
-#include <dune/common/collectivecommunication.hh>
-#include <dune/grid/common/capabilities.hh>
-#include <dune/grid/common/grid.hh>
-
-#include <dune/common/scopedptr.hh>
+#include <dune/grid/multidomaingrid/multidomaingrid.hh>
 
 namespace Dune {
 
-template <typename HostGrid>
-class MultiDomainGrid;
+using mdgrid::MultiDomainGrid;
 
-template<int dim, typename HostGrid>
-struct MultiDomainGridFamily
-{
-  typedef GridTraits<
-    dim,
-    HostGrid::dimensionworld,
-    MultiDomainGrid<HostGrid>,
-    MultiDomainGridGeometry,
-    MultiDomainGridEntity,
-    MultiDomainGridEntityPointer,
-    MultiDomainGridLevelIterator,
-    MultiDomainGridLeafIntersection,
-    MultiDomainGridLevelIntersection,
-    MultiDomainGridLeafIntersectionIterator,
-    MultiDomainGridLevelIntersectionIterator,
-    MultiDomainGridHierarchicIterator,
-    MultiDomainGridLeafIterator,
-    MultiDomainGridLevelIndexSet<const MultiDomainGrid<HostGrid> >,
-    MultiDomainGridLeafIndexSet<const MultiDomainGrid<HostGrid> >,
-    MultiDomainGridGlobalIdSet<const MultiDomainGrid<HostGrid> >,
-    typename HostGrid::Traits::GlobalIdSet::IdType,
-    MultiDomainGridLocalIdSet<const MultiDomainGrid<HostGrid> >,
-    typename HostGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<MultiDomainGrid<HostGrid> >
-    > Traits;
-};
+namespace Capabilities {
 
-template<typename HostGrid>
-class MultiDomainGrid :
-    public GridDefaultImplementation<HostGrid::dimension,
-				     HostGrid::dimensionworld,
-				     HostGrid::ctype,
-				     MultiDomainGridFamily<
-				       HostGrid::dimension,
-				       HostGrid
-				       >
-				     > {
-
-public:
-
-  typedef MultiDomainGridFamily<HostGrid::dimension,HostGrid> GridFamily;
-
-  typedef typename GridFamily::Traits Traits;
-
-  typedef typename HostGrid::ctype ctype;
-
-  explicit MultiDomainGrid(HostGrid& hostgrid) :
-    _hostgrid(hostgrid),
-    _leafIndexSet(*this),
-    _globalIdSet(*this),
-    _localIdSet(*this)
+  template<class HostGrid, int codim>
+  struct hasEntity<MultiDomainGrid<HostGrid>, codim>
   {
+    static const bool v = hasEntity<HostGrid,codim>::v;
+  };
+  
 
-  }
+  template<class HostGrid>
+  struct isParallel<MultiDomainGrid<HostGrid> >
+  {
+    static const bool v = isParallel<HostGrid>::v;
+  };
 
-private:
 
-};
+  template<class HostGrid>
+  struct hasHangingNodes<MultiDomainGrid<HostGrid> >
+  {
+    static const bool v = hasHangingNodes<HostGrid>::v;
+  };
 
-} // namespace multidomaingrid
+
+  template<class HostGrid>
+  struct isLevelwiseConforming<MultiDomainGrid<HostGrid> >
+  {
+    static const bool v = isLevelwiseConforming<HostGrid>::v;
+  };
+
+
+  template<class HostGrid>
+  struct isLeafwiseConforming<MultiDomainGrid<HostGrid> >
+  {
+    static const bool v = isLeafwiseConforming<HostGrid>::v;
+  };
+
+
+  template<class HostGrid>
+  struct isUnstructured<MultiDomainGrid<HostGrid> >
+  {
+    static const bool v = isUnstructured<HostGrid>::v;
+  };
+
+
+} // namespace Capabilities
 
 } // namespace Dune
 
-
-#endif // DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
+#endif // DUNE_MULTIDOMAINGRID_HH
