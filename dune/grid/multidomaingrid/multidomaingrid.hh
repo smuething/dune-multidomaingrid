@@ -27,9 +27,9 @@ struct MultiDomainGridFamily {
     LeafIterator,
     LevelIndexSet<const MultiDomainGrid<HostGrid> >,
     LeafIndexSet<const MultiDomainGrid<HostGrid> >,
-    GlobalIdSet<const MultiDomainGrid<HostGrid> >,
+    IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet>,
     typename HostGrid::Traits::GlobalIdSet::IdType,
-    LocalIdSet<const MultiDomainGrid<HostGrid> >,
+    IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet>,
     typename HostGrid::Traits::LocalIdSet::IdType,
     CollectiveCommunication<MultiDomainGrid<HostGrid> >
     > Traits;
