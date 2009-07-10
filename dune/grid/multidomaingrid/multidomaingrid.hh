@@ -197,12 +197,12 @@ private:
 
   template<typename EntityType>
   typename HostEntity<EntityType>::type& hostEntity(EntityType& e) const {
-    return e.wrappedEntity();
+    return getRealImplementation(e).wrappedEntity();
   }
 
   template<typename EntityType>
   typename const HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
-    return e.wrappedEntity();
+    return getRealImplementation(e).wrappedEntity();
   }
 
 };
