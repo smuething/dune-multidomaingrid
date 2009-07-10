@@ -173,6 +173,25 @@ public:
     return _hostGrid.ghostSize(codim);
   }
 
+private:
+
+  HostGrid& _hostGrid;
+
+  template<typename Entity>
+  struct HostEntity {
+    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
+  };
+
+  template<typename EntityType>
+  typename HostEntity<EntityType>::type& hostEntity(EntityType& e) const {
+    return e.wrappedEntity();
+  }
+
+  template<typename EntityType>
+  typename const HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
+    return e.wrappedEntity();
+  }
+
 };
 
 } // namespace mdgrid
