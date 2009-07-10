@@ -66,7 +66,9 @@ public:
 
   explicit MultiDomainGrid(HostGrid& hostGrid) :
     _hostGrid(hostGrid)
-  {}
+  {
+    updateIndexSets();
+  }
 
   std::string name() const {
     return "MultiDomainGrid";
@@ -166,7 +168,9 @@ public:
   }
 
   bool adapt() {
-    return _hostGrid.adapt();
+    bool r = _hostGrid.adapt();
+    updateIndexSets();
+    return r;
   }
 
   void postAdapt() {
