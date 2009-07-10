@@ -73,7 +73,7 @@ public:
   }
 
   std::size_t maxLevel() const {
-    return _hostGrid->maxLevel();
+    return _hostGrid.maxLevel();
   }
 
   template<int codim>
