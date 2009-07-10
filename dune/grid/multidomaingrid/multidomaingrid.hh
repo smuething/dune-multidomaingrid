@@ -65,7 +65,10 @@ public:
   typedef typename HostGrid::ctype ctype;
 
   explicit MultiDomainGrid(HostGrid& hostGrid) :
-    _hostGrid(hostGrid)
+    _hostGrid(hostGrid),
+    _leafIndexSet(*this),
+    _globalIdSet(*this),
+    _localIdSet(*this)
   {
     updateIndexSets();
   }
@@ -194,8 +197,9 @@ public:
   }
 
   void updateIndexSets() {
+    // make sure we have enough LevelIndexSets
     if (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.resize(maxLevel()+1);
+      _levelIndexSets.resize(maxLevel()+1,typename Traits::LevelIndexSet(*this));
     }
 
     for (int l = 0; l <= maxLevel(); ++l) {
@@ -212,11 +216,11 @@ private:
 
   HostGrid& _hostGrid;
 
-  std::vector<LevelIndexSetWrapper> _levelIndexSets;
-  LeafIndexSetWrapper _leafIndexSet;
+  std::vector<typename Traits::LevelIndexSet> _levelIndexSets;
+  typename Traits::LeafIndexSet _leafIndexSet;
 
-  GlobalIdSet _globalIdSet;
-  LocalIdSet _localIdSet;
+  typename Traits::GlobalIdSet _globalIdSet;
+  typename Traits::LocalIdSet _localIdSet;
 
   template<typename Entity>
   struct HostEntity {
