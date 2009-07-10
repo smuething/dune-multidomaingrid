@@ -188,9 +188,30 @@ public:
     return _hostGrid.ghostSize(codim);
   }
 
+  void updateIndexSets() {
+    if (_levelIndexSets.size() <= maxLevel()) {
+      _levelIndexSets.resize(maxLevel()+1);
+    }
+
+    for (int l = 0; l <= maxLevel(); ++l) {
+      _levelIndexSets[i].update(_hostGrid.levelIndexSet(l));
+    }
+
+    _leafIndexSet.update(_hostGrid.leafIndexSet());
+
+    _globalIdSet.update(_hostGrid.globalIdSet());
+    _localIdSet.update(_hostGrid.localIdSet());
+  }
+
 private:
 
   HostGrid& _hostGrid;
+
+  std::vector<LevelIndexSetWrapper> _levelIndexSets;
+  LeafIndexSetWrapper _leafIndexSet;
+
+  GlobalIdSet _globalIdSet;
+  LocalIdSet _localIdSet;
 
   template<typename Entity>
   struct HostEntity {
