@@ -21,49 +21,53 @@ public:
 
   template<int codim>
   IndexType index(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {
-    return _wrappedIndexSet.index(_grid.hostEntity(e));
+    return _wrappedIndexSet->index(_grid.hostEntity(e));
   }
 
   template<typename Entity>
   IndexType index(const Entity& e) const {
-    return _wrappedIndexSet.index(_grid.hostEntity(e));
+    return _wrappedIndexSet->index(_grid.hostEntity(e));
   }
 
   template<int codim>
   IndexType subIndex(const Codim0Entity& e, int i) const {
-    return _wrappedIndexSet.subIndex(_grid.hostEntity(e),i,codim);
+    return _wrappedIndexSet->subIndex(_grid.hostEntity(e),i,codim);
   }
 
   IndexType subIndex(const Codim0Entity& e, int i, unsigned int codim) const {
-    return _wrappedIndexSet.subIndex(_grid.hostEntity(e),i,codim);
+    return _wrappedIndexSet->subIndex(_grid.hostEntity(e),i,codim);
   }
 
   const std::vector<GeometryType>& geomTypes(int codim) const {
-    return _wrappedIndexSet.geomTypes(codim);
+    return _wrappedIndexSet->geomTypes(codim);
   }
 
   IndexType size(GeometryType type) const {
-    return _wrappedIndexSet.size(type);
+    return _wrappedIndexSet->size(type);
   }
 
   IndexType size(int codim) const {
-    return _wrappedIndexSet.size(codim);
+    return _wrappedIndexSet->size(codim);
   }
 
   template<typename Entity&>
   bool contains(const Entity& e) const {
-    return _wrappedIndexSet.contains(_grid.hostEntity(e));
+    return _wrappedIndexSet->contains(_grid.hostEntity(e));
   }
 
 private:
 
   const GridImp& _grid;
-  const WrappedIndexSet& _wrappedIndexSet;
+  const WrappedIndexSet* _wrappedIndexSet;
 
-  IndexSetWrapper(const GridImp& grid, const WrappedIndexSet& wrappedIndexSet) :
+  IndexSetWrapper(const GridImp& grid) :
     _grid(grid),
-    _wrappedIndexSet(wrappedIndexSet)
+    _wrappedIndexSet(NULL)
   {}
+
+  void update(const WrappedIndexSet& indexSet) {
+    _wrappedIndexSet = indexSet;
+  }
 
 };
 
