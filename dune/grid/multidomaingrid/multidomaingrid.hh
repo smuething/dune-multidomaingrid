@@ -133,19 +133,20 @@ public:
   }
 
   const typename Traits::GlobalIdSet& globalIdSet() const {
-    return ...;
+    return _globalIdSet;
   }
 
   const typename Traits::LocalIdSet& localIdSet() const {
-    return ...;
+    return _localIdSet;
   }
 
   const typename Traits::LevelIndexSet& levelIndexSet(int level) const {
-    return ...;
+    assert(level <= maxLevel());
+    return _levelIndexSets[level];
   }
 
   const typename Traits::LeafIndexSet& leafIndexSet() const {
-    return ...;
+    return _leafIndexSet;
   }
 
   void globalRefine(int refCount) {
