@@ -1,6 +1,19 @@
 #ifndef DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
 #define DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
 
+#include <string>
+
+#include <dune/grid/multidomaingrid/geometry.hh>
+#include <dune/grid/multidomaingrid/entity.hh>
+#include <dune/grid/multidomaingrid/entitypointer.hh>
+#include <dune/grid/multidomaingrid/leafiterator.hh>
+#include <dune/grid/multidomaingrid/leveliterator.hh>
+#include <dune/grid/multidomaingrid/hierarchiciterator.hh>
+#include <dune/grid/multidomaingrid/intersectioniterator.hh>
+#include <dune/grid/multidomaingrid/idsets.hh>
+#include <dune/grid/multidomaingrid/indexsets.hh>
+
+
 namespace Dune {
 
 namespace mdgrid {
