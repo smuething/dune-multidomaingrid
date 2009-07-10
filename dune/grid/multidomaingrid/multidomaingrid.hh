@@ -16,15 +16,15 @@ struct MultiDomainGridFamily {
     HostGrid::dimensionworld,
     MultiDomainGrid<HostGrid>,
     GeometryWrapper,
-    Entity,
-    EntityPointer,
-    LevelIterator,
-    LeafIntersection,
-    LevelIntersection,
-    LeafIntersectionIterator,
-    LevelIntersectionIterator,
-    HierarchicIterator,
-    LeafIterator,
+    EntityWrapper,
+    EntityPointerWrapper,
+    LevelIteratorWrapper,
+    LeafIntersectionIteratorWrapper, // leaf intersection
+    LevelIntersectionIteratorWrapper, // level intersection
+    LeafIntersectionIteratorWrapper, // leaf intersection iterator
+    LevelIntersectionIteratorWrapper, // level intersection iterator
+    HierarchicIteratorWrapper,
+    LeafIteratorWrapper,
     IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LevelIndexSet>,
     IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LeafIndexSet>,
     IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet>,
