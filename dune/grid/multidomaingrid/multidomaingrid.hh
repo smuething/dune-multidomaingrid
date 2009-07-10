@@ -78,42 +78,42 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return ...;
+    return LevelIteratorWrapper<codim,All_Partition,GridImp>(_hostgrid.lbegin(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return ...;
+    return LevelIteratorWrapper<codim,All_Partition,GridImp>(_hostgrid.lend(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return ...;
+    return LevelIteratorWrapper<codim,PiType,GridImp>(_hostgrid.lbegin(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return ...;
+    return LevelIteratorWrapper<codim,PiType,GridImp>(_hostgrid.lend(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
-    return ...;
+    return LeafIteratorWrapper<codim,All_Partition,GridImp>(_hostgrid.leafbegin());
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafEnd() const {
-    return ...;
+    return LeafIteratorWrapper<codim,All_Partition,GridImp>(_hostgrid.leafend());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
-    return ...;
+    return LeafIteratorWrapper<codim,PiType,GridImp>(_hostgrid.leafbegin());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
-    return ...;
+    return LeafIteratorWrapper<codim,PiType,GridImp>(_hostgrid.leafend());
   }
 
   int size(int level, int codim) const {
