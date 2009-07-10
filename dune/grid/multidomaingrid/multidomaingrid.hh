@@ -56,6 +56,8 @@ class MultiDomainGrid :
 				     HostGrid::ctype,
 				     MultiDomainGridFamily<HostGrid> > {
 
+  typedef MultiDomainGrid<HostGrid> GridImp;
+
 public:
 
   typedef MultiDomainGridFamily<HostGrid> GridFamily;
