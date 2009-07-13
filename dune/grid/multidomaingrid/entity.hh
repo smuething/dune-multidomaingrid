@@ -119,18 +119,23 @@ public:
   }
 
   LeafIntersectionIterator ileafbegin() const {
+    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafbegin());
   }
 
   LeafIntersectionIterator ileafend() const {
+    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafend());
   }
 
   LevelIntersectionIterator ilevelbegin() const {
+    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelbegin());
   }
 
   LevelIntersectionIterator ilevelend() const {
+    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelend());
   }
 
   EntityPointer father() const {
+    return EntityPointerWrapper<codim,GridImp>(_hostEntityPointer->father());
   }
 
   bool isLeaf() const {
@@ -149,9 +154,11 @@ public:
   }
 
   HierarchicIterator hbegin(int maxlevel) const {
+    return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hbegin(maxLevel));
   }
 
   HierarchicIterator hend(int maxlevel) const {
+    return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hend(maxLevel));
   }
 
   bool isNew() const {
