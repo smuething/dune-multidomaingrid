@@ -16,7 +16,7 @@ class IndexSetWrapper :
 
 public:
 
-  typedef WrappedIndexSet::IndexType IndexType;
+  typedef typename WrappedIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
 
   template<int codim>
@@ -50,8 +50,8 @@ public:
     return _wrappedIndexSet->size(codim);
   }
 
-  template<typename Entity&>
-  bool contains(const Entity& e) const {
+  template<typename EntityType>
+  bool contains(const EntityType& e) const {
     return _wrappedIndexSet->contains(_grid.hostEntity(e));
   }
 

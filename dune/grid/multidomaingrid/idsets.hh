@@ -16,7 +16,7 @@ class IdSetWrapper :
 
 public:
 
-  typedef WrappedIdSet::IdType IdType;
+  typedef typename WrappedIdSet::IdType IdType;
 
   template<int codim>
   IdType id(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {

@@ -45,9 +45,9 @@ namespace Capabilities {
 
 
   template<class HostGrid>
-  struct isUnstructured<MultiDomainGrid<HostGrid> >
+  struct IsUnstructured<MultiDomainGrid<HostGrid> >
   {
-    static const bool v = isUnstructured<HostGrid>::v;
+    static const bool v = IsUnstructured<HostGrid>::v;
   };
 
 

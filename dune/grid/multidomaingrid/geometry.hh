@@ -62,12 +62,12 @@ public:
     return _wrappedGeometry.volume();
   }
 
-  const FieldMatrix<ctype,mydimension,coorddimension)&
+  const FieldMatrix<ctype,mydimension,coorddimension>&
   jacobianTransposed(const LocalCoords& local) const {
     return _wrappedGeometry.jacobianTransposed(local);
   }
 
-  const FieldMatrix<ctype,coorddimension,mydimension)&
+  const FieldMatrix<ctype,coorddimension,mydimension>&
   jacobianInverseTransposed(const LocalCoords& local) const {
     return _wrappedGeometry.jacobianInverseTransposed(local);
   }

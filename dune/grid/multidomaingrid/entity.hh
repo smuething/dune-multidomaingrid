@@ -6,22 +6,37 @@ namespace Dune {
 namespace mdgrid {
 
 template<int codim, int dim, typename GridImp>
-class MakeableEntity :
+class EntityWrapper;
+
+template<int codim, typename GridImp>
+class EntityPointerWrapper;
+
+template<typename GridImp>
+class LeafIntersectionIteratorWrapper;
+
+template<typename GridImp>
+class LevelIntersectionIteratorWrapper;
+
+template<typename GridImp>
+class HierarchicIteratorWrapper;
+
+template<int codim, int dim, typename GridImp>
+class MakeableEntityWrapper :
     public GridImp::template Codim<codim>::Entity
 {
   
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
   
-  MakeableEntity(const GridImp& grid, const HostEntityPointer& hostEntityPointer) :
-    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,const GridImp>(grid,hostEntityPointer))
+  MakeableEntityWrapper(const GridImp& grid, const HostEntityPointer& hostEntityPointer) :
+    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,hostEntityPointer))
   {}
 
   void reset(const HostEntityPointer& hostEntityPointer) {
-    realEntity().reset(hostEntityPointer);
+    this->getRealImp().reset(hostEntityPointer);
   }
 
   void compactify() {
-    realEntity().compactify();
+    this->getRealImp().compactify();
   }
 
 };
@@ -32,12 +47,14 @@ class EntityWrapper :
     public EntityDefaultImplementation<codim,dim,GridImp,EntityWrapper>
 {
 
+  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+
 public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
   
   EntityWrapper(const GridImp& grid, const HostEntityPointer& e) :
-    _hostEntityPointer(&hostEntityPointer)
+    _hostEntityPointer(&e)
   {}
 
   int level() const {
@@ -53,7 +70,7 @@ public:
     return _hostEntityPointer->template count<cc>();
   }
 
-  const Geometry& geometry const() {
+  const Geometry& geometry() const {
     if (_geometry == NULL) {
       _geometry.reset(new MakeableInterfaceObject<Geometry>(_hostEntityPointer->geometry()));
     }
@@ -89,6 +106,12 @@ public:
 
   typedef typename GridImp::template Codim<0>::Geometry Geometry;
   typedef typename GridImp::template Codim<0>::LocalGeometry LocalGeometry;
+  typedef typename GridImp::Traits::LeafIntersectionIterator LeafIntersectionIterator;
+  typedef typename GridImp::Traits::LevelIntersectionIterator LevelIntersectionIterator;
+  typedef typename GridImp::Traits::template Codim<0>::HierarchicIterator HierarchicIterator;
+  typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
+
+
 
   int level() const {
     return _hostEntityPointer->level();
@@ -135,7 +158,7 @@ public:
   }
 
   EntityPointer father() const {
-    return EntityPointerWrapper<codim,GridImp>(_hostEntityPointer->father());
+    return EntityPointerWrapper<0,GridImp>(_hostEntityPointer->father());
   }
 
   bool isLeaf() const {
@@ -153,11 +176,11 @@ public:
     return *_fatherGeometry;
   }
 
-  HierarchicIterator hbegin(int maxlevel) const {
+  HierarchicIterator hbegin(int maxLevel) const {
     return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hbegin(maxLevel));
   }
 
-  HierarchicIterator hend(int maxlevel) const {
+  HierarchicIterator hend(int maxLevel) const {
     return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hend(maxLevel));
   }
 
@@ -170,6 +193,9 @@ public:
   }
 
 private:
+
+  typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
+
   HostEntityPointer _hostEntityPointer;
   mutable boost::scoped_ptr<MakeableInterfaceObject<Geometry> > _geometry;
   mutable boost::scoped_ptr<MakeableInterfaceObject<LocalGeometry> > _fatherGeometry;

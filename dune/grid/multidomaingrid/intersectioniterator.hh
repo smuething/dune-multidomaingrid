@@ -5,29 +5,30 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename GridImpl, WrapperImpl>
+template<typename GridImp, typename WrapperImp>
 class IntersectionIteratorWrapper {
 
-  typedef typename WrapperImpl::HostIntersectionIterator HostIntersectionIterator;
-  typedef typename WrapperImpl::Intersection Intersection;
+  typedef typename WrapperImp::HostIntersectionIterator HostIntersectionIterator;
+  typedef typename WrapperImp::Intersection Intersection;
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
   typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
   typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
   typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
 
-  typedef GridImp::ctype ctype;
+  typedef typename 
+GridImp::ctype ctype;
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;
 
   typedef FieldVector<ctype,dimensionworld> GlobalCoords;
-  typedef FieldVector<ctype,dimension - 1> LocalCoords:
+  typedef FieldVector<ctype,dimension - 1> LocalCoords;
 
   explicit IntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
     _hostIterator(hostIterator)
   {}
 
-  bool equals(const WrapperImpl& rhs) const {
+  bool equals(const WrapperImp& rhs) const {
     return _hostIterator == rhs._hostIterator;
   }
 
@@ -81,7 +82,7 @@ class IntersectionIteratorWrapper {
     if (_geometryInOutside == NULL) {
       _geometryInOutside = new MakeableInterfaceObject<LocalGeometry>(_hostIterator->geometryInOutside());
     }
-    return *_geometryOutInside;
+    return *_geometryInOutside;
   }
 
   const LocalGeometry& intersectionNeighborLocal() const {
@@ -131,24 +132,22 @@ class IntersectionIteratorWrapper {
     return _hostIterator->unitOuterNormal(local);
   }
 
+private:
+  HostIntersectionIterator _hostIterator;
   boost::scoped_ptr<MakeableInterfaceObject<LocalGeometry> > _geometryInInside;
   boost::scoped_ptr<MakeableInterfaceObject<LocalGeometry> > _geometryInOutside;
   boost::scoped_ptr<MakeableInterfaceObject<Geometry> > _geometry;
 
-protected:
-
-  boost::scoped_ptr<MakeableInterfaceObject<LocalGeometry> > _geometryInInside;
-
 };
 
 
-template<typename GridImpl>
+template<typename GridImp>
 class LeafIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,LeafIntersectionIteratorWrapper<GridImp> >
 {
 
-  typedef GridImpl::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
-  typedef GridImpl::Traits::LeafIntersection Intersection;
+  typedef typename GridImp::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
+  typedef typename GridImp::Traits::LeafIntersection Intersection;
 
   explicit LeafIntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
     IntersectionIteratorWrapper<GridImp,LeafIntersectionIteratorWrapper<GridImp> >(hostIterator)
@@ -157,13 +156,13 @@ class LeafIntersectionIteratorWrapper :
 };
 
 
-template<typename GridImpl>
-class LebelIntersectionIteratorWrapper :
+template<typename GridImp>
+class LevelIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,LevelIntersectionIteratorWrapper<GridImp> >
 {
 
-  typedef GridImpl::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
-  typedef GridImpl::Traits::LevelIntersection Intersection;
+  typedef typename GridImp::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
+  typedef typename GridImp::Traits::LevelIntersection Intersection;
 
   explicit LevelIntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
    IntersectionIteratorWrapper<GridImp,LevelIntersectionIteratorWrapper<GridImp> >(hostIterator)

@@ -12,13 +12,13 @@ class LevelIteratorWrapper :
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator HostLevelIterator;
 
-  explicit LeafIteratorWrapper(const HostLevelIterator& hostIterator) :
+  explicit LevelIteratorWrapper(const HostLevelIterator& hostIterator) :
     _hostIterator(hostIterator)
   {}
 
   void increment() {
     ++_hostIterator;
-    _hostEntity.reset(_hostIterator);
+    this->_entityWrapper.reset(_hostIterator);
   }
 
   HostLevelIterator _hostIterator;

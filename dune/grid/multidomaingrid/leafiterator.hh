@@ -18,7 +18,7 @@ class LeafIteratorWrapper :
 
   void increment() {
     ++_hostIterator;
-    _hostEntity.reset(_hostIterator);
+    this->_entityWrapper.reset(_hostIterator);
   }
 
   HostLeafIterator _hostIterator;

@@ -18,7 +18,7 @@ class HierarchicIteratorWrapper :
 
   void increment() {
     ++_hostIterator;
-    _hostEntity.reset(_hostIterator);
+    this->_entityWrapper.reset(_hostIterator);
   }
 
   HostHierarchicIterator _hostIterator;
