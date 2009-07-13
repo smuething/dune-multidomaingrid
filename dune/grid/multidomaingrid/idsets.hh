@@ -5,11 +5,17 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename HostGrid>
+class MultiDomainGrid;
+
 template<typename GridImp, typename WrappedIdSet>
 class IdSetWrapper :
     public Dune::IdSet<GridImp,IdSetWrapper<GridImp,WrappedIdSet>,
 		       typename WrappedIdSet::IdType>
 {
+
+  template<typename HostGrid>
+  friend class MultiDomainGrid;
 
   typedef typename remove_const<GridImp>::type::HostGridType HostGrid;
   typedef typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity Codim0Entity;

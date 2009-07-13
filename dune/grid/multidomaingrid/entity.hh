@@ -108,7 +108,7 @@ public:
   typedef typename GridImp::template Codim<0>::LocalGeometry LocalGeometry;
   typedef typename GridImp::Traits::LeafIntersectionIterator LeafIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersectionIterator LevelIntersectionIterator;
-  typedef typename GridImp::Traits::template Codim<0>::HierarchicIterator HierarchicIterator;
+  typedef typename GridImp::Traits::HierarchicIterator HierarchicIterator;
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
 
 

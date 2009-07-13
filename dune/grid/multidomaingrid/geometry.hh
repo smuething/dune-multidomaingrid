@@ -1,6 +1,8 @@
 #ifndef DUNE_MULTIDOMAINGRID_GEOMETRY_HH
 #define DUNE_MULTIDOMAINGRID_GEOMETRY_HH
 
+#include <dune/grid/common/geometry.hh>
+
 namespace Dune {
 
 namespace mdgrid {
@@ -22,7 +24,7 @@ private:
 
   typedef FieldVector<ctype,coorddimension> GlobalCoords;
   typedef FieldVector<ctype,mydimension> LocalCoords;
-  typedef typename GridImp::HostGridType::Traits::template Codim<dimension-mydim>::Geometry HostGridGeometry;
+  typedef typename GridImp::HostGridType::Traits::template Codim<dimension-mydim>::Geometry HostGridGeometry; //TODO: fix this
 
 public:
 

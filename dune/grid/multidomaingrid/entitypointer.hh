@@ -13,7 +13,7 @@ class EntityPointerWrapper
 
 public:
 
-  typedef EntityPointerWrapper EntityPointerImpl;
+  typedef EntityPointerWrapper EntityPointerImp;
 
   static const int codimension = codim;
 

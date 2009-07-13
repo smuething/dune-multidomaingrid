@@ -56,7 +56,41 @@ class MultiDomainGrid :
 				     typename HostGrid::ctype,
 				     MultiDomainGridFamily<HostGrid> > {
 
+
+  template<int codim, int dim, typename GridImp>
+  friend class EntityWrapper;
+
+  template<int codim, int dim, typename GridImp>
+  friend class MakeableEntityWrapper;
+
+  template<int codim, typename GridImp>
+  friend class EntityPointerWrapper;
+
+  template<int codim, PartitionIteratorType pitype, typename GridImp>
+  friend class LeafIteratorWrapper;
+
+  template<int codim, PartitionIteratorType pitype, typename GridImp>
+  friend class LevelIteratorWrapper;
+
+  template<int mydim, int coorddim, typename GridImp>
+  friend class GeometryWrapper;
+
+  template<typename GridImp, typename WrappedIndexSet>
+  friend class IndexSetWrapper;
+
+  template<typename GridImp, typename WrappedIdSet>
+  friend class IdSetWrapper;
+
   typedef MultiDomainGrid<HostGrid> GridImp;
+  typedef HostGrid HostGridType;
+
+  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LevelIndexSet> LevelIndexSetImp;
+
+  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LeafIndexSet> LeafIndexSetImp;
+
+  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
+
+  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
 
 public:
 
@@ -199,7 +233,7 @@ public:
   void updateIndexSets() {
     // make sure we have enough LevelIndexSets
     if (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.resize(maxLevel()+1,typename Traits::LevelIndexSet(*this));
+      _levelIndexSets.resize(maxLevel()+1,LevelIndexSetImp(*this));
     }
 
     for (int l = 0; l <= maxLevel(); ++l) {
@@ -217,10 +251,10 @@ private:
   HostGrid& _hostGrid;
 
   std::vector<typename Traits::LevelIndexSet> _levelIndexSets;
-  typename Traits::LeafIndexSet _leafIndexSet;
+  LeafIndexSetImp _leafIndexSet;
 
-  typename Traits::GlobalIdSet _globalIdSet;
-  typename Traits::LocalIdSet _localIdSet;
+  GlobalIdSetImp _globalIdSet;
+  LocalIdSetImp _localIdSet;
 
   template<typename Entity>
   struct HostEntity {
