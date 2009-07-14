@@ -45,7 +45,7 @@ struct MultiDomainGridFamily {
     typename HostGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet>,
     typename HostGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<MultiDomainGrid<HostGrid> >
+    CollectiveCommunication<HostGrid>
     > Traits;
 
 };
@@ -233,6 +233,10 @@ public:
 
   int ghostSize(int codim) const {
     return _hostGrid.ghostSize(codim);
+  }
+
+  const typename Traits::CollectiveCommunication& comm() const {
+    return _hostGrid.comm();
   }
 
   void updateIndexSets() {
