@@ -54,7 +54,7 @@ private:
   {}
 
   void update(const WrappedIdSet& idSet) {
-    _wrappedIdSet = idSet;
+    _wrappedIdSet = &idSet;
   }
 
 };

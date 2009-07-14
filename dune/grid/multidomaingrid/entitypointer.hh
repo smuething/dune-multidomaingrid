@@ -31,7 +31,7 @@ public:
   {}
 
   bool equals(const EntityPointerWrapper<codim,GridImp>& rhs) const {
-    return _entityWrapper == rhs._entityWrapper;
+    return _entityWrapper.hostEntityPointer() == rhs._entityWrapper.hostEntityPointer();
   }
 
   Entity& dereference() const {
@@ -48,7 +48,7 @@ public:
 
 protected:
 
-  MakeableEntityWrapper<codim,dim,GridImp> _entityWrapper;
+  mutable MakeableEntityWrapper<codim,dim,GridImp> _entityWrapper;
 
 };
 

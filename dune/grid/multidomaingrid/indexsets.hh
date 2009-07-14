@@ -72,7 +72,7 @@ private:
   {}
 
   void update(const WrappedIndexSet& indexSet) {
-    _wrappedIndexSet = indexSet;
+    _wrappedIndexSet = &indexSet;
   }
 
 };

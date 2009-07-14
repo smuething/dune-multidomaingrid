@@ -2,6 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 #include <dune/grid/multidomaingrid/geometry.hh>
 #include <dune/grid/multidomaingrid/entity.hh>
@@ -75,6 +76,9 @@ class MultiDomainGrid :
   template<int mydim, int coorddim, typename GridImp>
   friend class GeometryWrapper;
 
+  template<int mydim, int coorddim, typename GridImp>
+  friend class MakeableGeometryWrapper;
+
   template<typename GridImp, typename WrappedIndexSet>
   friend class IndexSetWrapper;
 
@@ -117,42 +121,42 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,GridImp>(_hostGrid.lbegin(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lbegin<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,GridImp>(_hostGrid.lend(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,GridImp>(_hostGrid.lbegin(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template lbegin<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,GridImp>(_hostGrid.lend(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,All_Partition,GridImp>(_hostGrid.leafbegin());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafbegin<codim>());
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafEnd() const {
-    return LeafIteratorWrapper<codim,All_Partition,GridImp>(_hostGrid.leafend());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafend<codim>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,PiType,GridImp>(_hostGrid.leafbegin());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafbegin<codim,PiType>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,PiType,GridImp>(_hostGrid.leafend());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafend<codim,PiType>());
   }
 
   int size(int level, int codim) const {
@@ -181,7 +185,7 @@ public:
 
   const typename Traits::LevelIndexSet& levelIndexSet(int level) const {
     assert(level <= maxLevel());
-    return _levelIndexSets[level];
+    return *_levelIndexSets[level];
   }
 
   const typename Traits::LeafIndexSet& leafIndexSet() const {
@@ -232,12 +236,12 @@ public:
 
   void updateIndexSets() {
     // make sure we have enough LevelIndexSets
-    if (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.resize(maxLevel()+1,LevelIndexSetImp(*this));
+    while (_levelIndexSets.size() <= maxLevel()) {
+      _levelIndexSets.push_back(new LevelIndexSetImp(*this));
     }
 
     for (int l = 0; l <= maxLevel(); ++l) {
-      _levelIndexSets[l].update(_hostGrid.levelIndexSet(l));
+      _levelIndexSets[l]->update(_hostGrid.levelIndexSet(l));
     }
 
     _leafIndexSet.update(_hostGrid.leafIndexSet());
@@ -250,7 +254,7 @@ private:
 
   HostGrid& _hostGrid;
 
-  std::vector<typename Traits::LevelIndexSet> _levelIndexSets;
+  std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
   LeafIndexSetImp _leafIndexSet;
 
   GlobalIdSetImp _globalIdSet;
@@ -261,14 +265,15 @@ private:
     typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
   };
 
+  /*
   template<typename EntityType>
   typename HostEntity<EntityType>::type& hostEntity(EntityType& e) const {
     return getRealImplementation(e).wrappedEntity();
-  }
+    }*/
 
   template<typename EntityType>
   const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
-    return getRealImplementation(e).wrappedEntity();
+    return *(getRealImplementation(e).hostEntityPointer());
   }
 
 };
