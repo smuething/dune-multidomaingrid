@@ -194,6 +194,7 @@ public:
 
   void globalRefine(int refCount) {
     _hostGrid.globalRefine(refCount);
+    updateIndexSets();
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
