@@ -145,7 +145,7 @@ public:
   }
 
   template<int codim>
-  typename Traits::template Codim<codim>::LeafIterator leafEnd() const {
+  typename Traits::template Codim<codim>::LeafIterator leafend() const {
     return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafend<codim>());
   }
 
