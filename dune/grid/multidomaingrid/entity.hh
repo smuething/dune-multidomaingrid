@@ -183,11 +183,8 @@ public:
   }
 
   template<int cc>
-  typename GridImp::template Codim<cc>::EntityPointer entity(int i) const {
-  }
-
-  template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
+    return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->subEntity<cc>(i));
   }
 
   LeafIntersectionIterator ileafbegin() const {
