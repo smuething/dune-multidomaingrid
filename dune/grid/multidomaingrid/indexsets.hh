@@ -1,6 +1,15 @@
 #ifndef DUNE_MULTIDOMAINGRID_INDEXSETS_HH
 #define DUNE_MULTIDOMAINGRID_INDEXSETS_HH
 
+#include <unordered_map>
+#include <vector>
+#include <array>
+#include <algorithm>
+#include <type_traits>
+#include <tuple>
+#include <boost/bind.hpp>
+#include <dune/grid/multidomaingrid/utility.hh>
+
 namespace Dune {
 
 namespace mdgrid {

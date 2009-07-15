@@ -8,97 +8,21 @@
 #include <type_traits>
 #include <tuple>
 #include <boost/scoped_ptr.hpp>
-#include <dune/common/iteratorfacades.hh>
+#include <boost/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+#include <dune/grid/multidomaingrid/utility.hh>
 
 namespace Dune {
 
-namespace multidomaingrid {
-
-struct GeometryTypeHash {
-
-  std::size_t operator()(GeometryType gt) const {
-    std::size_t hash = gt.dim() * 509;
-    return gt.dim() < 2 ? hash : hash + static_cast<std::size_t>(gt.basicType());
-  }
-
-};
-
-template<typename T, std::size_t I>
-class TupleElementPickingIterator : public ForwardIteratorFacade<TupleElementPickingIterator<T,I>,
-								 typename std::tuple_element<I,typename T::value_type>::type,
-								 typename std::add_lvalue_reference<typename std::tuple_element<I,typename T::value_type>::type>::type,
-								 typename T::difference_type
-								 > {
-
-public:
-
-  typedef ForwardIteratorFacade<TupleElementPickingIterator<T,I>,
-				typename std::tuple_element<I,typename T::value_type>::type,
-				typename std::add_lvalue_reference<typename std::tuple_element<I,typename T::value_type>::type>::type,
-				typename T::difference_type
-				> BaseType;
-
-  typedef typename BaseType::Reference Reference;
-  typedef typename BaseType::Value Value;
-  typedef TupleElementPickingIterator<T,I> ThisType;
-
-  Reference dereference() const {
-    return std::get<I>(*_it);
-  }
-
-  bool equals(const ThisType& rhs) const {
-    return _it == rhs._it;
-  }
-
-  void increment() {
-    ++_it;
-  }
-
-private:
-
-  T _it;
-
-public:
-
-  TupleElementPickingIterator(T it) :
-    _it(it)
-  {}
-
-};
-
-template<std::size_t I, typename T>
-TupleElementPickingIterator<T,I> pick_element(T it) {
-  return TupleElementPickingIterator<T,I>(it);
-}
-
-template<typename T>
-struct collect_elementwise_struct {
-
-  T& result;
-
-  collect_elementwise_struct(T& r) :
-    result(r)
-  {}
-
-  void operator()(T& val) {
-    typedef typename T::iterator Iterator;
-    Iterator end = result.end();
-    Iterator rit = result.begin();
-    Iterator vit = val.begin();
-    for (; rit != end; ++rit, ++vit)
-      *rit += *vit;
-  }
-};
-
-template<typename T>
-collect_elementwise_struct<T> collect_elementwise(T& result) {
-  return collect_elementwise_struct<T>(result);
-}
+namespace mdgrid {
 
 template<typename HostGridView, typename SubDomainSetType>
 class IndexSet {
 
 public:
+
+  typedef IndexSet<HostGridView,SubDomainSetType> ThisType;
 
   typedef SubDomainSetType SubDomainSet;
 
@@ -117,8 +41,8 @@ public:
   };
 
   typedef std::array<IndexType,maxSubDomains> SizeContainer;
-  typedef std::unordered_map<GeometryType,std::vector<MapEntry>,GeometryTypeHash> IndexMap;
-  typedef std::unordered_map<GeometryType,SizeContainer,GeometryTypeHash> SizeMap;
+  typedef std::unordered_map<GeometryType,std::vector<MapEntry>,util::GeometryTypeHash> IndexMap;
+  typedef std::unordered_map<GeometryType,SizeContainer,util::GeometryTypeHash> SizeMap;
   typedef std::array<IndexType,maxSubDomains> MultiIndexContainer;
 
   void update(bool full) {
@@ -187,10 +111,7 @@ public:
       const GeometryType gt = it->first;
       std::vector<MapEntry>& indices = it->second;
       SizeContainer& sizes = sizeMap(codim)[gt];
-      const typename std::vector<MapEntry>::iterator end = indices.end();
-      for (typename std::vector<MapEntry>::iterator iit = indices.begin(); iit != end; ++iit) {
-	updateMapEntry(*iit,sizes);
-      }
+      std::for_each(indices.begin(),indices.end(),boost::bind(&ThisType::updateMapEntry,this,_1,boost::ref(sizes)));
     }
     if (codim < dimension) {
       updateSubIndices(codim+1);
@@ -200,9 +121,9 @@ public:
   void updatePerCodimSizes() {
     for (int codim = 0; codim <= dimension; ++codim) {
       _codimSizes[codim].assign(0);
-      std::for_each(pick_element<1>(sizeMap(codim).begin()),
-		    pick_element<1>(sizeMap(codim).end()),
-		    collect_elementwise(_codimSizes[codim]));
+      std::for_each(util::value_iterator(sizeMap(codim).begin()),
+		    util::value_iterator(sizeMap(codim).end()),
+		    util::collect_elementwise<std::plus<IndexType> >(_codimSizes[codim]));
     }
   }
 
@@ -278,7 +199,7 @@ private:
 
 };
 
-} // namespace multidomaingrid
+} // namespace mdgrid
 
 } // namespace Dune
 

@@ -13,7 +13,7 @@
 
 namespace Dune {
 
-namespace multidomaingrid {
+namespace mdgrid {
 
   // forward declarations
   template<std::size_t capacity>
@@ -83,7 +83,7 @@ namespace sds_detail {
     inline static std::size_t doCalculation(T value);
 
   public:
-    
+
     inline static std::size_t calculate(T value) {
       assert(value != 0 && (value & (value-1)) == 0); // make sure value is a power of 2
       return doCalculation(value);
@@ -117,7 +117,7 @@ namespace sds_detail {
 						std::ptrdiff_t> {
 
     template<std::size_t capacity>
-    friend class ::Dune::multidomaingrid::IntegralTypeSubDomainSet;
+    friend class ::Dune::mdgrid::IntegralTypeSubDomainSet;
 
   public:
 
@@ -165,7 +165,7 @@ namespace sds_detail {
     DomainType _value;
 
   };
-  
+
 }
 
 template<std::size_t capacity>
@@ -248,7 +248,7 @@ private:
 };
 
 
-} // namespace multidomaingrid
+} // namespace mdgrid
 
 } // namespace Dune
 
