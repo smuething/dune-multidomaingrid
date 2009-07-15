@@ -34,9 +34,9 @@ GridImp::ctype ctype;
 
   void increment() {
     ++_hostIterator;
-    _geometry.reset(NULL);
-    _geometryInInside.reset(NULL);
-    _geometryInOutside.reset(NULL);
+    _geometry.clear();
+    _geometryInInside.clear();
+    _geometryInOutside.clear();
   }
 
   const Intersection& dereference() const {
@@ -68,10 +68,10 @@ GridImp::ctype ctype;
   }
 
   const LocalGeometry& geometryInInside() const {
-    if (_geometryInInside == NULL) {
-      _geometryInInside = new MakeableInterfaceObject<LocalGeometry>(_hostIterator->geometryInInside());
+    if (!_geometryInInside.isSet()) {
+      _geometryInInside.reset(_hostIterator->geometryInInside());
     }
-    return *_geometryInInside;
+    return _geometryInInside;
   }
 
   const LocalGeometry& intersectionSelfLocal() const {
@@ -79,10 +79,10 @@ GridImp::ctype ctype;
   }
 
   const LocalGeometry& geometryInOutside() const {
-    if (_geometryInOutside == NULL) {
-      _geometryInOutside = new MakeableInterfaceObject<LocalGeometry>(_hostIterator->geometryInOutside());
+    if (!_geometryInOutside.isSet()) {
+      _geometryInOutside.reset(_hostIterator->geometryInOutside());
     }
-    return *_geometryInOutside;
+    return _geometryInOutside;
   }
 
   const LocalGeometry& intersectionNeighborLocal() const {
@@ -90,10 +90,10 @@ GridImp::ctype ctype;
   }
 
   const Geometry& geometry() const {
-    if (_geometry == NULL) {
-      _geometry = new MakeableInterfaceObject<Geometry>(_hostIterator->geometry());
+    if (!_geometry.isSet()) {
+      _geometry.reset(_hostIterator->geometry());
     }
-    return *_geometry;
+    return _geometry;
   }
 
   const LocalGeometry& intersectionGlobal() const {
@@ -134,9 +134,8 @@ GridImp::ctype ctype;
 
 private:
   HostIntersectionIterator _hostIterator;
-  boost::scoped_ptr<MakeableInterfaceObject<LocalGeometry> > _geometryInInside;
-  boost::scoped_ptr<MakeableInterfaceObject<LocalGeometry> > _geometryInOutside;
-  boost::scoped_ptr<MakeableInterfaceObject<Geometry> > _geometry;
+  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
+MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
 };
 
