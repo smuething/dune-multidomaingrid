@@ -34,8 +34,14 @@ class MakeableEntityWrapper :
   template<int, PartitionIteratorType, typename>
   friend class LeafIteratorWrapper;
 
+  template<int, PartitionIteratorType, typename>
+  friend class LevelIteratorWrapper;
+
   template<typename>
   friend class MultiDomainGrid;
+
+  template<typename>
+  friend class HierarchicIteratorWrapper;
   
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
   
@@ -65,6 +71,9 @@ class EntityWrapper :
 
   template<int, int, typename>
   friend class MakeableEntityWrapper;
+
+  template<int, typename>
+  friend class EntityPointerWrapper;
 
   template<typename>
   friend class MultiDomainGrid;
@@ -130,6 +139,9 @@ class EntityWrapper<0,dim,GridImp> :
 
   template<int, int, typename>
   friend class MakeableEntityWrapper;
+
+  template<int, typename>
+  friend class EntityPointerWrapper;
 
   template<typename>
   friend class MultiDomainGrid;

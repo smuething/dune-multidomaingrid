@@ -73,6 +73,9 @@ class MultiDomainGrid :
   template<int codim, PartitionIteratorType pitype, typename GridImp>
   friend class LevelIteratorWrapper;
 
+  template<typename GridImp>
+  friend class HierarchicIteratorWrapper;
+
   template<int mydim, int coorddim, typename GridImp>
   friend class GeometryWrapper;
 
@@ -207,11 +210,11 @@ public:
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
-    return _hostGrid.mark(refCount, getHostEntity(e));
+    return _hostGrid.mark(refCount, hostEntity(e));
   }
 
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
-    return _hostGrid.getMark(getHostEntity(e));
+    return _hostGrid.getMark(hostEntity(e));
   }
 
   bool preAdapt() {

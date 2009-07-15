@@ -11,6 +11,12 @@ template<typename GridImp,
 	 typename IntersectionType>
 class IntersectionIteratorWrapper {
 
+  template<class, template<class> class, template<class> class>
+  friend class IntersectionIterator;
+
+  template<class, template<class> class>
+  friend class Intersection;
+
   typedef HostIntersectionIteratorType HostIntersectionIterator;
   typedef IntersectionType Intersection;
 
@@ -27,9 +33,13 @@ GridImp::ctype ctype;
   typedef FieldVector<ctype,dimensionworld> GlobalCoords;
   typedef FieldVector<ctype,dimension - 1> LocalCoords;
 
+protected:
+
   explicit IntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
     _hostIterator(hostIterator)
   {}
+
+private:
 
   bool equals(const WrapperImp& rhs) const {
     return _hostIterator == rhs._hostIterator;
@@ -162,6 +172,9 @@ class LeafIntersectionIteratorWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
+  template<int, int, typename>
+  friend class EntityWrapper;
+
   typedef typename GridImp::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LeafIntersection Intersection;
 
@@ -188,6 +201,9 @@ class LevelIntersectionIteratorWrapper :
 
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
+
+  template<int, int, typename>
+  friend class EntityWrapper;
 
   typedef typename GridImp::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;

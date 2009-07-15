@@ -10,6 +10,13 @@ class LevelIteratorWrapper :
     public EntityPointerWrapper<codim,GridImp>
 {
 
+  template<typename>
+  friend class MultiDomainGrid;
+
+  template<int, PartitionIteratorType, class,
+	   template<int,PartitionIteratorType,class> class>
+  friend class LevelIterator;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator HostLevelIterator;
 
   explicit LevelIteratorWrapper(const HostLevelIterator& hostIterator) :

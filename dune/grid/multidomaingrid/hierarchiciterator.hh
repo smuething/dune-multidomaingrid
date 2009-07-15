@@ -10,9 +10,19 @@ class HierarchicIteratorWrapper :
     public EntityPointerWrapper<0,GridImp>
 {
 
+  template<class, template<class> class>
+  friend class HierarchicIterator;
+
+  template<int, int, typename>
+  friend class MakeableEntityWrapper;
+
+  template<int, int, typename>
+  friend class EntityWrapper;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity::HierarchicIterator HostHierarchicIterator;
 
   explicit HierarchicIteratorWrapper(const HostHierarchicIterator& hostIterator) :
+    EntityPointerWrapper<0,GridImp>(hostIterator),
     _hostIterator(hostIterator)
   {}
 
