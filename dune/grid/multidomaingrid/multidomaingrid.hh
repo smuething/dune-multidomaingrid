@@ -4,6 +4,8 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+#include <dune/grid/multidomaingrid/subdomainset.hh>
+
 #include <dune/grid/multidomaingrid/geometry.hh>
 #include <dune/grid/multidomaingrid/entity.hh>
 #include <dune/grid/multidomaingrid/entitypointer.hh>
@@ -39,8 +41,8 @@ struct MultiDomainGridFamily {
     LevelIntersectionIteratorWrapper, // level intersection iterator
     HierarchicIteratorWrapper,
     LeafIteratorWrapper,
-    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LevelIndexSet>,
-    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LeafIndexSet>,
+    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView>,
+    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView>,
     IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet>,
     typename HostGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet>,
@@ -100,9 +102,9 @@ class MultiDomainGrid :
   typedef MultiDomainGrid<HostGrid> GridImp;
   typedef HostGrid HostGridType;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LevelIndexSet> LevelIndexSetImp;
+  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView> LevelIndexSetImp;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LeafIndexSet> LeafIndexSetImp;
+  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView> LeafIndexSetImp;
 
   typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
 
@@ -113,10 +115,11 @@ public:
   typedef MultiDomainGridFamily<HostGrid> GridFamily;
   typedef typename GridFamily::Traits Traits;
   typedef typename HostGrid::ctype ctype;
+  typedef IntegralTypeSubDomainSet<3> SubDomainSet;
 
   explicit MultiDomainGrid(HostGrid& hostGrid) :
     _hostGrid(hostGrid),
-    _leafIndexSet(*this),
+    _leafIndexSet(*this,hostGrid.leafView()),
     _globalIdSet(*this),
     _localIdSet(*this)
   {
@@ -254,14 +257,14 @@ public:
   void updateIndexSets() {
     // make sure we have enough LevelIndexSets
     while (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.push_back(new LevelIndexSetImp(*this));
+      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
     }
 
     for (int l = 0; l <= maxLevel(); ++l) {
-      _levelIndexSets[l]->update(_hostGrid.levelIndexSet(l));
+      _levelIndexSets[l]->update(true);
     }
 
-    _leafIndexSet.update(_hostGrid.leafIndexSet());
+    _leafIndexSet.update(true);
 
     _globalIdSet.update(_hostGrid.globalIdSet());
     _localIdSet.update(_hostGrid.localIdSet());
