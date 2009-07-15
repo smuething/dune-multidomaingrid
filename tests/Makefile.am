@@ -2,10 +2,24 @@ dunedir = $(includedir)/dune
 
 include $(top_srcdir)/am/global-rules
 
-noinst_PROGRAMS = testsubdomainset testindexset
+noinst_PROGRAMS = testsubdomainset testindexset testwrapper
 
 testsubdomainset_SOURCES = testsubdomainset.cc
+
 testindexset_SOURCES = testindexset.cc
 testindexset_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
 testindexset_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testindexset_LIBS = $(ALL_PKG_LIBS)
+
+testwrapper_SOURCES = testwrapper.cc
+testwrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
+testwrapper_LIBS = $(ALL_PKG_LIBS)
+
+check_PROGRAMS = test-wrapper
+
+test_wrapper_SOURCES = test-wrapper.cc
+test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+test_wrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
+test_wrapper_LIBS = $(ALL_PKG_LIBS)
+
