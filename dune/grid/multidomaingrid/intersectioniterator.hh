@@ -5,11 +5,14 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename GridImp, typename WrapperImp>
+template<typename GridImp,
+	 typename WrapperImp,
+	 typename HostIntersectionIteratorType,
+	 typename IntersectionType>
 class IntersectionIteratorWrapper {
 
-  typedef typename WrapperImp::HostIntersectionIterator HostIntersectionIterator;
-  typedef typename WrapperImp::Intersection Intersection;
+  typedef HostIntersectionIteratorType HostIntersectionIterator;
+  typedef IntersectionType Intersection;
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
   typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
@@ -139,17 +142,36 @@ MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> 
 
 };
 
+namespace detail {
+
+  template<typename GridImp>
+  struct HostGridTraits {
+    typedef typename GridImp::HostGridType::Traits Traits;
+  };
+
+}
 
 template<typename GridImp>
 class LeafIntersectionIteratorWrapper :
-    public IntersectionIteratorWrapper<GridImp,LeafIntersectionIteratorWrapper<GridImp> >
+    public IntersectionIteratorWrapper<GridImp,
+				       LeafIntersectionIteratorWrapper<GridImp>,
+				       typename detail::HostGridTraits<GridImp>::Traits::LeafIntersectionIterator,
+				       typename GridImp::Traits::LeafIntersection>
 {
+
+  template<typename, typename, typename, typename>
+  friend class IntersectionIteratorWrapper;
 
   typedef typename GridImp::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LeafIntersection Intersection;
 
+  typedef IntersectionIteratorWrapper<GridImp,
+				      LeafIntersectionIteratorWrapper<GridImp>,
+				      HostIntersectionIterator,
+				      Intersection> Base;
+
   explicit LeafIntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
-    IntersectionIteratorWrapper<GridImp,LeafIntersectionIteratorWrapper<GridImp> >(hostIterator)
+    Base(hostIterator)
   {}
 
 };
@@ -157,14 +179,26 @@ class LeafIntersectionIteratorWrapper :
 
 template<typename GridImp>
 class LevelIntersectionIteratorWrapper :
-    public IntersectionIteratorWrapper<GridImp,LevelIntersectionIteratorWrapper<GridImp> >
+    public IntersectionIteratorWrapper<GridImp,
+				       LevelIntersectionIteratorWrapper<GridImp>,
+				       typename detail::HostGridTraits<GridImp>::Traits::LevelIntersectionIterator,
+				       typename GridImp::Traits::LevelIntersection>
+
 {
+
+  template<typename, typename, typename, typename>
+  friend class IntersectionIteratorWrapper;
 
   typedef typename GridImp::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;
 
+  typedef IntersectionIteratorWrapper<GridImp,
+				      LevelIntersectionIteratorWrapper<GridImp>,
+				      HostIntersectionIterator,
+				      Intersection> Base;
+
   explicit LevelIntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
-   IntersectionIteratorWrapper<GridImp,LevelIntersectionIteratorWrapper<GridImp> >(hostIterator)
+    Base(hostIterator)
   {}
 
 };

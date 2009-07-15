@@ -85,6 +85,15 @@ class MultiDomainGrid :
   template<typename GridImp, typename WrappedIdSet>
   friend class IdSetWrapper;
 
+  template<typename GridImp>
+  friend struct detail::HostGridTraits;
+
+  template<typename GridImp>
+  friend class LeafIntersectionIteratorWrapper;
+
+  template<typename GridImp>
+  friend class LevelIntersectionIteratorWrapper;
+
   typedef MultiDomainGrid<HostGrid> GridImp;
   typedef HostGrid HostGridType;
 
