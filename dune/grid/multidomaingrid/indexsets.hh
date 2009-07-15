@@ -17,10 +17,11 @@ namespace mdgrid {
 template<typename HostGrid>
 class MultiDomainGrid;
 
-template<typename GridImp, typename WrappedIndexSet>
+
+template<typename GridImp, typename HostIndexSet>
 class IndexSetWrapper :
-    public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,WrappedIndexSet>,
-		       typename WrappedIndexSet::IndexType>
+    public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,HostIndexSet>,
+		       typename HostIndexSet::IndexType>
 {
 
   template<typename HostGrid>
@@ -31,57 +32,57 @@ class IndexSetWrapper :
 
 public:
 
-  typedef typename WrappedIndexSet::IndexType IndexType;
+  typedef typename HostIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
 
   template<int codim>
   IndexType index(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {
-    return _wrappedIndexSet->index(_grid.hostEntity(e));
+    return _hostIndexSet->index(_grid.hostEntity(e));
   }
 
   template<typename Entity>
   IndexType index(const Entity& e) const {
-    return _wrappedIndexSet->index(_grid.hostEntity(e));
+    return _hostIndexSet->index(_grid.hostEntity(e));
   }
 
   template<int codim>
   IndexType subIndex(const Codim0Entity& e, int i) const {
-    return _wrappedIndexSet->subIndex(_grid.hostEntity(e),i,codim);
+    return _hostIndexSet->subIndex(_grid.hostEntity(e),i,codim);
   }
 
   IndexType subIndex(const Codim0Entity& e, int i, unsigned int codim) const {
-    return _wrappedIndexSet->subIndex(_grid.hostEntity(e),i,codim);
+    return _hostIndexSet->subIndex(_grid.hostEntity(e),i,codim);
   }
 
   const std::vector<GeometryType>& geomTypes(int codim) const {
-    return _wrappedIndexSet->geomTypes(codim);
+    return _hostIndexSet->geomTypes(codim);
   }
 
   IndexType size(GeometryType type) const {
-    return _wrappedIndexSet->size(type);
+    return _hostIndexSet->size(type);
   }
 
   IndexType size(int codim) const {
-    return _wrappedIndexSet->size(codim);
+    return _hostIndexSet->size(codim);
   }
 
   template<typename EntityType>
   bool contains(const EntityType& e) const {
-    return _wrappedIndexSet->contains(_grid.hostEntity(e));
+    return _hostIndexSet->contains(_grid.hostEntity(e));
   }
 
 private:
 
   const GridImp& _grid;
-  const WrappedIndexSet* _wrappedIndexSet;
+  const HostIndexSet* _hostIndexSet;
 
   IndexSetWrapper(const GridImp& grid) :
     _grid(grid),
-    _wrappedIndexSet(NULL)
+    _hostIndexSet(NULL)
   {}
 
-  void update(const WrappedIndexSet& indexSet) {
-    _wrappedIndexSet = &indexSet;
+  void update(const HostIndexSet& indexSet) {
+    _hostIndexSet = &indexSet;
   }
 
 };
