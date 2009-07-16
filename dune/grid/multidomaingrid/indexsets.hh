@@ -51,6 +51,7 @@ private:
 
   typedef typename HostGridView::template Codim<0>::Iterator HostEntityIterator;
   typedef typename HostGridView::template Codim<0>::Entity HostEntity;
+  typedef typename HostGridView::template Codim<0>::EntityPointer HostEntityPointer;
   typedef typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity Codim0Entity;
 
   struct MapEntry {
@@ -103,7 +104,64 @@ public:
     return _hostGridView.indexSet().contains(_grid.hostEntity(e));
   }
 
-  void addtoSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+  template<typename EntityType>
+  const SubDomainSet& subDomains(const EntityType& e) const {
+    return subDomains<EntityType::codimension>(e);
+  }
+
+  template<int cc>
+  const SubDomainSet& subDomains(const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
+    return indexMap(cc).find(e.type())->second[_hostGridView.indexSet().index(_grid.hostEntity(e))].domains;
+  }
+
+  IndexType indexForSubDomain(DomainType subDomain, const Codim0Entity& e) const {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    const MapEntry& me = indexMap(0).find(gt)->second[hostIndex];
+    assert(me.domains.contains(subDomain));
+    if (me.domains.simple()) {
+      return me.index;
+    } else {
+      return _multiIndexMap[me.index][subDomain];
+    }
+  }
+
+  template<class EntityType>
+  IndexType subIndexForSubDomain(DomainType subDomain, const EntityType& e) const {
+    return subIndexForSubDomain<EntityType::codimension>(subDomain,e);
+  }
+
+  template<int cc>
+  IndexType subIndexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    const MapEntry& me = indexMap(cc).find(gt)->second[hostIndex];
+    assert(me.domains.contains(subDomain));
+    if (me.domains.simple()) {
+      return me.index;
+    } else {
+      return _multiIndexMap[me.index][subDomain];
+    }
+  }
+
+private:
+
+  const GridImp& _grid;
+  HostGridView _hostGridView;
+  std::array<boost::scoped_ptr<IndexMap>,dimension+1> _indexMap;
+  std::array<boost::scoped_ptr<SizeMap>,dimension+1> _sizeMap;
+  std::array<std::array<IndexType,maxSubDomains>,dimension+1> _codimSizes;
+  std::vector<MultiIndexContainer> _multiIndexMap;
+
+  void swap(ThisType& rhs) {
+    assert(&_grid == &rhs._grid);
+    std::swap(_indexMap,rhs._indexMap);
+    std::swap(_sizeMap,rhs._sizeMap);
+    std::swap(_codimSizes,rhs._codimSizes);
+    std::swap(_multiIndexMap,rhs._multiIndexMap);
+  }
+
+  void addToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     indexMap(0)[gt][hostIndex].domains.add(subDomain);
@@ -120,24 +178,6 @@ public:
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     indexMap(0)[gt][hostIndex].domains.set(subDomain);
   }
-
-private:
-
-  const GridImp& _grid;
-  HostGridView _hostGridView;
-  std::array<boost::scoped_ptr<IndexMap>,dimension+1> _indexMap;
-  std::array<boost::scoped_ptr<SizeMap>,dimension+1> _sizeMap;
-  std::array<std::array<IndexType,maxSubDomains>,dimension+1> _codimSizes;
-  std::vector<MultiIndexContainer> _multiIndexMap;
-
-  void swap(ThisType& rhs) {
-    assert(_grid == rhs._grid);
-    std::swap(_indexMap,rhs._indexMap);
-    std::swap(_sizeMap,rhs._sizeMap);
-    std::swap(_codimSizes,rhs._codimSizes);
-    std::swap(_multiIndexMap,rhs._multiIndexMap);
-  }
-
 
   IndexSetWrapper(const GridImp& grid, HostGridView hostGridView) :
     _grid(grid),
@@ -171,6 +211,14 @@ private:
     return *(_sizeMap[codim]);
   }
 
+  const IndexMap& indexMap(std::size_t codim) const {
+    return *(_indexMap[codim]);
+  }
+
+  const SizeMap& sizeMap(std::size_t codim) const {
+    return *(_sizeMap[codim]);
+  }
+
   void reset(bool full) {
     const HostIndexSet& his = _hostGridView.indexSet();
     for (int codim = 0; codim <= dimension; ++codim) {
@@ -192,7 +240,7 @@ private:
 
   void update(LevelIndexSets& levelIndexSets, bool full) {
     const HostIndexSet& his = _hostGridView.indexSet();
-    reset(full);
+    //reset(full);
     for (typename LevelIndexSets::iterator it = levelIndexSets.begin(); it != levelIndexSets.end(); ++it) {
       (*it)->reset(full);
     }
@@ -205,7 +253,7 @@ private:
       IndexType hostIndex = his.index(he);
       MapEntry& me = im[hgt][hostIndex];
       levelIndexSets[he.level()]->indexMap(0)[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.add(me.domains);
-      markAncestors(levelIndexSets,he,me.domains);
+      markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
       updateMapEntry(me,sm[hgt]);
       markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt),1);
     }
@@ -249,10 +297,9 @@ private:
     }
   }
 
-  void markAncestors(LevelIndexSets& levelIndexSets, const HostEntity& hostEntity, const SubDomainSet& domains) {
-    const HostEntity* he = &hostEntity;
+  void markAncestors(LevelIndexSets& levelIndexSets, HostEntityPointer he, const SubDomainSet& domains) {
     while (he->level() > 0) {
-      he = &(*he->father());
+      he = he->father();
       SubDomainSet& fatherDomains = levelIndexSets[he->level()]->indexMap(0)[he->type()][levelIndexSets[he->level()]->_hostGridView.indexSet().index(*he)].domains;
       if (fatherDomains.contains(domains))
         break;
