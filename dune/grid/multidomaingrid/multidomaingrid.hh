@@ -269,7 +269,7 @@ public:
   void preUpdateSubDomains() {
     assert(_state == marking);
     for (int l = 0; l <= maxLevel(); ++l) {
-      _tmpLevelIndexSets.push_back(new LevelIndexSetImp(_levelIndexSets[l]));
+      _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
     }
     _tmpLeafIndexSet.update(_tmpLevelIndexSets,false);
     _state = preUpdate;
