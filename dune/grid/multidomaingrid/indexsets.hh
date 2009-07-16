@@ -130,6 +130,14 @@ private:
   std::array<std::array<IndexType,maxSubDomains>,dimension+1> _codimSizes;
   std::vector<MultiIndexContainer> _multiIndexMap;
 
+  void swap(ThisType& rhs) {
+    assert(_grid == rhs._grid);
+    std::swap(_indexMap,rhs._indexMap);
+    std::swap(_sizeMap,rhs._sizeMap);
+    std::swap(_codimSizes,rhs._codimSizes);
+    std::swap(_multiIndexMap,rhs._multiIndexMap);
+  }
+
 
   IndexSetWrapper(const GridImp& grid, HostGridView hostGridView) :
     _grid(grid),
@@ -138,6 +146,20 @@ private:
     for (int codim = 0; codim <= dimension; ++codim) {
       _indexMap[codim].reset(new IndexMap());
       _sizeMap[codim].reset(new SizeMap());
+    }
+  }
+
+  explicit IndexSetWrapper(const ThisType& rhs) :
+    _grid(rhs._grid),
+    _hostGridView(rhs._hostGridView),
+    _indexMap(),
+    _sizeMap(),
+    _codimSizes(rhs._codimSizes),
+    _multiIndexMap(rhs._multiIndexMap)
+  {
+    for (int codim = 0; codim <= dimension; ++codim) {
+      _indexMap[codim].reset(new IndexMap(rhs.indexMap(codim)));
+      _sizeMap[codim].reset(new SizeMap(rhs.sizeMap(codim)));
     }
   }
 
