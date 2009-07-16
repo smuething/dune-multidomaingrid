@@ -452,6 +452,7 @@ private:
       _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
     }
 
+    _leafIndexSet.reset(true);
     _leafIndexSet.update(_levelIndexSets,true);
 
     _globalIdSet.update(_hostGrid.globalIdSet());
