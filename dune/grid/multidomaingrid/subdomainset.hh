@@ -195,6 +195,10 @@ public:
     return (base << domain) & _set;
   }
 
+  bool contains(const This& set) const {
+    return (_set & set._set) == set._set;
+  }
+
   bool simple() const {
     return (!empty()) && ((_set & (_set - 1)) == 0);
   }
@@ -234,7 +238,7 @@ public:
     _set = base << domain;
   }
 
-  void addAll(const This& rhs) {
+  void add(const This& rhs) {
     _set |= rhs._set;
   }
 
