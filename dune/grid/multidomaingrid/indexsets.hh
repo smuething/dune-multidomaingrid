@@ -25,6 +25,9 @@ class IndexSetWrapper :
                           typename HostGridViewType::IndexSet::IndexType>
 {
 
+  template<typename, typename>
+  friend class IndexSetWrapper;
+
   template<typename HostGrid>
   friend class MultiDomainGrid;
 
@@ -38,6 +41,7 @@ class IndexSetWrapper :
 public:
 
   typedef typename remove_const<GridImp>::type::SubDomainSet SubDomainSet;
+  typedef typename SubDomainSet::DomainType SubDomainType;
   typedef typename HostIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
   typedef typename SubDomainSet::DomainType DomainType;
@@ -58,6 +62,8 @@ private:
   typedef std::unordered_map<GeometryType,std::vector<MapEntry>,util::GeometryTypeHash> IndexMap;
   typedef std::unordered_map<GeometryType,SizeContainer,util::GeometryTypeHash> SizeMap;
   typedef std::array<IndexType,maxSubDomains> MultiIndexContainer;
+
+  typedef std::vector<boost::shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
 
 public:
 
@@ -97,6 +103,24 @@ public:
     return _hostGridView.indexSet().contains(_grid.hostEntity(e));
   }
 
+  void addtoSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    indexMap(0)[gt][hostIndex].domains.add(subDomain);
+  }
+
+  void removeFromSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    indexMap(0)[gt][hostIndex].domains.remove(subDomain);
+  }
+
+  void assignToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    indexMap(0)[gt][hostIndex].domains.set(subDomain);
+  }
+
 private:
 
   const GridImp& _grid;
@@ -125,23 +149,54 @@ private:
     return *(_sizeMap[codim]);
   }
 
-  void update(bool full) {
+  void reset(bool full) {
     const HostIndexSet& his = _hostGridView.indexSet();
-    if (full) {
-      for (int codim = 0; codim <= dimension; ++codim) {
-	indexMap(codim).swap(IndexMap());
-	indexMap(codim).rehash(his.geomTypes(codim).size());
-	sizeMap(codim).swap(SizeMap());
-	sizeMap(codim).rehash(his.geomTypes(codim).size());
-      }
-    }
     for (int codim = 0; codim <= dimension; ++codim) {
+      if (full) {
+        indexMap(codim).swap(IndexMap());
+        indexMap(codim).rehash(his.geomTypes(codim).size());
+        sizeMap(codim).swap(SizeMap());
+        sizeMap(codim).rehash(his.geomTypes(codim).size());
+      }
       for (std::vector<GeometryType>::const_iterator it = his.geomTypes(codim).begin(); it != his.geomTypes(codim).end(); ++it) {
-	indexMap(codim)[*it].resize(his.size(*it));
+        if (full) {
+          indexMap(codim)[*it].resize(his.size(*it));
+        }
 	sizeMap(codim)[*it].assign(0);
       }
     }
     _multiIndexMap.clear();
+  }
+
+  void update(LevelIndexSets& levelIndexSets, bool full) {
+    const HostIndexSet& his = _hostGridView.indexSet();
+    reset(full);
+    for (typename LevelIndexSets::iterator it = levelIndexSets.begin(); it != levelIndexSets.end(); ++it) {
+      (*it)->reset(full);
+    }
+    HostEntityIterator end = _hostGridView.template end<0>();
+    IndexMap& im = indexMap(0);
+    SizeMap& sm = sizeMap(0);
+    for (HostEntityIterator it  = _hostGridView.template begin<0>(); it != end; ++it) {
+      const HostEntity& he = *it;
+      const GeometryType hgt = he.type();
+      IndexType hostIndex = his.index(he);
+      MapEntry& me = im[hgt][hostIndex];
+      levelIndexSets[he.level()]->indexMap(0)[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.add(me.domains);
+      markAncestors(levelIndexSets,he,me.domains);
+      updateMapEntry(me,sm[hgt]);
+      markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt),1);
+    }
+    updateSubIndices(1);
+    updatePerCodimSizes();
+    for(typename LevelIndexSets::iterator it = levelIndexSets.begin(); it != levelIndexSets.end(); ++it) {
+      (*it)->updateLevelIndexSet();
+    }
+  }
+
+
+  void updateLevelIndexSet() {
+    const HostIndexSet& his = _hostGridView.indexSet();
     HostEntityIterator end = _hostGridView.template end<0>();
     IndexMap& im = indexMap(0);
     SizeMap& sm = sizeMap(0);
@@ -172,13 +227,24 @@ private:
     }
   }
 
+  void markAncestors(LevelIndexSets& levelIndexSets, const HostEntity& hostEntity, const SubDomainSet& domains) {
+    const HostEntity* he = &hostEntity;
+    while (he->level() > 0) {
+      he = &(*he->father());
+      SubDomainSet& fatherDomains = levelIndexSets[he->level()]->indexMap(0)[he->type()][levelIndexSets[he->level()]->_hostGridView.indexSet().index(*he)].domains;
+      if (fatherDomains.contains(domains))
+        break;
+      fatherDomains.add(domains);
+    }
+  }
+
   void markSubIndices(const HostEntity& e, const SubDomainSet& domains, const HostIndexSet& his, const GenericReferenceElement<ctype,dimension>& refEl, int codim) {
     const int size = refEl.size(codim);
     IndexMap& im = indexMap(codim);
     for (int i = 0; i < size; ++i) {
       IndexType hostIndex = his.subIndex(e,i,codim);
       GeometryType gt = refEl.type(i,codim);
-      im[gt][hostIndex].domains.addAll(domains);
+      im[gt][hostIndex].domains.add(domains);
     }
     if (codim < dimension) {
       markSubIndices(e,domains,his,refEl,codim+1);

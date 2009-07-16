@@ -110,12 +110,15 @@ class MultiDomainGrid :
 
   typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
 
+  enum State { fixed, marking, preUpdate, postUpdate };
+
 public:
 
   typedef MultiDomainGridFamily<HostGrid> GridFamily;
   typedef typename GridFamily::Traits Traits;
   typedef typename HostGrid::ctype ctype;
   typedef IntegralTypeSubDomainSet<3> SubDomainSet;
+  typedef typename SubDomainSet::DomainType SubDomainType;
 
   explicit MultiDomainGrid(HostGrid& hostGrid) :
     _hostGrid(hostGrid),
@@ -221,16 +224,19 @@ public:
   }
 
   bool preAdapt() {
+    assert(_state == fixed);
     return _hostGrid.preAdapt();
   }
 
   bool adapt() {
+    assert(_state == fixed);
     bool r = _hostGrid.adapt();
     updateIndexSets();
     return r;
   }
 
   void postAdapt() {
+    assert(_state == fixed);
     _hostGrid.postAdapt();
   }
 
@@ -254,20 +260,53 @@ public:
     return _hostGrid.comm();
   }
 
-  void updateIndexSets() {
-    // make sure we have enough LevelIndexSets
-    while (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
-    }
+  void startSubDomainMarking() {
+    assert(_state == fixed);
+    _tmpLeafIndexSet.reset(new LeafIndexSetImp(_leafIndexSet));
+    _state = marking;
+  }
 
+  void preUpdateSubDomains() {
+    assert(_state == marking);
     for (int l = 0; l <= maxLevel(); ++l) {
-      _levelIndexSets[l]->update(true);
+      _tmpLevelIndexSets.push_back(new LevelIndexSetImp(_levelIndexSets[l]));
     }
+    _tmpLeafIndexSet.update(_tmpLevelIndexSets,false);
+    _state = preUpdate;
+  }
 
-    _leafIndexSet.update(true);
+  void updateSubDomains() {
+    assert(_state == preUpdate);
+    swap(_levelIndexSets,_tmpLevelIndexSets);
+    swap(_leafIndexSet,_tmpLeafIndexSet);
+    _state = postUpdate;
+  }
 
-    _globalIdSet.update(_hostGrid.globalIdSet());
-    _localIdSet.update(_hostGrid.localIdSet());
+  void postUpdateSubDomains() {
+    assert(_state == postUpdate);
+    _tmpLevelIndexSets.clear();
+    _tmpLeafIndexSet.reset(NULL);
+    _state = fixed;
+  }
+
+  void addToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+    assert(_state == marking);
+    assert(e.isLeaf());
+    _tmpLeafIndexSet.addToSubDomain(subDomain,e);
+  }
+
+
+  void removeFromSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+    assert(_state == marking);
+    assert(e.isLeaf());
+    _tmpLeafIndexSet.removeFromSubDomain(subDomain,e);
+  }
+
+
+  void assignToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+    assert(_state == marking);
+    assert(e.isLeaf());
+    _tmpLeafIndexSet.assignToSubDomain(subDomain,e);
   }
 
 private:
@@ -277,8 +316,13 @@ private:
   std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
   LeafIndexSetImp _leafIndexSet;
 
+  std::vector<boost::shared_ptr<LevelIndexSetImp> > _tmpLevelIndexSets;
+  boost::scoped_ptr<LeafIndexSetImp> _tmpLeafIndexSet;
+
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
+
+  State _state;
 
   template<typename Entity>
   struct HostEntity {
@@ -294,6 +338,18 @@ private:
   template<typename EntityType>
   const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
     return *(getRealImplementation(e).hostEntityPointer());
+  }
+
+  void updateIndexSets() {
+    // make sure we have enough LevelIndexSets
+    while (_levelIndexSets.size() <= maxLevel()) {
+      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
+    }
+
+    _leafIndexSet.update(_levelIndexSets,true);
+
+    _globalIdSet.update(_hostGrid.globalIdSet());
+    _localIdSet.update(_hostGrid.localIdSet());
   }
 
 };
