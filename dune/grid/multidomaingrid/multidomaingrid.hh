@@ -277,8 +277,10 @@ public:
 
   void updateSubDomains() {
     assert(_state == preUpdate);
-    swap(_levelIndexSets,_tmpLevelIndexSets);
-    swap(_leafIndexSet,_tmpLeafIndexSet);
+    _leafIndexSet.swap(_tmpLeafIndexSet);
+    for (int l = 0; l <= maxLevel(); ++l) {
+      _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
+    }
     _state = postUpdate;
   }
 
