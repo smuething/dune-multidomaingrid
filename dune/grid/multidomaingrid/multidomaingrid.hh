@@ -375,13 +375,13 @@ public:
     for (int l = 0; l <= maxLevel(); ++l) {
       _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
     }
-    _tmpLeafIndexSet.update(_tmpLevelIndexSets,false);
+    _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
     _state = preUpdate;
   }
 
   void updateSubDomains() {
     assert(_state == preUpdate);
-    _leafIndexSet.swap(_tmpLeafIndexSet);
+    _leafIndexSet.swap(*_tmpLeafIndexSet);
     for (int l = 0; l <= maxLevel(); ++l) {
       _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
     }
@@ -398,21 +398,21 @@ public:
   void addToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == marking);
     assert(e.isLeaf());
-    _tmpLeafIndexSet.addToSubDomain(subDomain,e);
+    _tmpLeafIndexSet->addToSubDomain(subDomain,e);
   }
 
 
   void removeFromSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == marking);
     assert(e.isLeaf());
-    _tmpLeafIndexSet.removeFromSubDomain(subDomain,e);
+    _tmpLeafIndexSet->removeFromSubDomain(subDomain,e);
   }
 
 
   void assignToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == marking);
     assert(e.isLeaf());
-    _tmpLeafIndexSet.assignToSubDomain(subDomain,e);
+    _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
 
 private:
