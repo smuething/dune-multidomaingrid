@@ -21,10 +21,10 @@ template<typename MDGrid>
 class SubDomainGrid;
 
 
-template<typename GridImp, typename HostGridViewType>
+template<typename GridImp, typename MDIndexSet>
 class IndexSetWrapper :
-    public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,HostGridViewType>,
-                          typename HostGridViewType::IndexSet::IndexType>
+    public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,MDIndexSet>,
+                          typename MDIndexSet::IndexType>
 {
 
   template<typename, typename>
@@ -33,26 +33,24 @@ class IndexSetWrapper :
   template<typename MDGrid>
   friend class SubDomainGrid;
 
-  typedef IndexSetWrapper<GridImp,HostGridViewType> ThisType;
+  typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 
   typedef typename remove_const<GridImp>::type::HostGridType HostGrid;
   typedef typename remove_const<GridImp>::type::MDGridType MDGrid;
-  typedef HostGridViewType HostGridView;
-  typedef typename HostGridView::IndexSet HostIndexSet;
+
   typedef typename remove_const<GridImp>::type::ctype ctype;
 
 public:
 
   typedef typename remove_const<GridImp>::type::SubDomainSet SubDomainSet;
   typedef typename SubDomainSet::DomainType SubDomainType;
-  typedef typename HostIndexSet::IndexType IndexType;
+  typedef typename MDIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
   typedef typename SubDomainSet::DomainType DomainType;
   static const std::size_t maxSubDomains = SubDomainSet::maxSize;
 
 private:
 
-  typedef typename HostGridView::template Codim<0>::Entity HostEntity;
   typedef typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity Codim0Entity;
 
 public:

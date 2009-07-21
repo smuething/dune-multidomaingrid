@@ -44,7 +44,7 @@ class LevelIteratorWrapper :
   }
 
   const IndexSet& _indexSet;
-  HostLeveIterator _hostIterator;
+  HostLevelIterator _hostIterator;
   const HostLevelIterator _end;
 
 };

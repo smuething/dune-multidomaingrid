@@ -34,7 +34,7 @@ class HierarchicIteratorWrapper :
   }
 
   void incrementToNextValidPosition() {
-    while(_hostIterator != _end && _grid.containsHostEntity(*_hostIterator)) {
+    while(_hostIterator != _hostEnd && _grid.containsHostEntity(*_hostIterator)) {
       ++_hostIterator;
     }
   }

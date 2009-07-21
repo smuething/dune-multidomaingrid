@@ -4,6 +4,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+#include <dune/common/exceptions.hh>
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/geometry.hh>
@@ -20,6 +21,11 @@
 namespace Dune {
 
 namespace mdgrid {
+
+
+// forward declaration in correct namespace
+template<typename>
+class MultiDomainGrid;
 
 namespace subdomain {
 
@@ -158,6 +164,7 @@ struct SubDomainGridFamily {
 
 };
 
+
 template<typename MDGrid>
 class SubDomainGrid :
     public GridDefaultImplementation<MDGrid::dimension,
@@ -165,7 +172,8 @@ class SubDomainGrid :
 				     typename MDGrid::ctype,
 				     SubDomainGridFamily<MDGrid> > {
 
-  friend class MDGrid;
+  template<typename>
+  friend class ::Dune::mdgrid::MultiDomainGrid;
 
   template<int codim, int dim, typename GridImp>
   friend class EntityWrapper;
@@ -206,18 +214,18 @@ class SubDomainGrid :
   template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
 
-  typedef MultiDomainGrid<HostGrid> GridImp;
+  typedef SubDomainGrid<MDGrid> GridImp;
   typedef MDGrid MDGridType;
 
   typedef typename MDGrid::HostGridType HostGridType;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView> LevelIndexSetImp;
+  typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp> LevelIndexSetImp;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView> LeafIndexSetImp;
+  typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp> LeafIndexSetImp;
 
-  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
+  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGridType::Traits::GlobalIdSet> GlobalIdSetImp;
 
-  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
+  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGridType::Traits::LocalIdSet> LocalIdSetImp;
 
 public:
 
@@ -236,42 +244,42 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lbegin<codim>(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template lbegin<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lend<codim>(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template lbegin<codim,PiType>(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template lbegin<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template lend<codim,PiType>(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafbegin<codim>());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template leafbegin<codim>());
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafend<codim>());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template leafend<codim>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafbegin<codim,PiType>());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template leafbegin<codim,PiType>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafend<codim,PiType>());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template leafend<codim,PiType>());
   }
 
   int size(int level, int codim) const {
@@ -310,27 +318,27 @@ public:
   }
 
   void globalRefine(int refCount) {
-    DUNE_TROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
-    DUNE_TROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
-    DUNE_TROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   bool preAdapt() {
-    DUNE_TROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   bool adapt() {
-    DUNE_TROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   void postAdapt() {
-    DUNE_TROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   int overlapSize(int level, int codim) const {
@@ -379,8 +387,8 @@ private:
   SubDomainGrid(MDGrid& grid, SubDomainType subDomain) :
     _grid(grid),
     _subDomain(subDomain),
-    _globalIdSet(*this,grid.globalIdSet()),
-    _localIdSet(*this,grid.localIdSet()),
+    _globalIdSet(*this,grid._hostGrid.globalIdSet()),
+    _localIdSet(*this,grid._hostGrid.localIdSet()),
     _leafIndexSet(*this,grid.leafIndexSet())
   {
     update();
@@ -398,7 +406,7 @@ private:
 
   template<typename Entity>
   struct HostEntity {
-    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
+    typedef typename HostGridType::Traits::template Codim<Entity::codimension>::Entity type;
   };
 
   template<typename EntityType>

@@ -40,7 +40,7 @@ protected:
   IntersectionIteratorWrapper(const IndexSet& indexSet, const HostIntersectionIterator& hostIterator) :
     _indexSet(indexSet),
     _hostIterator(hostIterator),
-    outsideTested(false)
+    _outsideTested(false)
   {}
 
 private:
@@ -62,14 +62,14 @@ private:
   }
 
   void checkOutside() const {
-    if (!outsideTested) {
+    if (!_outsideTested) {
       if (_hostIterator->boundary()) {
-        _outsideType = otboundary;
+        _outsideType = otBoundary;
       } else {
         if (_indexSet.containsHostEntity(_hostIterator->outside())) {
-          _outsideType = otneighbor;
+          _outsideType = otNeighbor;
         } else {
-          _outsideType = otforeigncell;
+          _outsideType = otForeignCell;
         }
       }
     }
@@ -77,7 +77,7 @@ private:
 
   bool boundary() const {
     checkOutside();
-    return _outsideType != otneighbor;
+    return _outsideType != otNeighbor;
   }
 
   int boundaryId() const {
@@ -86,7 +86,7 @@ private:
 
   bool neighbor() const {
     checkOutside();
-    return _outsideType == otneighbor;
+    return _outsideType == otNeighbor;
   }
 
   EntityPointer inside() const {
@@ -152,13 +152,13 @@ private:
 
   int indexInOutside() const {
     checkOutside();
-    assert(_outsideType == neighbor);
+    assert(_outsideType == otNeighbor);
     return _hostIterator->indexInOutside();
   }
 
   int numberInNeighbor() const {
     checkOutside();
-    assert(_outsideType == neighbor);
+    assert(_outsideType == otNeighbor);
     return _hostIterator->numberInNeighbor();
   }
 
@@ -176,7 +176,7 @@ private:
 
 private:
 
-  enum OutsideType { otneighbor, otforeignCell, otboundary };
+  enum OutsideType { otNeighbor, otForeignCell, otBoundary };
 
   const IndexSet& _indexSet;
   HostIntersectionIterator _hostIterator;
