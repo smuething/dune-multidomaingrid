@@ -11,13 +11,14 @@ void vtkOut(GridView gv,std::string filename) {
     typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> hcid(gv.indexSet().size(0),0);
     std::vector<int> sdc0(gv.indexSet().size(0),0);
+
     std::vector<int> sdc1(gv.indexSet().size(0),0);
     for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       const typename GridView::Grid::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hcid[idx] = idx;
-      sdc0[idx] = sds.contains(0) ? gv.indexSet().indexForSubDomain(0,*it) : -1;
-      sdc1[idx] = sds.contains(1) ? gv.indexSet().indexForSubDomain(1,*it) : -1;
+      sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
+      sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
     }
     std::vector<int> hvid(gv.indexSet().size(2),0);
     std::vector<int> sdv0(gv.indexSet().size(2),0);
@@ -26,8 +27,8 @@ void vtkOut(GridView gv,std::string filename) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       const typename GridView::Grid::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hvid[idx] = idx;
-      sdv0[idx] = sds.contains(0) ? gv.indexSet().subIndexForSubDomain(0,*it) : -1;
-      sdv1[idx] = sds.contains(1) ? gv.indexSet().subIndexForSubDomain(1,*it) : -1;
+      sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
+      sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
     }
     Dune::VTKWriter<GridView> vtkWriter(gv);
     vtkWriter.addCellData(sdc0,"cell_subdomain0");
