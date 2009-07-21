@@ -6,6 +6,8 @@
 
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
+#include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>
+
 #include <dune/grid/multidomaingrid/geometry.hh>
 #include <dune/grid/multidomaingrid/entity.hh>
 #include <dune/grid/multidomaingrid/entitypointer.hh>
