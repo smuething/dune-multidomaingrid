@@ -33,6 +33,12 @@ class IndexSetWrapper :
   template<typename MDGrid>
   friend class SubDomainGrid;
 
+  template<int, PartitionIteratorType, typename>
+  friend class LeafIteratorWrapper;
+
+  template<int, PartitionIteratorType, typename>
+  friend class LevelIteratorWrapper;
+
   typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 
   typedef typename remove_const<GridImp>::type::HostGridType HostGrid;
@@ -57,7 +63,7 @@ public:
 
   template<int codim>
   IndexType index(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {
-    return _mdIndexSet.indexForSubDomain<codim>(_grid.domain(),_grid.hostEntity(e));
+    return _mdIndexSet.template indexForSubDomain<codim>(_grid.domain(),_grid.hostEntity(e));
   }
 
   template<typename Entity>
@@ -100,6 +106,11 @@ private:
     _grid(grid),
     _mdIndexSet(mdIndexSet)
   {}
+
+  template<typename EntityType>
+  bool containsHostEntity(const EntityType& he) const {
+    return _mdIndexSet.containsForSubDomain(_grid.domain(),he);
+  }
 
 };
 
