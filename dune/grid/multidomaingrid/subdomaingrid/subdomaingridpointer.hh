@@ -41,7 +41,9 @@ private:
 
   SubDomainGridPointer(const typename SubDomainGridType::MDGridType& multiDomainGrid, typename SubDomainGridType::SubDomainType subDomain) :
     _grid(multiDomainGrid,subDomain)
-  {}
+  {
+    _grid.update();
+  }
 
 };
 

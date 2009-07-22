@@ -247,6 +247,7 @@ public:
     _subDomainGrid(*this,0)
   {
     updateIndexSets();
+    _subDomainGrid.update();
   }
 
   std::string name() const {
@@ -433,6 +434,7 @@ public:
 
   const SubDomainGrid& subDomain(SubDomainType subDomain) const {
     _subDomainGrid.reset(subDomain);
+    _subDomainGrid.update();
     return _subDomainGrid;
   }
 
