@@ -401,6 +401,10 @@ private:
     _subDomain = rhs._subDomain;
   }
 
+  void reset(const SubDomainType subDomain) {
+    _subDomain = subDomain;
+  }
+
   template<typename EntityType>
   bool containsHostEntity(const EntityType& e) const {
     return levelIndexSet(e.level()).containsHostEntity(e);
