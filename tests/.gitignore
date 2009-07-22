@@ -1,0 +1,7 @@
+*.vtu
+dgfparser.log
+test-wrapper
+testwrapper
+testindexset
+testpartitioning
+testsubdomainset
