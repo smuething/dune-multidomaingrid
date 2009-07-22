@@ -393,7 +393,8 @@ private:
     _localIdSet(*this,grid._hostGrid.localIdSet()),
     _leafIndexSet(*this,grid.leafIndexSet())
   {
-    update();
+    // do not call automatically - creates a problem in MultiDomainGrid ctor
+    // update();
   }
 
   void reset(const SubDomainGrid& rhs) {
