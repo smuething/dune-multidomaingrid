@@ -21,11 +21,14 @@ class HierarchicIteratorWrapper :
   template<int, int, typename>
   friend class EntityWrapper;
 
+  template<typename, typename>
+  friend class EntityPointer;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity::HierarchicIterator HostHierarchicIterator;
   typedef typename GridImp::Traits::LevelIndexSet IndexSet;
 
   explicit HierarchicIteratorWrapper(const GridImp& grid, const HostHierarchicIterator& hostIterator, const HostHierarchicIterator& hostEnd) :
-    EntityPointerWrapper<0,GridImp>(hostIterator),
+    EntityPointerWrapper<0,GridImp>(grid,hostIterator),
     _grid(grid),
     _hostIterator(hostIterator),
     _hostEnd(hostEnd)
@@ -34,7 +37,7 @@ class HierarchicIteratorWrapper :
   }
 
   void incrementToNextValidPosition() {
-    while(_hostIterator != _hostEnd && _grid.containsHostEntity(*_hostIterator)) {
+    while(_hostIterator != _hostEnd && !_grid.containsHostEntity(*_hostIterator)) {
       ++_hostIterator;
     }
     this->_entityWrapper.reset(_hostIterator);
@@ -45,9 +48,15 @@ class HierarchicIteratorWrapper :
     incrementToNextValidPosition();
   }
 
+  const HierarchicIteratorWrapper& operator=(const HierarchicIteratorWrapper& rhs) {
+    assert(_grid == rhs._grid);
+    _hostIterator == rhs._hostIterator;
+    _hostEnd = rhs._hostEnd;
+  }
+
   const GridImp& _grid;
   HostHierarchicIterator _hostIterator;
-  const HostHierarchicIterator _hostEnd;
+  HostHierarchicIterator _hostEnd;
 
 };
 

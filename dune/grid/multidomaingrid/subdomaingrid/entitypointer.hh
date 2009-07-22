@@ -24,12 +24,12 @@ public:
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
-  EntityPointerWrapper(const HostEntityPointer& hostEntityPointer) :
-    _entityWrapper(hostEntityPointer)
+  EntityPointerWrapper(const GridImp& grid, const HostEntityPointer& hostEntityPointer) :
+    _entityWrapper(grid,hostEntityPointer)
   {}
 
   EntityPointerWrapper(const EntityWrapper<codim,dim,GridImp>& entity) :
-    _entityWrapper(entity._hostEntityPointer)
+    _entityWrapper(entity._grid,entity._hostEntityPointer)
   {}
 
   bool equals(const EntityPointerWrapper<codim,GridImp>& rhs) const {

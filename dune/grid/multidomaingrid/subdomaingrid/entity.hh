@@ -47,8 +47,8 @@ class MakeableEntityWrapper :
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
-  MakeableEntityWrapper(const HostEntityPointer& hostEntityPointer) :
-    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(hostEntityPointer))
+  MakeableEntityWrapper(const GridImp& grid, const HostEntityPointer& hostEntityPointer) :
+    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,hostEntityPointer))
   {}
 
   void reset(const HostEntityPointer& hostEntityPointer) {
@@ -80,13 +80,17 @@ class EntityWrapper :
   template<typename>
   friend class SubDomainGrid;
 
+  template<int, int, typename, template<int,int,typename> class>
+  friend class Entity;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
 public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
-  EntityWrapper(const HostEntityPointer& e) :
+  EntityWrapper(const GridImp& grid, const HostEntityPointer& e) :
+    _grid(grid),
     _hostEntityPointer(e)
   {}
 
@@ -112,8 +116,15 @@ public:
 
   private:
 
+  const GridImp& _grid;
   HostEntityPointer _hostEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
+
+  const EntityWrapper& operator=(const EntityWrapper& rhs) {
+    assert(_grid == rhs._grid);
+    reset(rhs._hostEntityPointer);
+    return *this;
+  }
 
   void reset(const HostEntityPointer& hostEntityPointer) {
     if (_hostEntityPointer != hostEntityPointer) {
@@ -148,6 +159,9 @@ class EntityWrapper<0,dim,GridImp> :
   template<typename>
   friend class SubDomainGrid;
 
+  template<int, int, typename, template<int,int,typename> class>
+  friend class Entity;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
 
 public:
@@ -160,7 +174,8 @@ public:
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
 
 
-  EntityWrapper(const HostEntityPointer& e) :
+  EntityWrapper(const GridImp& grid, const HostEntityPointer& e) :
+    _grid(grid),
     _hostEntityPointer(e)
   {}
 
@@ -186,27 +201,27 @@ public:
 
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
-    return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->subEntity<cc>(i));
+    return EntityPointerWrapper<cc,GridImp>(_grid,_hostEntityPointer->subEntity<cc>(i));
   }
 
   LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafbegin());
+    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_hostEntityPointer->ileafbegin());
   }
 
   LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafend());
+    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_hostEntityPointer->ileafend());
   }
 
   LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelbegin());
+    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_hostEntityPointer->ilevelbegin());
   }
 
   LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelend());
+    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_hostEntityPointer->ilevelend());
   }
 
   EntityPointer father() const {
-    return EntityPointerWrapper<0,GridImp>(_hostEntityPointer->father());
+    return EntityPointerWrapper<0,GridImp>(_grid,_hostEntityPointer->father());
   }
 
   bool isLeaf() const {
@@ -225,11 +240,15 @@ public:
   }
 
   HierarchicIterator hbegin(int maxLevel) const {
-    return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hbegin(maxLevel));
+    return HierarchicIteratorWrapper<GridImp>(_grid,
+                                              _hostEntityPointer->hbegin(maxLevel),
+                                              _hostEntityPointer->hend(maxLevel));
   }
 
   HierarchicIterator hend(int maxLevel) const {
-    return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hend(maxLevel));
+    return HierarchicIteratorWrapper<GridImp>(_grid,
+                                              _hostEntityPointer->hend(maxLevel),
+                                              _hostEntityPointer->hend(maxLevel));
   }
 
   bool isNew() const {
@@ -242,9 +261,16 @@ public:
 
 private:
 
+  const GridImp& _grid;
   HostEntityPointer _hostEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
   MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
+
+  const EntityWrapper& operator=(const EntityWrapper& rhs) {
+    assert(_grid == rhs._grid);
+    reset(rhs._hostEntityPointer);
+    return *this;
+  }
 
   void reset(const HostEntityPointer& hostEntityPointer) {
     if (_hostEntityPointer != hostEntityPointer) {

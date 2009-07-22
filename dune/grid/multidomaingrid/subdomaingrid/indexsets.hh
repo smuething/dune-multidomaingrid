@@ -39,6 +39,9 @@ class IndexSetWrapper :
   template<int, PartitionIteratorType, typename>
   friend class LevelIteratorWrapper;
 
+  template<typename, typename, typename, typename, typename>
+  friend class IntersectionIteratorWrapper;
+
   typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 
   typedef typename remove_const<GridImp>::type::HostGridType HostGrid;
@@ -95,6 +98,10 @@ public:
   template<typename EntityType>
   bool contains(const EntityType& e) const {
     return _mdIndexSet.containsForSubDomain(_grid.domain(),_grid.hostEntity(e));
+  }
+
+  bool operator==(const IndexSetWrapper& rhs) const {
+    return (_grid == rhs._grid && &_mdIndexSet == &rhs._mdIndexSet);
   }
 
 private:

@@ -13,17 +13,20 @@ class LevelIteratorWrapper :
 {
 
   template<typename>
-  friend class MultiDomainGrid;
+  friend class SubDomainGrid;
 
   template<int, PartitionIteratorType, class,
 	   template<int,PartitionIteratorType,class> class>
   friend class LevelIterator;
 
+  template<typename,typename>
+  friend class EntityPointer;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator HostLevelIterator;
   typedef typename GridImp::Traits::LevelIndexSet IndexSet;
 
   LevelIteratorWrapper(const IndexSet& indexSet, const HostLevelIterator& hostIterator, const HostLevelIterator& endIterator) :
-    EntityPointerWrapper<codim,GridImp>(hostIterator),
+    EntityPointerWrapper<codim,GridImp>(indexSet._grid,hostIterator),
     _indexSet(indexSet),
     _hostIterator(hostIterator),
     _end(endIterator)
@@ -43,9 +46,15 @@ class LevelIteratorWrapper :
     incrementToNextValidPosition();
   }
 
+  const LevelIteratorWrapper& operator=(const LevelIteratorWrapper& rhs) {
+    assert(_indexSet == rhs._indexSet);
+    _hostIterator = rhs._hostIterator;
+    _end = rhs._end;
+  }
+
   const IndexSet& _indexSet;
   HostLevelIterator _hostIterator;
-  const HostLevelIterator _end;
+  HostLevelIterator _end;
 
 };
 

@@ -246,28 +246,28 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
                                                                    _grid._hostGrid.template lbegin<codim>(level),
                                                                    _grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
                                                                    _grid._hostGrid.template lend<codim>(level),
                                                                    _grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
                                                             _grid._hostGrid.template lbegin<codim,PiType>(level),
                                                             _grid._hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
                                                             _grid._hostGrid.template lend<codim,PiType>(level),
                                                             _grid._hostGrid.template lend<codim,PiType>(level));
   }
@@ -391,6 +391,10 @@ public:
     while (_levelIndexSets.size() <= maxLevel()) {
       _levelIndexSets.push_back(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size())));
     }
+  }
+
+  bool operator==(const SubDomainGrid& rhs) const {
+    return (&_grid == &rhs._grid && _subDomain == rhs._subDomain);
   }
 
 private:

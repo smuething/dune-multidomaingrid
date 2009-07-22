@@ -22,11 +22,14 @@ class LeafIteratorWrapper :
 	   template<int,PartitionIteratorType,class> class>
   friend class LeafIterator;
 
+  template<typename,typename>
+  friend class EntityPointer;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LeafIterator HostLeafIterator;
   typedef typename GridImp::Traits::LeafIndexSet IndexSet;
 
   LeafIteratorWrapper(const IndexSet& indexSet, const HostLeafIterator& hostIterator, const HostLeafIterator& endIterator) :
-    EntityPointerWrapper<codim,GridImp>(hostIterator),
+    EntityPointerWrapper<codim,GridImp>(indexSet._grid,hostIterator),
     _indexSet(indexSet),
     _hostIterator(hostIterator),
     _end(endIterator)
@@ -46,9 +49,16 @@ class LeafIteratorWrapper :
     incrementToNextValidPosition();
   }
 
+
+  const LeafIteratorWrapper& operator=(const LeafIteratorWrapper& rhs) {
+    assert(_indexSet == rhs._indexSet);
+    _hostIterator = rhs._hostIterator;
+    _end = rhs._end;
+  }
+
   const IndexSet& _indexSet;
   HostLeafIterator _hostIterator;
-  const HostLeafIterator _end;
+  HostLeafIterator _end;
 
 };
 

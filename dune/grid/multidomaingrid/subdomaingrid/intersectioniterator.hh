@@ -43,6 +43,15 @@ protected:
     _outsideTested(false)
   {}
 
+  const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
+    assert(_indexSet == rhs._indexSet);
+    _hostIterator = rhs._hostIterator;
+    _outsideTested = false;
+    _geometry.clear();
+    _geometryInInside.clear();
+    _geometryInOutside.clear();
+  }
+
 private:
 
   bool equals(const WrapperImp& rhs) const {
@@ -66,7 +75,7 @@ private:
       if (_hostIterator->boundary()) {
         _outsideType = otBoundary;
       } else {
-        if (_indexSet.containsHostEntity(_hostIterator->outside())) {
+        if (_indexSet.containsHostEntity(*(_hostIterator->outside()))) {
           _outsideType = otNeighbor;
         } else {
           _outsideType = otForeignCell;
@@ -90,13 +99,13 @@ private:
   }
 
   EntityPointer inside() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIterator->inside());
+    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_hostIterator->inside());
   }
 
   EntityPointer outside() const {
     checkOutside();
-    assert(_outsideType == neighbor);
-    return EntityPointerWrapper<0,GridImp>(_hostIterator->outside());
+    assert(_outsideType == otNeighbor);
+    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_hostIterator->outside());
   }
 
   bool conforming() const {
@@ -116,7 +125,7 @@ private:
 
   const LocalGeometry& geometryInOutside() const {
     checkOutside();
-    assert(_outsideType == neighbor);
+    assert(_outsideType == otNeighbor);
     if (!_geometryInOutside.isSet()) {
       _geometryInOutside.reset(_hostIterator->geometryInOutside());
     }
@@ -238,7 +247,7 @@ class LevelIntersectionIteratorWrapper :
 
 {
 
-  template<typename, typename, typename, typename>
+  template<typename, typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
   template<int, int, typename>
