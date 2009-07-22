@@ -114,25 +114,13 @@ public:
     return indexMap(cc).find(e.type())->second[_hostGridView.indexSet().index(_grid.hostEntity(e))].domains;
   }
 
-  IndexType indexForSubDomain(DomainType subDomain, const Codim0Entity& e) const {
-    GeometryType gt = e.type();
-    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
-    const MapEntry& me = indexMap(0).find(gt)->second[hostIndex];
-    assert(me.domains.contains(subDomain));
-    if (me.domains.simple()) {
-      return me.index;
-    } else {
-      return _multiIndexMap[me.index][subDomain];
-    }
-  }
-
   template<class EntityType>
-  IndexType subIndexForSubDomain(DomainType subDomain, const EntityType& e) const {
-    return subIndexForSubDomain<EntityType::codimension>(subDomain,e);
+  IndexType index(DomainType subDomain, const EntityType& e) const {
+    return index<EntityType::codimension>(subDomain,e);
   }
 
   template<int cc>
-  IndexType subIndexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
+  IndexType index(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     const MapEntry& me = indexMap(cc).find(gt)->second[hostIndex];
@@ -142,6 +130,51 @@ public:
     } else {
       return _multiIndexMap[me.index][subDomain];
     }
+  }
+
+  template<int cc>
+  IndexType indexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<cc>::Entity& he) const {
+    const GeometryType gt = he.type();
+    const IndexType hostIndex = _hostGridView.indexSet().index(he);
+    const MapEntry& me = indexMap(cc).find(gt)->second[hostIndex];
+    assert(me.domains.contains(subDomain));
+    if (me.domains.simple()) {
+      return me.index;
+    } else {
+      return _multiIndexMap[me.index][subDomain];
+    }
+  }
+
+  IndexType subIndexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<0>::Entity& he, int i, int codim) const {
+    const GeometryType gt = GenericReferenceElements<ctype,dimension>::general(he.type()).type(i,codim);
+    const IndexType hostIndex = _hostGridView.indexSet().subIndex(he,i,codim);
+    const MapEntry& me = indexMap(codim).find(gt)->second[hostIndex];
+    assert(me.domains.contains(subDomain));
+    if (me.domains.simple()) {
+      return me.index;
+    } else {
+      return _multiIndexMap[me.index][subDomain];
+    }
+  }
+
+  const std::vector<GeometryType>& geomTypesForSubDomain(DomainType subDomain, int codim) const {
+    return geomTypes(codim);
+  }
+
+  IndexType sizeForSubDomain(DomainType subDomain, GeometryType type) const {
+    return sizeMap(dimension-type.dim()).find(type)->second[subDomain];
+  }
+
+  IndexType sizeForSubDomain(DomainType subDomain, int codim) const {
+    return _codimSizes[codim][subDomain];
+  }
+
+  template<typename EntityType>
+  bool containsForSubDomain(DomainType subDomain, const EntityType& he) const {
+    const GeometryType gt = he.type();
+    const IndexType hostIndex = _hostGridView.indexSet().index(he);
+    const MapEntry& me = indexMap(EntityType::codimension).find(gt)->second[hostIndex];
+    return me.domains.contains(subDomain);
   }
 
 private:

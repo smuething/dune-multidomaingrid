@@ -34,14 +34,44 @@ void check_yasp(bool p0=false) {
   //Dune::YaspGrid<dim> grid(MPI_COMM_WORLD,Len,s,p,overlap);
   //#else
   Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
-  Dune::MultiDomainGrid<Dune::YaspGrid<dim> > grid(wgrid);
+
+  typedef Dune::MultiDomainGrid<Dune::YaspGrid<dim> > MDGrid;
+
+  MDGrid grid(wgrid);
   //#endif
 
   grid.globalRefine(2);
-  
+
   gridcheck(grid);
 
-  // check communication interface 
+  typedef typename MDGrid::template Codim<0>::Entity Entity;
+  typedef typename MDGrid::LeafGridView::template Codim<0>::Iterator Iterator;
+
+  typename MDGrid::LeafGridView gv = grid.leafView();
+
+  grid.startSubDomainMarking();
+  for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
+    const Entity& e = *it;
+    //IndexSet::SubDomainSet& sds = is.subDomainSet(e);
+    Dune::FieldVector<typename MDGrid::ctype,dim> c = e.geometry().global(Dune::GenericReferenceElements<typename MDGrid::ctype,dim>::general(e.type()).position(0,0));
+    double x = c[0];
+    double y = c[1];
+    if (x > 0.2) {
+      if (y > 0.3 && y < 0.7) {
+        if (x < 0.8)
+          grid.addToSubDomain(1,e);
+        if (x > 0.6)
+          grid.addToSubDomain(0,e);
+      } else {
+        grid.addToSubDomain(0,e);
+      }
+    }
+  }
+  grid.preUpdateSubDomains();
+  grid.updateSubDomains();
+  grid.postUpdateSubDomains();
+
+  // check communication interface
   checkCommunication(grid,-1,Dune::dvverb);
   for(int l=0; l<=grid.maxLevel(); ++l)
     checkCommunication(grid,l,Dune::dvverb);
@@ -50,6 +80,15 @@ void check_yasp(bool p0=false) {
   checkGeometryInFather(grid);
   // check the intersection iterator and the geometries it returns
   checkIntersectionIterator(grid);
+
+  gridcheck(grid.subDomain(0));
+  checkGeometryInFather(grid.subDomain(0));
+  checkIntersectionIterator(grid.subDomain(0));
+
+  gridcheck(grid.subDomain(1));
+  checkGeometryInFather(grid.subDomain(1));
+  checkIntersectionIterator(grid.subDomain(1));
+
 };
 
 int main (int argc , char **argv) {
@@ -60,7 +99,7 @@ int main (int argc , char **argv) {
 
     // get own rank
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-#endif    
+#endif
 
     check_yasp<1>();
     //check_yasp<1>(true);
@@ -77,7 +116,7 @@ int main (int argc , char **argv) {
     std::cerr << "Generic exception!" << std::endl;
     return 2;
   }
-  
+
 #if HAVE_MPI
   // Terminate MPI
   MPI_Finalize();

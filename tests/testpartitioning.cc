@@ -11,13 +11,14 @@ void vtkOut(GridView gv,std::string filename) {
     typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> hcid(gv.indexSet().size(0),0);
     std::vector<int> sdc0(gv.indexSet().size(0),0);
+
     std::vector<int> sdc1(gv.indexSet().size(0),0);
     for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       const typename GridView::Grid::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hcid[idx] = idx;
-      sdc0[idx] = sds.contains(0) ? gv.indexSet().indexForSubDomain(0,*it) : -1;
-      sdc1[idx] = sds.contains(1) ? gv.indexSet().indexForSubDomain(1,*it) : -1;
+      sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
+      sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
     }
     std::vector<int> hvid(gv.indexSet().size(2),0);
     std::vector<int> sdv0(gv.indexSet().size(2),0);
@@ -26,8 +27,8 @@ void vtkOut(GridView gv,std::string filename) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       const typename GridView::Grid::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hvid[idx] = idx;
-      sdv0[idx] = sds.contains(0) ? gv.indexSet().subIndexForSubDomain(0,*it) : -1;
-      sdv1[idx] = sds.contains(1) ? gv.indexSet().subIndexForSubDomain(1,*it) : -1;
+      sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
+      sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
     }
     Dune::VTKWriter<GridView> vtkWriter(gv);
     vtkWriter.addCellData(sdc0,"cell_subdomain0");
@@ -36,6 +37,31 @@ void vtkOut(GridView gv,std::string filename) {
     vtkWriter.addVertexData(sdv0,"vertex_subdomain0");
     vtkWriter.addVertexData(sdv1,"vertex_subdomain1");
     vtkWriter.addVertexData(hvid,"vertex_hostIndex");
+    vtkWriter.write(filename,Dune::VTKOptions::binary);
+}
+
+template<typename GridView>
+void vtkOut2(GridView gv,std::string filename) {
+    typedef typename GridView::template Codim<0>::Iterator Iterator;
+    typedef typename GridView::template Codim<2>::Iterator VIterator;
+    std::vector<int> cid(gv.indexSet().size(0),0);
+    int count = 0;
+    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it, ++count) {
+      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
+      cid[idx] = idx;
+    }
+    std::cout << "codim=0 count=" << count << std::endl;
+    std::vector<int> vid(gv.indexSet().size(2),0);
+    std::cout << gv.indexSet().size(Dune::GeometryType(0)) << std::endl;
+    count = 0;
+    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it, ++count) {
+      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
+      vid[idx] = idx;
+    }
+    std::cout << "codim=2 count=" << count << std::endl;
+    Dune::VTKWriter<GridView> vtkWriter(gv);
+    vtkWriter.addCellData(cid,"cellIndex");
+    vtkWriter.addVertexData(vid,"vertexIndex");
     vtkWriter.write(filename,Dune::VTKOptions::binary);
 }
 
@@ -74,13 +100,18 @@ int main(int argc, char** argv) {
     grid.preUpdateSubDomains();
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
-    vtkOut(gv,"leafView");
+    const Dune::MultiDomainGrid<GridType>::SubDomainGrid& sd0 = grid.subDomain(0);
+    std::cout << sd0.leafView().size(0) << std::endl;
+    /*vtkOut(gv,"leafView");
     vtkOut(grid.levelView(0),"levelView0");
     vtkOut(grid.levelView(1),"levelView1");
     vtkOut(grid.levelView(2),"levelView2");
     vtkOut(grid.levelView(3),"levelView3");
     vtkOut(grid.levelView(4),"levelView4");
     vtkOut(grid.levelView(5),"levelView5");
+    */
+    vtkOut2(grid.subDomain(0).leafView(),"subdomain0");
+    vtkOut2(grid.subDomain(1).leafView(),"subdomain1");
 
     /*for (int i = 0; i <= 2; ++i) {
       std::cout << "codim " << i << ":";

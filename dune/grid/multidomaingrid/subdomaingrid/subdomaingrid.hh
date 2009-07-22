@@ -1,34 +1,39 @@
-#ifndef DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
-#define DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
+#ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HH
+#define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HH
 
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+#include <dune/common/exceptions.hh>
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
-#include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>
-#include <dune/grid/multidomaingrid/subdomaingrid/subdomaingridpointer.hh>
-
-#include <dune/grid/multidomaingrid/geometry.hh>
-#include <dune/grid/multidomaingrid/entity.hh>
-#include <dune/grid/multidomaingrid/entitypointer.hh>
-#include <dune/grid/multidomaingrid/leafiterator.hh>
-#include <dune/grid/multidomaingrid/leveliterator.hh>
-#include <dune/grid/multidomaingrid/hierarchiciterator.hh>
-#include <dune/grid/multidomaingrid/intersectioniterator.hh>
-#include <dune/grid/multidomaingrid/idsets.hh>
-#include <dune/grid/multidomaingrid/indexsets.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/geometry.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/entity.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/entitypointer.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/leafiterator.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/leveliterator.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/hierarchiciterator.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/intersectioniterator.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/idsets.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/indexsets.hh>
 
 
 namespace Dune {
 
 namespace mdgrid {
 
-template<typename HostGrid>
+
+// forward declaration in correct namespace
+template<typename>
 class MultiDomainGrid;
 
-template<typename HostGrid>
-struct MultiDomainGridFamily {
+namespace subdomain {
+
+template<typename MDGrid>
+class SubDomainGrid;
+
+template<typename MDGrid>
+struct SubDomainGridFamily {
 
   template <int dim, int dimw, class GridImp,
             template<int,int,class> class GeometryImp,
@@ -46,7 +51,7 @@ struct MultiDomainGridFamily {
             template<class,PartitionIteratorType> class LevelGridViewTraits = DefaultLevelGridViewTraits,
             template<class,PartitionIteratorType> class LeafGridViewTraits = DefaultLeafGridViewTraits
             >
-  struct MultiDomainGridTraits
+  struct SubDomainGridTraits
   {
     /** \brief The type that implementing the grid. */
     typedef GridImp Grid;
@@ -134,10 +139,10 @@ struct MultiDomainGridFamily {
     typedef CCType CollectiveCommunication;
   };
 
-  typedef MultiDomainGridTraits<
-    HostGrid::dimension,
-    HostGrid::dimensionworld,
-    MultiDomainGrid<HostGrid>,
+  typedef SubDomainGridTraits<
+    MDGrid::dimension,
+    MDGrid::dimensionworld,
+    SubDomainGrid<MDGrid>,
     GeometryWrapper,
     EntityWrapper,
     EntityPointerWrapper,
@@ -148,24 +153,27 @@ struct MultiDomainGridFamily {
     LevelIntersectionIteratorWrapper, // level intersection iterator
     HierarchicIteratorWrapper,
     LeafIteratorWrapper,
-    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView>,
-    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView>,
-    IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet>,
-    typename HostGrid::Traits::GlobalIdSet::IdType,
-    IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet>,
-    typename HostGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<HostGrid>
+    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp>,
+    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp>,
+    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::GlobalIdSet>,
+    typename MDGrid::Traits::GlobalIdSet::IdType,
+    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::LocalIdSet>,
+    typename MDGrid::Traits::LocalIdSet::IdType,
+    CollectiveCommunication<typename MDGrid::HostGridType>
     > Traits;
 
 };
 
-template<typename HostGrid>
-class MultiDomainGrid :
-    public GridDefaultImplementation<HostGrid::dimension,
-				     HostGrid::dimensionworld,
-				     typename HostGrid::ctype,
-				     MultiDomainGridFamily<HostGrid> > {
 
+template<typename MDGrid>
+class SubDomainGrid :
+    public GridDefaultImplementation<MDGrid::dimension,
+				     MDGrid::dimensionworld,
+				     typename MDGrid::ctype,
+				     SubDomainGridFamily<MDGrid> > {
+
+  template<typename>
+  friend class ::Dune::mdgrid::MultiDomainGrid;
 
   template<int codim, int dim, typename GridImp>
   friend class EntityWrapper;
@@ -206,112 +214,108 @@ class MultiDomainGrid :
   template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
 
-  template<typename>
-  friend class subdomain::SubDomainGrid;
+  typedef SubDomainGrid<MDGrid> GridImp;
+  typedef MDGrid MDGridType;
 
-  template<typename>
-  friend struct subdomain::SubDomainGridFamily;
+  typedef typename MDGrid::HostGridType HostGridType;
 
-  typedef MultiDomainGrid<HostGrid> GridImp;
-  typedef HostGrid HostGridType;
+  typedef typename MDGrid::SubDomainSet SubDomainSet;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView> LevelIndexSetImp;
+  typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp> LevelIndexSetImp;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView> LeafIndexSetImp;
+  typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp> LeafIndexSetImp;
 
-  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
+  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGridType::Traits::GlobalIdSet> GlobalIdSetImp;
 
-  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
-
-  enum State { fixed, marking, preUpdate, postUpdate };
-
-  typedef MultiDomainGrid<HostGrid> ThisType;
+  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGridType::Traits::LocalIdSet> LocalIdSetImp;
 
 public:
 
-  typedef MultiDomainGridFamily<HostGrid> GridFamily;
+  typedef SubDomainGridFamily<MDGrid> GridFamily;
   typedef typename GridFamily::Traits Traits;
-  typedef typename HostGrid::ctype ctype;
-  typedef IntegralTypeSubDomainSet<3> SubDomainSet;
-  typedef typename SubDomainSet::DomainType SubDomainType;
-
-  typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
-  typedef subdomain::SubDomainGridPointer<SubDomainGrid> SubDomainGridPointer;
-
-  explicit MultiDomainGrid(HostGrid& hostGrid) :
-    _hostGrid(hostGrid),
-    _leafIndexSet(*this,hostGrid.leafView()),
-    _globalIdSet(*this),
-    _localIdSet(*this),
-    _state(fixed),
-    _subDomainGrid(*this,0)
-  {
-    updateIndexSets();
-    _subDomainGrid.update();
-  }
+  typedef typename MDGrid::ctype ctype;
+  typedef typename MDGrid::SubDomainType SubDomainType;
 
   std::string name() const {
-    return "MultiDomainGrid";
+    return "SubDomainGrid";
   }
 
   std::size_t maxLevel() const {
-    return _hostGrid.maxLevel();
+    return _grid.maxLevel();
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lbegin<codim>(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
+                                                                   _grid._hostGrid.template lbegin<codim>(level),
+                                                                   _grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lend<codim>(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
+                                                                   _grid._hostGrid.template lend<codim>(level),
+                                                                   _grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template lbegin<codim,PiType>(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
+                                                            _grid._hostGrid.template lbegin<codim,PiType>(level),
+                                                            _grid._hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template lend<codim,PiType>(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
+                                                            _grid._hostGrid.template lend<codim,PiType>(level),
+                                                            _grid._hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafbegin<codim>());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
+                                                                  _grid._hostGrid.template leafbegin<codim>(),
+                                                                  _grid._hostGrid.template leafend<codim>());
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template leafend<codim>());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
+                                                                  _grid._hostGrid.template leafend<codim>(),
+                                                                  _grid._hostGrid.template leafend<codim>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafbegin<codim,PiType>());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
+                                                           _grid._hostGrid.template leafbegin<codim,PiType>(),
+                                                           _grid._hostGrid.template leafend<codim,PiType>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafend<codim,PiType>());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
+                                                           _grid._hostGrid.template leafend<codim,PiType>(),
+                                                           _grid._hostGrid.template leafend<codim,PiType>());
   }
 
   int size(int level, int codim) const {
-    return _hostGrid.size(level,codim);
+    assert(level <= maxLevel());
+    return _levelIndexSets[level]->size(codim);
   }
 
   int size(int codim) const {
-    return _hostGrid.size(codim);
+    return _leafIndexSet.size(codim);
   }
 
   int size(int level, GeometryType type) const {
-    return _hostGrid.size(level,type);
+    assert(level <= maxLevel());
+    return _levelIndexSets[level]->size(type);
   }
 
   int size(GeometryType type) const {
-    return _hostGrid.size(type);
+    return _leafIndexSet.size(type);
   }
 
   const typename Traits::GlobalIdSet& globalIdSet() const {
@@ -332,163 +336,114 @@ public:
   }
 
   void globalRefine(int refCount) {
-    _hostGrid.globalRefine(refCount);
-    updateIndexSets();
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
-    return _hostGrid.mark(refCount, hostEntity(e));
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
-    return _hostGrid.getMark(hostEntity(e));
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   bool preAdapt() {
-    assert(_state == fixed);
-    return _hostGrid.preAdapt();
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   bool adapt() {
-    assert(_state == fixed);
-    bool r = _hostGrid.adapt();
-    updateIndexSets();
-    return r;
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   void postAdapt() {
-    assert(_state == fixed);
-    _hostGrid.postAdapt();
+    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
   int overlapSize(int level, int codim) const {
-    return _hostGrid.overlapSize(level,codim);
+    return _grid.overlapSize(level,codim);
   }
 
   int overlapSize(int codim) const {
-    return _hostGrid.overlapSize(codim);
+    return _grid.overlapSize(codim);
   }
 
   int ghostSize(int level, int codim) const {
-    return _hostGrid.ghostSize(level,codim);
+    return _grid.ghostSize(level,codim);
   }
 
   int ghostSize(int codim) const {
-    return _hostGrid.ghostSize(codim);
+    return _grid.ghostSize(codim);
   }
 
   const typename Traits::CollectiveCommunication& comm() const {
-    return _hostGrid.comm();
+    return _grid.comm();
   }
 
-  void startSubDomainMarking() {
-    assert(_state == fixed);
-    _tmpLeafIndexSet.reset(new LeafIndexSetImp(_leafIndexSet));
-    _state = marking;
+  const MDGrid& multiDomainGrid() const {
+    return _grid;
   }
 
-  void preUpdateSubDomains() {
-    assert(_state == marking);
-    for (int l = 0; l <= maxLevel(); ++l) {
-      _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
+  SubDomainType domain() const {
+    return _subDomain;
+  }
+
+  void update() const {
+    while (_levelIndexSets.size() <= maxLevel()) {
+      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size())));
     }
-    _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
-    _state = preUpdate;
   }
 
-  void updateSubDomains() {
-    assert(_state == preUpdate);
-    _leafIndexSet.swap(*_tmpLeafIndexSet);
-    for (int l = 0; l <= maxLevel(); ++l) {
-      _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
-    }
-    _state = postUpdate;
-  }
-
-  void postUpdateSubDomains() {
-    assert(_state == postUpdate);
-    _tmpLevelIndexSets.clear();
-    _tmpLeafIndexSet.reset(NULL);
-    _state = fixed;
-  }
-
-  void addToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
-    assert(_state == marking);
-    assert(e.isLeaf());
-    _tmpLeafIndexSet->addToSubDomain(subDomain,e);
-  }
-
-
-  void removeFromSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
-    assert(_state == marking);
-    assert(e.isLeaf());
-    _tmpLeafIndexSet->removeFromSubDomain(subDomain,e);
-  }
-
-
-  void assignToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
-    assert(_state == marking);
-    assert(e.isLeaf());
-    _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
-  }
-
-  const SubDomainGrid& subDomain(SubDomainType subDomain) const {
-    _subDomainGrid.reset(subDomain);
-    _subDomainGrid.update();
-    return _subDomainGrid;
-  }
-
-  SubDomainGridPointer subdomainPointer(SubDomainType subDomain) const {
-    return SubDomainGridPointer(*this,subDomain);
+  bool operator==(const SubDomainGrid& rhs) const {
+    return (&_grid == &rhs._grid && _subDomain == rhs._subDomain);
   }
 
 private:
 
-  HostGrid& _hostGrid;
-
-  std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
-  LeafIndexSetImp _leafIndexSet;
-
-  std::vector<boost::shared_ptr<LevelIndexSetImp> > _tmpLevelIndexSets;
-  boost::scoped_ptr<LeafIndexSetImp> _tmpLeafIndexSet;
-
+  const MDGrid& _grid;
+  SubDomainType _subDomain;
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
+  LeafIndexSetImp _leafIndexSet;
+  mutable std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
 
-  State _state;
+  SubDomainGrid(MDGrid& grid, SubDomainType subDomain) :
+    _grid(grid),
+    _subDomain(subDomain),
+    _globalIdSet(*this,grid._hostGrid.globalIdSet()),
+    _localIdSet(*this,grid._hostGrid.localIdSet()),
+    _leafIndexSet(*this,grid.leafIndexSet())
+  {
+    // do not call automatically - creates a problem in MultiDomainGrid ctor
+    // update();
+  }
 
-  mutable SubDomainGrid _subDomainGrid;
+  void reset(const SubDomainGrid& rhs) {
+    assert(_grid == rhs._grid);
+    _subDomain = rhs._subDomain;
+  }
+
+  void reset(const SubDomainType subDomain) {
+    _subDomain = subDomain;
+  }
+
+  template<typename EntityType>
+  bool containsHostEntity(const EntityType& e) const {
+    return levelIndexSet(e.level()).containsHostEntity(e);
+  }
 
   template<typename Entity>
   struct HostEntity {
-    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
+    typedef typename HostGridType::Traits::template Codim<Entity::codimension>::Entity type;
   };
-
-  /*
-  template<typename EntityType>
-  typename HostEntity<EntityType>::type& hostEntity(EntityType& e) const {
-    return getRealImplementation(e).wrappedEntity();
-    }*/
 
   template<typename EntityType>
   const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
     return *(getRealImplementation(e).hostEntityPointer());
   }
 
-  void updateIndexSets() {
-    // make sure we have enough LevelIndexSets
-    while (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
-    }
-
-    _leafIndexSet.reset(true);
-    _leafIndexSet.update(_levelIndexSets,true);
-
-    _globalIdSet.update(_hostGrid.globalIdSet());
-    _localIdSet.update(_hostGrid.localIdSet());
-  }
-
 };
+
+} // namespace subdomain
 
 } // namespace mdgrid
 
