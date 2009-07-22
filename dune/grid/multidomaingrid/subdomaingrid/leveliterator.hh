@@ -35,12 +35,12 @@ class LevelIteratorWrapper :
     while(_hostIterator != _end && !_indexSet.containsHostEntity(*_hostIterator)) {
       ++_hostIterator;
     }
+    this->_entityWrapper.reset(_hostIterator);
   }
 
   void increment() {
     ++_hostIterator;
     incrementToNextValidPosition();
-    this->_entityWrapper.reset(_hostIterator);
   }
 
   const IndexSet& _indexSet;

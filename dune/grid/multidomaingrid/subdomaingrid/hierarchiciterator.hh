@@ -37,12 +37,12 @@ class HierarchicIteratorWrapper :
     while(_hostIterator != _hostEnd && _grid.containsHostEntity(*_hostIterator)) {
       ++_hostIterator;
     }
+    this->_entityWrapper.reset(_hostIterator);
   }
 
   void increment() {
     ++_hostIterator;
     incrementToNextValidPosition();
-    this->_entityWrapper.reset(_hostIterator);
   }
 
   const GridImp& _grid;
