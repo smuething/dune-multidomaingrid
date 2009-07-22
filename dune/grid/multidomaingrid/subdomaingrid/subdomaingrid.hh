@@ -159,7 +159,7 @@ struct SubDomainGridFamily {
     typename MDGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::LocalIdSet>,
     typename MDGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<MDGrid>
+    CollectiveCommunication<typename MDGrid::HostGridType>
     > Traits;
 
 };
@@ -393,8 +393,7 @@ private:
     _localIdSet(*this,grid._hostGrid.localIdSet()),
     _leafIndexSet(*this,grid.leafIndexSet())
   {
-    // do not call automatically - creates a problem in MultiDomainGrid ctor
-    // update();
+    update();
   }
 
   void reset(const SubDomainGrid& rhs) {
