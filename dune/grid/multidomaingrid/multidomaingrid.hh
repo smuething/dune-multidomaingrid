@@ -7,6 +7,7 @@
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/subdomaingridpointer.hh>
 
 #include <dune/grid/multidomaingrid/geometry.hh>
 #include <dune/grid/multidomaingrid/entity.hh>
@@ -224,6 +225,8 @@ class MultiDomainGrid :
 
   enum State { fixed, marking, preUpdate, postUpdate };
 
+  typedef MultiDomainGrid<HostGrid> ThisType;
+
 public:
 
   typedef MultiDomainGridFamily<HostGrid> GridFamily;
@@ -232,11 +235,16 @@ public:
   typedef IntegralTypeSubDomainSet<3> SubDomainSet;
   typedef typename SubDomainSet::DomainType SubDomainType;
 
+  typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
+  typedef subdomain::SubDomainGridPointer<SubDomainGrid> SubDomainGridPointer;
+
   explicit MultiDomainGrid(HostGrid& hostGrid) :
     _hostGrid(hostGrid),
     _leafIndexSet(*this,hostGrid.leafView()),
     _globalIdSet(*this),
-    _localIdSet(*this)
+    _localIdSet(*this),
+    _state(fixed),
+    _subDomainGrid(*this,0)
   {
     updateIndexSets();
   }
@@ -423,6 +431,15 @@ public:
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
 
+  const SubDomainGrid& subDomain(SubDomainType subDomain) const {
+    _subDomainGrid.reset(subDomain);
+    return _subDomainGrid;
+  }
+
+  SubDomainGridPointer subdomainPointer(SubDomainType subDomain) const {
+    return SubDomainGridPointer(*this,subDomain);
+  }
+
 private:
 
   HostGrid& _hostGrid;
@@ -437,6 +454,8 @@ private:
   LocalIdSetImp _localIdSet;
 
   State _state;
+
+  mutable SubDomainGrid _subDomainGrid;
 
   template<typename Entity>
   struct HostEntity {
