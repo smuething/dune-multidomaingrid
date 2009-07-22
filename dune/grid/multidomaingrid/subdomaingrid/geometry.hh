@@ -21,7 +21,7 @@ class MakeableGeometryWrapper :
   template<int, int, typename>
   friend class EntityWrapper;
 
-  template<typename, typename, typename, typename>
+  template<typename, typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<GridImp::dimension-mydim>::Geometry HostGeometry;
