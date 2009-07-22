@@ -246,42 +246,58 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template lbegin<codim>(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_levelIndexSets[level],
+                                                                   _grid._hostGrid.template lbegin<codim>(level),
+                                                                   _grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template lend<codim>(level));
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_levelIndexSets[level],
+                                                                   _grid._hostGrid.template lend<codim>(level),
+                                                                   _grid._hostGrid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template lbegin<codim,PiType>(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(_levelIndexSets[level],
+                                                            _grid._hostGrid.template lbegin<codim,PiType>(level),
+                                                            _grid._hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template lend<codim,PiType>(level));
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(_levelIndexSets[level],
+                                                            _grid._hostGrid.template lend<codim,PiType>(level),
+                                                            _grid._hostGrid.template lend<codim,PiType>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template leafbegin<codim>());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
+                                                                  _grid._hostGrid.template leafbegin<codim>(),
+                                                                  _grid._hostGrid.template leafend<codim>());
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_grid._hostGrid.template leafend<codim>());
+    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
+                                                                  _grid._hostGrid.template leafend<codim>(),
+                                                                  _grid._hostGrid.template leafend<codim>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template leafbegin<codim,PiType>());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
+                                                           _grid._hostGrid.template leafbegin<codim,PiType>(),
+                                                           _grid._hostGrid.template leafend<codim,PiType>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_grid._hostGrid.template leafend<codim,PiType>());
+    return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
+                                                           _grid._hostGrid.template leafend<codim,PiType>(),
+                                                           _grid._hostGrid.template leafend<codim,PiType>());
   }
 
   int size(int level, int codim) const {
