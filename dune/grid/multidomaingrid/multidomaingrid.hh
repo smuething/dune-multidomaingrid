@@ -205,6 +205,12 @@ class MultiDomainGrid :
   template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
 
+  template<typename>
+  friend class subdomain::SubDomainGrid;
+
+  template<typename>
+  friend struct subdomain::SubDomainGridFamily;
+
   typedef MultiDomainGrid<HostGrid> GridImp;
   typedef HostGrid HostGridType;
 
