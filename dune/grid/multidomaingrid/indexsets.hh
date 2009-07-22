@@ -162,7 +162,7 @@ public:
   }
 
   IndexType sizeForSubDomain(DomainType subDomain, GeometryType type) const {
-    return sizeMap(type.dim())[type];
+    return sizeMap(dimension-type.dim()).find(type)->second[subDomain];
   }
 
   IndexType sizeForSubDomain(DomainType subDomain, int codim) const {
