@@ -25,7 +25,7 @@ public:
   }
 
   const SubDomainGrid* operator->() const {
-    return &grid;
+    return &_grid;
   }
 
   SubDomainGridPointer(const SubDomainGridPointer& rhs) {
