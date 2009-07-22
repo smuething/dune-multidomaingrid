@@ -153,11 +153,11 @@ struct SubDomainGridFamily {
     LevelIntersectionIteratorWrapper, // level intersection iterator
     HierarchicIteratorWrapper,
     LeafIteratorWrapper,
-    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelGridView>,
-    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafGridView>,
-    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::Traits::GlobalIdSet>,
+    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp>,
+    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp>,
+    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::GlobalIdSet>,
     typename MDGrid::Traits::GlobalIdSet::IdType,
-    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::Traits::LocalIdSet>,
+    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::LocalIdSet>,
     typename MDGrid::Traits::LocalIdSet::IdType,
     CollectiveCommunication<MDGrid>
     > Traits;
@@ -218,6 +218,8 @@ class SubDomainGrid :
   typedef MDGrid MDGridType;
 
   typedef typename MDGrid::HostGridType HostGridType;
+
+  typedef typename MDGrid::SubDomainSet SubDomainSet;
 
   typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp> LevelIndexSetImp;
 
@@ -371,7 +373,7 @@ public:
 
   void update() const {
     while (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.push_back(new LevelIndexSetImp(_levelIndexSets.size()));
+      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size())));
     }
   }
 
