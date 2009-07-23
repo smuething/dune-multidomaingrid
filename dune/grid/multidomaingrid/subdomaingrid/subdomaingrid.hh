@@ -206,7 +206,7 @@ class SubDomainGrid :
   friend class IdSetWrapper;
 
   template<typename GridImp>
-  friend struct detail::HostGridTraits;
+  friend struct ::Dune::mdgrid::detail::HostGridAccessor;
 
   template<typename GridImp>
   friend class LeafIntersectionIteratorWrapper;

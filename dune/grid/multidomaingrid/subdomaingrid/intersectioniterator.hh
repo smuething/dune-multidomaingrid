@@ -197,21 +197,12 @@ private:
 
 };
 
-namespace detail {
-
-  template<typename GridImp>
-  struct HostGridTraits {
-    typedef typename GridImp::HostGridType::Traits Traits;
-  };
-
-}
-
 template<typename GridImp>
 class LeafIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,
 				       LeafIntersectionIteratorWrapper<GridImp>,
                                        typename GridImp::Traits::LeafIndexSet,
-				       typename detail::HostGridTraits<GridImp>::Traits::LeafIntersectionIterator,
+				       typename detail::HostGridAccessor<GridImp>::Traits::LeafIntersectionIterator,
 				       typename GridImp::Traits::LeafIntersection>
 {
 
@@ -242,7 +233,7 @@ class LevelIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,
 				       LevelIntersectionIteratorWrapper<GridImp>,
                                        typename GridImp::Traits::LevelIndexSet,
-				       typename detail::HostGridTraits<GridImp>::Traits::LevelIntersectionIterator,
+				       typename detail::HostGridAccessor<GridImp>::Traits::LevelIntersectionIterator,
 				       typename GridImp::Traits::LevelIntersection>
 
 {

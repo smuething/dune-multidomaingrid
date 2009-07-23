@@ -4,6 +4,20 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+namespace Dune {
+namespace mdgrid {
+namespace detail {
+
+  template<typename GridImp>
+  struct HostGridAccessor {
+    typedef typename GridImp::HostGridType::Traits Traits;
+    typedef typename GridImp::HostGridType Type;
+  };
+
+}
+}
+}
+
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>
@@ -198,7 +212,7 @@ class MultiDomainGrid :
   friend class IdSetWrapper;
 
   template<typename GridImp>
-  friend struct detail::HostGridTraits;
+  friend struct detail::HostGridAccessor;
 
   template<typename GridImp>
   friend class LeafIntersectionIteratorWrapper;
