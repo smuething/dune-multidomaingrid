@@ -22,6 +22,9 @@ class MakeableGeometryWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
+  template<typename, typename, typename, typename, typename>
+  friend class SubDomainInterfaceIterator;
+
   typedef typename GridImp::HostGridType::Traits::template Codim<GridImp::dimension-mydim>::Geometry HostGeometry;
 
   // MakeableGeometryWrapper(const HostGeometry& geometry) :
@@ -55,7 +58,7 @@ class GeometryWrapper
   friend class MakeableGeometryWrapper;
 
 public:
-  
+
   typedef typename GridImp::ctype ctype;
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;

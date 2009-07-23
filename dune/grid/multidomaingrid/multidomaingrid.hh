@@ -33,6 +33,8 @@ namespace detail {
 #include <dune/grid/multidomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/indexsets.hh>
 
+#include <dune/grid/multidomaingrid/subdomaininterfaceiterator.hh>
+
 
 namespace Dune {
 
@@ -226,6 +228,12 @@ class MultiDomainGrid :
   template<typename>
   friend struct subdomain::SubDomainGridFamily;
 
+  template <typename>
+  friend class LeafSubDomainInterfaceIterator;
+
+  template <typename>
+  friend class LevelSubDomainInterfaceIterator;
+
   typedef MultiDomainGrid<HostGrid> GridImp;
   typedef HostGrid HostGridType;
 
@@ -251,6 +259,9 @@ public:
 
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
   typedef subdomain::SubDomainGridPointer<SubDomainGrid> SubDomainGridPointer;
+
+  typedef LeafSubDomainInterfaceIterator<const ThisType> LeafSubDomainInterfaceIteratorType;
+  typedef LevelSubDomainInterfaceIterator<const ThisType> LevelSubDomainInterfaceIteratorType;
 
   explicit MultiDomainGrid(HostGrid& hostGrid) :
     _hostGrid(hostGrid),
@@ -310,6 +321,22 @@ public:
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
     return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafend<codim,PiType>());
+  }
+
+  LeafSubDomainInterfaceIteratorType leafSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2) const {
+    return LeafSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2);
+  }
+
+  LeafSubDomainInterfaceIteratorType leafSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2) const {
+    return LeafSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2,true);
+  }
+
+  LevelSubDomainInterfaceIteratorType levelSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
+    return LevelSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2,level);
+  }
+
+  LevelSubDomainInterfaceIteratorType levelSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
+    return LevelSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2,level,true);
   }
 
   int size(int level, int codim) const {
