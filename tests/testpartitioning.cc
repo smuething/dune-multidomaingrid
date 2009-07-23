@@ -5,8 +5,8 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/multidomaingrid.hh>
 
-template<typename GridView>
-void vtkOut(GridView gv,std::string filename) {
+template<typename GridView, typename InterfaceIterator>
+void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIterator iend) {
     typedef typename GridView::template Codim<0>::Iterator Iterator;
     typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> hcid(gv.indexSet().size(0),0);
@@ -30,10 +30,20 @@ void vtkOut(GridView gv,std::string filename) {
       sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
     }
+
+    std::vector<int> borderCells(gv.indexSet().size(0),0);
+    std::vector<int> borderVertices(gv.indexSet().size(2),0);
+
+    for(; iit != iend; ++iit) {
+      borderCells[gv.indexSet().index(*iit->firstEntity())] = 1;
+      borderCells[gv.indexSet().index(*iit->secondEntity())] = 2;
+    }
+
     Dune::VTKWriter<GridView> vtkWriter(gv);
     vtkWriter.addCellData(sdc0,"cell_subdomain0");
     vtkWriter.addCellData(sdc1,"cell_subdomain1");
     vtkWriter.addCellData(hcid,"cell_hostIndex");
+    vtkWriter.addCellData(borderCells,"borderCells");
     vtkWriter.addVertexData(sdv0,"vertex_subdomain0");
     vtkWriter.addVertexData(sdv1,"vertex_subdomain1");
     vtkWriter.addVertexData(hvid,"vertex_hostIndex");
@@ -45,20 +55,15 @@ void vtkOut2(GridView gv,std::string filename) {
     typedef typename GridView::template Codim<0>::Iterator Iterator;
     typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> cid(gv.indexSet().size(0),0);
-    int count = 0;
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it, ++count) {
+    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       cid[idx] = idx;
     }
-    std::cout << "codim=0 count=" << count << std::endl;
     std::vector<int> vid(gv.indexSet().size(2),0);
-    std::cout << gv.indexSet().size(Dune::GeometryType(0)) << std::endl;
-    count = 0;
-    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it, ++count) {
+    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
       vid[idx] = idx;
     }
-    std::cout << "codim=2 count=" << count << std::endl;
     Dune::VTKWriter<GridView> vtkWriter(gv);
     vtkWriter.addCellData(cid,"cellIndex");
     vtkWriter.addVertexData(vid,"vertexIndex");
@@ -101,15 +106,14 @@ int main(int argc, char** argv) {
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
     const Dune::MultiDomainGrid<GridType>::SubDomainGrid& sd0 = grid.subDomain(0);
-    std::cout << sd0.leafView().size(0) << std::endl;
-    /*vtkOut(gv,"leafView");
-    vtkOut(grid.levelView(0),"levelView0");
-    vtkOut(grid.levelView(1),"levelView1");
-    vtkOut(grid.levelView(2),"levelView2");
-    vtkOut(grid.levelView(3),"levelView3");
-    vtkOut(grid.levelView(4),"levelView4");
-    vtkOut(grid.levelView(5),"levelView5");
-    */
+    vtkOut(gv,"leafView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
+    vtkOut(grid.levelView(0),"levelView0",grid.levelSubDomainInterfaceBegin(0,1,0),grid.levelSubDomainInterfaceEnd(0,1,0));
+    vtkOut(grid.levelView(1),"levelView1",grid.levelSubDomainInterfaceBegin(0,1,1),grid.levelSubDomainInterfaceEnd(0,1,1));
+    vtkOut(grid.levelView(2),"levelView2",grid.levelSubDomainInterfaceBegin(0,1,2),grid.levelSubDomainInterfaceEnd(0,1,2));
+    vtkOut(grid.levelView(3),"levelView3",grid.levelSubDomainInterfaceBegin(0,1,3),grid.levelSubDomainInterfaceEnd(0,1,3));
+    vtkOut(grid.levelView(4),"levelView4",grid.levelSubDomainInterfaceBegin(0,1,4),grid.levelSubDomainInterfaceEnd(0,1,4));
+    vtkOut(grid.levelView(5),"levelView5",grid.levelSubDomainInterfaceBegin(0,1,5),grid.levelSubDomainInterfaceEnd(0,1,5));
+
     vtkOut2(grid.subDomain(0).leafView(),"subdomain0");
     vtkOut2(grid.subDomain(1).leafView(),"subdomain1");
 
