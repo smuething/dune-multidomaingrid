@@ -177,6 +177,30 @@ public:
     return me.domains.contains(subDomain);
   }
 
+  IndexType subIndex(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity& e, int i, int codim) const {
+    return subIndexForSubDomain(subDomain,_grid.hostEntity(e),i,codim);
+  }
+
+  const std::vector<GeometryType>& geomTypes(DomainType subDomain, int codim) const {
+    return geomTypes(codim);
+  }
+
+  IndexType size(DomainType subDomain, GeometryType type) const {
+    return sizeMap(dimension-type.dim()).find(type)->second[subDomain];
+  }
+
+  IndexType size(DomainType subDomain, int codim) const {
+    return _codimSizes[codim][subDomain];
+  }
+
+  template<typename EntityType>
+  bool contains(DomainType subDomain, const EntityType& e) const {
+    const GeometryType gt = e.type();
+    const IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    const MapEntry& me = indexMap(EntityType::codimension).find(gt)->second[hostIndex];
+    return me.domains.contains(subDomain);
+  }
+
 private:
 
   const GridImp& _grid;
