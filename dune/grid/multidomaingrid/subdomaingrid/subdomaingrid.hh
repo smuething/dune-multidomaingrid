@@ -397,6 +397,16 @@ public:
     return (&_grid == &rhs._grid && _subDomain == rhs._subDomain);
   }
 
+  template<int cc>
+  typename Traits::template Codim<cc>::EntityPointer getSubDomainEntity(const typename MDGrid::Traits::template Codim<cc>::Entity& mdEntity) const {
+    return EntityPointerWrapper<cc,const SubDomainGrid<MDGrid> >(*this,_grid.hostEntityPointer(mdEntity));
+  }
+
+  template<typename EntityType>
+  typename Traits::template Codim<EntityType::codimension>::EntityPointer getSubDomainEntity(const EntityType& mdEntity) const {
+    return getSubDomainEntity<EntityType::codimension>(mdEntity);
+  }
+
 private:
 
   const MDGrid& _grid;
