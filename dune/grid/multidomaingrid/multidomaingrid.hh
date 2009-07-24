@@ -505,6 +505,11 @@ private:
     typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
   };
 
+  template<typename Entity>
+  struct HostEntityPointer {
+    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
+  };
+
   /*
   template<typename EntityType>
   typename HostEntity<EntityType>::type& hostEntity(EntityType& e) const {
@@ -514,6 +519,11 @@ private:
   template<typename EntityType>
   const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
     return *(getRealImplementation(e).hostEntityPointer());
+  }
+
+  template<typename EntityType>
+  const typename HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
+    return getRealImplementation(e).hostEntityPointer();
   }
 
   void updateIndexSets() {
