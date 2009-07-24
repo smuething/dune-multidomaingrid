@@ -2,10 +2,12 @@
 #define DUNE_MULTIDOMAINGRID_HH
 
 #include <dune/grid/multidomaingrid/multidomaingrid.hh>
+#include <dune/grid/multidomaingrid/multidomainmcmgmapper.hh>
 
 namespace Dune {
 
 using mdgrid::MultiDomainGrid;
+using mdgrid::MultiDomainMCMGMapper;
 
 
 namespace Capabilities {
