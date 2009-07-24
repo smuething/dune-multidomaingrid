@@ -24,7 +24,7 @@ namespace mdgrid {
 
 
 // forward declaration in correct namespace
-template<typename>
+template<typename,typename>
 class MultiDomainGrid;
 
 namespace subdomain {
@@ -172,7 +172,7 @@ class SubDomainGrid :
 				     typename MDGrid::ctype,
 				     SubDomainGridFamily<MDGrid> > {
 
-  template<typename>
+  template<typename,typename>
   friend class ::Dune::mdgrid::MultiDomainGrid;
 
   template<int codim, int dim, typename GridImp>

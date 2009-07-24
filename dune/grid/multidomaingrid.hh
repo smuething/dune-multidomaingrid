@@ -25,50 +25,50 @@ namespace Capabilities {
 
 namespace Capabilities {
 
-  template<class HostGrid, int codim>
-  struct hasEntity<MultiDomainGrid<HostGrid>, codim>
+  template<class HostGrid, typename MDGridTraits, int codim>
+  struct hasEntity<MultiDomainGrid<HostGrid,MDGridTraits>, codim>
   {
     static const bool v = hasEntity<HostGrid,codim>::v;
   };
 
 
-  template<class HostGrid>
-  struct isParallel<MultiDomainGrid<HostGrid> >
+  template<class HostGrid, typename MDGridTraits>
+  struct isParallel<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
     static const bool v = isParallel<HostGrid>::v;
   };
 
 
-  template<class HostGrid>
-  struct hasHangingNodes<MultiDomainGrid<HostGrid> >
+  template<class HostGrid, typename MDGridTraits>
+  struct hasHangingNodes<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
     static const bool v = hasHangingNodes<HostGrid>::v;
   };
 
 
-  template<class HostGrid>
-  struct isLevelwiseConforming<MultiDomainGrid<HostGrid> >
+  template<class HostGrid, typename MDGridTraits>
+  struct isLevelwiseConforming<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
     static const bool v = isLevelwiseConforming<HostGrid>::v;
   };
 
 
-  template<class HostGrid>
-  struct isLeafwiseConforming<MultiDomainGrid<HostGrid> >
+  template<class HostGrid, typename MDGridTraits>
+  struct isLeafwiseConforming<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
     static const bool v = isLeafwiseConforming<HostGrid>::v;
   };
 
 
-  template<class HostGrid>
-  struct IsUnstructured<MultiDomainGrid<HostGrid> >
+  template<class HostGrid, typename MDGridTraits>
+  struct IsUnstructured<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
     static const bool v = IsUnstructured<HostGrid>::v;
   };
 
 
-  template<typename HostGrid>
-  struct isAdaptable<MultiDomainGrid<HostGrid> >
+  template<typename HostGrid, typename MDGridTraits>
+  struct isAdaptable<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
     static const bool v = isAdaptable<HostGrid>::v;
   };

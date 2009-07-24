@@ -222,7 +222,7 @@ class LeafSubDomainInterfaceIterator :
   template<int, int, typename>
   friend class EntityWrapper;
 
-  template<typename>
+  template<typename,typename>
   friend class MultiDomainGrid;
 
   typedef SubDomainInterfaceIterator<GridImp,
@@ -256,7 +256,7 @@ class LevelSubDomainInterfaceIterator :
   template<int, int, typename>
   friend class EntityWrapper;
 
-  template<typename>
+  template<typename,typename>
   friend class MultiDomainGrid;
 
   typedef SubDomainInterfaceIterator<GridImp,

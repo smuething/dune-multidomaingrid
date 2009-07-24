@@ -15,7 +15,7 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename HostGrid>
+template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
 
@@ -28,7 +28,7 @@ class IndexSetWrapper :
   template<typename, typename>
   friend class IndexSetWrapper;
 
-  template<typename HostGrid>
+  template<typename, typename>
   friend class MultiDomainGrid;
 
   typedef IndexSetWrapper<GridImp,HostGridViewType> ThisType;
