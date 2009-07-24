@@ -25,7 +25,7 @@ class IntersectionIteratorWrapper {
   typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
   typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
 
-  typedef typename 
+  typedef typename
 GridImp::ctype ctype;
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;
@@ -152,20 +152,11 @@ MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> 
 
 };
 
-namespace detail {
-
-  template<typename GridImp>
-  struct HostGridTraits {
-    typedef typename GridImp::HostGridType::Traits Traits;
-  };
-
-}
-
 template<typename GridImp>
 class LeafIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,
 				       LeafIntersectionIteratorWrapper<GridImp>,
-				       typename detail::HostGridTraits<GridImp>::Traits::LeafIntersectionIterator,
+				       typename detail::HostGridAccessor<GridImp>::Traits::LeafIntersectionIterator,
 				       typename GridImp::Traits::LeafIntersection>
 {
 
@@ -194,7 +185,7 @@ template<typename GridImp>
 class LevelIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,
 				       LevelIntersectionIteratorWrapper<GridImp>,
-				       typename detail::HostGridTraits<GridImp>::Traits::LevelIntersectionIterator,
+				       typename detail::HostGridAccessor<GridImp>::Traits::LevelIntersectionIterator,
 				       typename GridImp::Traits::LevelIntersection>
 
 {
