@@ -254,7 +254,10 @@ public:
   typedef MultiDomainGridFamily<HostGrid> GridFamily;
   typedef typename GridFamily::Traits Traits;
   typedef typename HostGrid::ctype ctype;
-  typedef IntegralTypeSubDomainSet<3> SubDomainSet;
+
+  static const std::size_t maxNumberOfSubDomains = 3;
+
+  typedef IntegralTypeSubDomainSet<maxNumberOfSubDomains> SubDomainSet;
   typedef typename SubDomainSet::DomainType SubDomainType;
 
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
@@ -479,7 +482,7 @@ public:
     return _subDomainGrid;
   }
 
-  SubDomainGridPointer subdomainPointer(SubDomainType subDomain) const {
+  SubDomainGridPointer subDomainPointer(SubDomainType subDomain) const {
     return SubDomainGridPointer(*this,subDomain);
   }
 
