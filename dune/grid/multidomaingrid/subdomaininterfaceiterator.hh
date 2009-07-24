@@ -119,11 +119,11 @@ public:
     return &(dereference());
   }
 
-  EntityPointer firstEntity() const {
+  EntityPointer firstCell() const {
     return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->inside());
   }
 
-  EntityPointer secondEntity() const {
+  EntityPointer secondCell() const {
     return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->outside());
   }
 
@@ -131,14 +131,14 @@ public:
     return _hostIntersectionIterator->conforming();
   }
 
-  const LocalGeometry& geometryInFirstEntity() const {
+  const LocalGeometry& geometryInFirstCell() const {
     if (!_geometryInInside.isSet()) {
       _geometryInInside.reset(_hostIntersectionIterator->geometryInInside());
     }
     return _geometryInInside;
   }
 
-  const LocalGeometry& geometryInSecondEntity() const {
+  const LocalGeometry& geometryInSecondCell() const {
     if (!_geometryInOutside.isSet()) {
       _geometryInOutside.reset(_hostIntersectionIterator->geometryInOutside());
     }
@@ -156,11 +156,11 @@ public:
     return _hostIntersectionIterator->type();
   }
 
-  int indexInFirstEntity() const {
+  int indexInFirstCell() const {
     return _hostIntersectionIterator->indexInInside();
   }
 
-  int indexInSecondEntity() const {
+  int indexInSecondCell() const {
     return _hostIntersectionIterator->indexInOutside();
   }
 
