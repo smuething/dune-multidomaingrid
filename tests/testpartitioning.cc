@@ -5,8 +5,19 @@
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/multidomaingrid.hh>
 
+template<int dim>
+struct AllLayout
+{
+  bool contains(Dune::GeometryType gt) {
+    return true;
+  }
+};
+
 template<typename GridView, typename InterfaceIterator>
 void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIterator iend) {
+
+    Dune::MultiDomainMCMGMapper<GridView,AllLayout> mapper(gv);
+
     typedef typename GridView::template Codim<0>::Iterator Iterator;
     typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> hcid(gv.indexSet().size(0),0);
@@ -19,6 +30,9 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
       hcid[idx] = idx;
       sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
+      typename GridView::IndexSet::IndexType tmp;
+      assert(sdc0[idx] > -1 == mapper.contains(0,*it,tmp));
+      assert(sdc1[idx] > -1 == mapper.contains(1,*it,tmp));
     }
     std::vector<int> hvid(gv.indexSet().size(2),0);
     std::vector<int> sdv0(gv.indexSet().size(2),0);
@@ -29,6 +43,9 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
       hvid[idx] = idx;
       sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
+      typename GridView::IndexSet::IndexType tmp;
+      assert(sdv0[idx] > -1 == mapper.contains(0,*it,tmp));
+      assert(sdv1[idx] > -1 == mapper.contains(1,*it,tmp));
     }
 
     std::vector<int> borderCells(gv.indexSet().size(0),0);
