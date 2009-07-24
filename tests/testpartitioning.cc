@@ -35,8 +35,8 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
     std::vector<int> borderVertices(gv.indexSet().size(2),0);
 
     for(; iit != iend; ++iit) {
-      borderCells[gv.indexSet().index(*iit->firstEntity())] = 1;
-      borderCells[gv.indexSet().index(*iit->secondEntity())] = 2;
+      borderCells[gv.indexSet().index(*iit->firstCell())] = 1;
+      borderCells[gv.indexSet().index(*iit->secondCell())] = 2;
     }
 
     Dune::VTKWriter<GridView> vtkWriter(gv);
@@ -105,6 +105,7 @@ int main(int argc, char** argv) {
     grid.preUpdateSubDomains();
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
+
     const Dune::MultiDomainGrid<GridType>::SubDomainGrid& sd0 = grid.subDomain(0);
     vtkOut(gv,"leafView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
     vtkOut(grid.levelView(0),"levelView0",grid.levelSubDomainInterfaceBegin(0,1,0),grid.levelSubDomainInterfaceEnd(0,1,0));
