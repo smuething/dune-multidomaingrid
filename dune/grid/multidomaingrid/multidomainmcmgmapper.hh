@@ -131,7 +131,7 @@ public:
         result = 0;
         return false;
       }
-    result = map(e);
+    result = map(subDomain,e);
     return true;
   }
 
