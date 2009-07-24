@@ -10,7 +10,7 @@ class LevelIteratorWrapper :
     public EntityPointerWrapper<codim,GridImp>
 {
 
-  template<typename>
+  template<typename,typename>
   friend class MultiDomainGrid;
 
   template<int, PartitionIteratorType, class,

@@ -40,10 +40,10 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename HostGrid>
+template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
-template<typename HostGrid>
+template<typename HostGrid, typename MDGridTraits>
 struct MultiDomainGridFamily {
 
   template <int dim, int dimw, class GridImp,
@@ -153,7 +153,7 @@ struct MultiDomainGridFamily {
   typedef MultiDomainGridTraits<
     HostGrid::dimension,
     HostGrid::dimensionworld,
-    MultiDomainGrid<HostGrid>,
+    MultiDomainGrid<HostGrid,MDGridTraits>,
     GeometryWrapper,
     EntityWrapper,
     EntityPointerWrapper,
@@ -164,23 +164,23 @@ struct MultiDomainGridFamily {
     LevelIntersectionIteratorWrapper, // level intersection iterator
     HierarchicIteratorWrapper,
     LeafIteratorWrapper,
-    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView>,
-    IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView>,
-    IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet>,
+    IndexSetWrapper<const MultiDomainGrid<HostGrid,MDGridTraits>, typename HostGrid::LevelGridView>,
+    IndexSetWrapper<const MultiDomainGrid<HostGrid,MDGridTraits>, typename HostGrid::LeafGridView>,
+    IdSetWrapper<const MultiDomainGrid<HostGrid,MDGridTraits>, typename HostGrid::Traits::GlobalIdSet>,
     typename HostGrid::Traits::GlobalIdSet::IdType,
-    IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet>,
+    IdSetWrapper<const MultiDomainGrid<HostGrid,MDGridTraits>, typename HostGrid::Traits::LocalIdSet>,
     typename HostGrid::Traits::LocalIdSet::IdType,
     CollectiveCommunication<HostGrid>
     > Traits;
 
 };
 
-template<typename HostGrid>
+template<typename HostGrid, typename MDGridTraits=void>
 class MultiDomainGrid :
     public GridDefaultImplementation<HostGrid::dimension,
 				     HostGrid::dimensionworld,
 				     typename HostGrid::ctype,
-				     MultiDomainGridFamily<HostGrid> > {
+				     MultiDomainGridFamily<HostGrid,MDGridTraits> > {
 
 
   template<int codim, int dim, typename GridImp>
@@ -234,24 +234,24 @@ class MultiDomainGrid :
   template <typename>
   friend class LevelSubDomainInterfaceIterator;
 
-  typedef MultiDomainGrid<HostGrid> GridImp;
+  typedef MultiDomainGrid<HostGrid,MDGridTraits> GridImp;
   typedef HostGrid HostGridType;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LevelGridView> LevelIndexSetImp;
+  typedef IndexSetWrapper<const GridImp, typename HostGrid::LevelGridView> LevelIndexSetImp;
 
-  typedef IndexSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::LeafGridView> LeafIndexSetImp;
+  typedef IndexSetWrapper<const GridImp, typename HostGrid::LeafGridView> LeafIndexSetImp;
 
-  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
+  typedef IdSetWrapper<const GridImp, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
 
-  typedef IdSetWrapper<const MultiDomainGrid<HostGrid>, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
+  typedef IdSetWrapper<const GridImp, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
 
   enum State { fixed, marking, preUpdate, postUpdate };
 
-  typedef MultiDomainGrid<HostGrid> ThisType;
+  typedef GridImp ThisType;
 
 public:
 
-  typedef MultiDomainGridFamily<HostGrid> GridFamily;
+  typedef MultiDomainGridFamily<HostGrid,MDGridTraits> GridFamily;
   typedef typename GridFamily::Traits Traits;
   typedef typename HostGrid::ctype ctype;
 

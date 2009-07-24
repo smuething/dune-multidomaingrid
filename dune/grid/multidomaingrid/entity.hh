@@ -20,7 +20,7 @@ class LevelIntersectionIteratorWrapper;
 template<typename GridImp>
 class HierarchicIteratorWrapper;
 
-template<typename HostGrid>
+template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
 template<int codim, int dim, typename GridImp>
@@ -37,14 +37,14 @@ class MakeableEntityWrapper :
   template<int, PartitionIteratorType, typename>
   friend class LevelIteratorWrapper;
 
-  template<typename>
+  template<typename,typename>
   friend class MultiDomainGrid;
 
   template<typename>
   friend class HierarchicIteratorWrapper;
-  
+
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
-  
+
   MakeableEntityWrapper(const HostEntityPointer& hostEntityPointer) :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(hostEntityPointer))
   {}
@@ -75,7 +75,7 @@ class EntityWrapper :
   template<int, typename>
   friend class EntityPointerWrapper;
 
-  template<typename>
+  template<typename,typename>
   friend class MultiDomainGrid;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
@@ -83,7 +83,7 @@ class EntityWrapper :
 public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
-  
+
   EntityWrapper(const HostEntityPointer& e) :
     _hostEntityPointer(e)
   {}
@@ -143,7 +143,7 @@ class EntityWrapper<0,dim,GridImp> :
   template<int, typename>
   friend class EntityPointerWrapper;
 
-  template<typename>
+  template<typename,typename>
   friend class MultiDomainGrid;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;

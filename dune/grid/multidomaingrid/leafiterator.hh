@@ -5,7 +5,7 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename HostGrid>
+template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
 template<int codim, PartitionIteratorType pitype, typename GridImp>
@@ -13,7 +13,7 @@ class LeafIteratorWrapper :
     public EntityPointerWrapper<codim,GridImp>
 {
 
-  template<typename HostGrid>
+  template<typename, typename>
   friend class MultiDomainGrid;
 
   template<int, PartitionIteratorType, class,
