@@ -214,6 +214,9 @@ class SubDomainGrid :
   template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
 
+  template<typename>
+  friend class SubDomainGridPointer;
+
   typedef SubDomainGrid<MDGrid> GridImp;
   typedef MDGrid MDGridType;
 
@@ -416,7 +419,7 @@ private:
   LeafIndexSetImp _leafIndexSet;
   mutable std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
 
-  SubDomainGrid(MDGrid& grid, SubDomainType subDomain) :
+  SubDomainGrid(const MDGrid& grid, SubDomainType subDomain) :
     _grid(grid),
     _subDomain(subDomain),
     _globalIdSet(*this,grid._hostGrid.globalIdSet()),

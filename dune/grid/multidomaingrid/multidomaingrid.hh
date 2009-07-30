@@ -234,6 +234,9 @@ class MultiDomainGrid :
   template <typename>
   friend class LevelSubDomainInterfaceIterator;
 
+  template<typename>
+  friend class subdomain::SubDomainGridPointer;
+
   typedef MultiDomainGrid<HostGrid,MDGridTraits> GridImp;
   typedef HostGrid HostGridType;
 

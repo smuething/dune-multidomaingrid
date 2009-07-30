@@ -5,6 +5,9 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename,typename>
+class MultiDomainGrid;
+
 namespace subdomain {
 
 template<typename>
@@ -15,6 +18,10 @@ class SubDomainGridPointer {
 
   template<typename>
   friend class SubDomainGrid;
+
+  template<typename,typename>
+  friend class ::Dune::mdgrid::MultiDomainGrid;
+
 
 public:
 
@@ -28,8 +35,10 @@ public:
     return &_grid;
   }
 
-  SubDomainGridPointer(const SubDomainGridPointer& rhs) {
-    _grid.reset(*rhs);
+  SubDomainGridPointer(const SubDomainGridPointer& rhs) :
+    _grid(rhs->_grid,rhs->_subDomain)
+  {
+    //_grid.reset(*rhs);
   }
 
   const SubDomainGridPointer& operator=(const SubDomainGridPointer& rhs) {
