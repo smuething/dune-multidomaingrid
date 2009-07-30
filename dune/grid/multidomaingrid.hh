@@ -1,6 +1,7 @@
 #ifndef DUNE_MULTIDOMAINGRID_HH
 #define DUNE_MULTIDOMAINGRID_HH
 
+#include <dune/common/collectivecommunication.hh>
 #include <dune/grid/multidomaingrid/multidomaingrid.hh>
 #include <dune/grid/multidomaingrid/multidomainmcmgmapper.hh>
 
