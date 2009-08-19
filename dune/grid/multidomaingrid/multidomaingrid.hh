@@ -32,6 +32,7 @@ namespace detail {
 #include <dune/grid/multidomaingrid/intersectioniterator.hh>
 #include <dune/grid/multidomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/indexsets.hh>
+#include <dune/grid/multidomaingrid/mdgridtraits.hh>
 
 #include <dune/grid/multidomaingrid/subdomaininterfaceiterator.hh>
 
@@ -175,12 +176,12 @@ struct MultiDomainGridFamily {
 
 };
 
-template<typename HostGrid, typename MDGridTraits=void>
+template<typename HostGrid, typename MDGridTraitsType>
 class MultiDomainGrid :
     public GridDefaultImplementation<HostGrid::dimension,
 				     HostGrid::dimensionworld,
 				     typename HostGrid::ctype,
-				     MultiDomainGridFamily<HostGrid,MDGridTraits> > {
+				     MultiDomainGridFamily<HostGrid,MDGridTraitsType> > {
 
 
   template<int codim, int dim, typename GridImp>
@@ -237,7 +238,7 @@ class MultiDomainGrid :
   template<typename>
   friend class subdomain::SubDomainGridPointer;
 
-  typedef MultiDomainGrid<HostGrid,MDGridTraits> GridImp;
+  typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
   typedef HostGrid HostGridType;
 
   typedef IndexSetWrapper<const GridImp, typename HostGrid::LevelGridView> LevelIndexSetImp;
@@ -254,14 +255,15 @@ class MultiDomainGrid :
 
 public:
 
-  typedef MultiDomainGridFamily<HostGrid,MDGridTraits> GridFamily;
+  typedef MultiDomainGridFamily<HostGrid,MDGridTraitsType> GridFamily;
   typedef typename GridFamily::Traits Traits;
+  typedef MDGridTraitsType MDGridTraits;
   typedef typename HostGrid::ctype ctype;
 
-  static const std::size_t maxNumberOfSubDomains = 3;
+  typedef typename MDGridTraits::SubDomainType SubDomainType;
 
-  typedef IntegralTypeSubDomainSet<maxNumberOfSubDomains> SubDomainSet;
-  typedef typename SubDomainSet::DomainType SubDomainType;
+  static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
+  static const SubDomainType maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
 
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
   typedef subdomain::SubDomainGridPointer<SubDomainGrid> SubDomainGridPointer;

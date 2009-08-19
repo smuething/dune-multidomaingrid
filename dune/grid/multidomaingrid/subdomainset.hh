@@ -15,9 +15,9 @@ namespace Dune {
 
 namespace mdgrid {
 
-  // forward declarations
-  template<std::size_t capacity>
-  class IntegralTypeSubDomainSet;
+// forward declarations
+template<typename SubDomainType, std::size_t capacity>
+class IntegralTypeSubDomainSet;
 
 namespace sds_detail {
 
@@ -168,7 +168,7 @@ namespace sds_detail {
 
 }
 
-template<std::size_t capacity>
+template<typename SubDomainType, std::size_t capacity>
 class IntegralTypeSubDomainSet {
 
   typedef typename sds_detail::SetStorageChooser<capacity>::type SetStorage;
@@ -176,9 +176,9 @@ class IntegralTypeSubDomainSet {
 
 public:
   static const std::size_t maxSize = capacity;
-  typedef std::size_t DomainType;
+  typedef SubDomainType DomainType;
   typedef sds_detail::Iterator<DomainType,SetStorage> Iterator;
-  typedef IntegralTypeSubDomainSet<capacity> This;
+  typedef IntegralTypeSubDomainSet<SubDomainType,capacity> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 

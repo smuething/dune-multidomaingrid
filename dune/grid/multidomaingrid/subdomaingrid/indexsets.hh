@@ -51,12 +51,12 @@ class IndexSetWrapper :
 
 public:
 
-  typedef typename remove_const<GridImp>::type::SubDomainSet SubDomainSet;
-  typedef typename SubDomainSet::DomainType SubDomainType;
+  //typedef typename remove_const<GridImp>::type::SubDomainSet SubDomainSet;
+  typedef typename remove_const<GridImp>::type::SubDomainType SubDomainType;
   typedef typename MDIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
-  typedef typename SubDomainSet::DomainType DomainType;
-  static const std::size_t maxSubDomains = SubDomainSet::maxSize;
+  //typedef typename SubDomainSet::DomainType DomainType;
+  //static const std::size_t maxSubDomains = MDGrid::MDGridTraits::template Codim
 
 private:
 

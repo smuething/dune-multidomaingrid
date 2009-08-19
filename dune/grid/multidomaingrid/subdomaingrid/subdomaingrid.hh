@@ -222,8 +222,6 @@ class SubDomainGrid :
 
   typedef typename MDGrid::HostGridType HostGridType;
 
-  typedef typename MDGrid::SubDomainSet SubDomainSet;
-
   typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp> LevelIndexSetImp;
 
   typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp> LeafIndexSetImp;

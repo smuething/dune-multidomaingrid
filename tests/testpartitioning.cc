@@ -26,7 +26,7 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
     std::vector<int> sdc1(gv.indexSet().size(0),0);
     for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::SubDomainSet& sds = gv.indexSet().subDomains(*it);
+      const typename GridView::Grid::MDGridTraits::template Codim<0>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hcid[idx] = idx;
       sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
@@ -39,7 +39,7 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
     std::vector<int> sdv1(gv.indexSet().size(2),0);
     for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::SubDomainSet& sds = gv.indexSet().subDomains(*it);
+      const typename GridView::Grid::MDGridTraits::template Codim<0>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hvid[idx] = idx;
       sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
@@ -93,9 +93,10 @@ int main(int argc, char** argv) {
     //typedef Dune::YaspGrid<2> GridType;
     Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
-    Dune::MultiDomainGrid<GridType> grid(wgrid);
+    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::MDGridTraits<GridType::dimension,4> > Grid;
+    Grid grid(wgrid);
     grid.globalRefine(5);
-    typedef Dune::MultiDomainGrid<GridType>::LeafGridView GridView;
+    typedef Grid::LeafGridView GridView;
     GridView gv = grid.leafView();
     typedef GridView::Codim<0>::Iterator Iterator;
     typedef GridView::Codim<2>::Iterator VIterator;
@@ -123,7 +124,7 @@ int main(int argc, char** argv) {
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
 
-    const Dune::MultiDomainGrid<GridType>::SubDomainGrid& sd0 = grid.subDomain(0);
+    const Grid::SubDomainGrid& sd0 = grid.subDomain(0);
     vtkOut(gv,"leafView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
     vtkOut(grid.levelView(0),"levelView0",grid.levelSubDomainInterfaceBegin(0,1,0),grid.levelSubDomainInterfaceEnd(0,1,0));
     vtkOut(grid.levelView(1),"levelView1",grid.levelSubDomainInterfaceBegin(0,1,1),grid.levelSubDomainInterfaceEnd(0,1,1));
