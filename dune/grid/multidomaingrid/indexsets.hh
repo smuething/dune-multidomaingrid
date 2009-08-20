@@ -337,7 +337,7 @@ public:
 
     template<int codim>
     IndexType dispatch() const {
-      const MapEntry<codim>& me = _indexSet.indexMap<codim>().find(_gt)->second[_hostIndex];
+      const MapEntry<codim>& me = _indexSet.indexMap<codim>().at(_gt)[_hostIndex];
       assert(me.domains.contains(_subDomain));
       if (me.domains.simple()) {
         return me.index;
