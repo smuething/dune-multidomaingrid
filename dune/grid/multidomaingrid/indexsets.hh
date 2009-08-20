@@ -361,7 +361,10 @@ public:
   };
 
   IndexType subIndexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<0>::Entity& he, int i, int codim) const {
-    return getSubIndexForSubDomain(subDomain,he.type(),_hostGridView.indexSet().index(he),*this).dispatcha(codim);
+    return getSubIndexForSubDomain(subDomain,
+                                   GenericReferenceElements<ctype,dimension>::general(he.type()).type(i,codim),
+                                   _hostGridView.indexSet().subIndex(he,i,codim),
+                                   *this).dispatcha(codim);
   }
 
   const std::vector<GeometryType>& geomTypesForSubDomain(DomainType subDomain, int codim) const {
