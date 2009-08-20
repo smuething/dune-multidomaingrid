@@ -490,8 +490,8 @@ private:
   explicit IndexSetWrapper(const ThisType& rhs) :
     _grid(rhs._grid),
     _hostGridView(rhs._hostGridView),
-    _indexMap(),
-    _sizeMap(),
+    _indexMap(rhs._indexMap),
+    _sizeMap(rhs._sizeMap),
     _codimSizes(rhs._codimSizes),
     _multiIndexMap(rhs._multiIndexMap)
   {}
