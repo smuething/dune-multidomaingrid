@@ -634,7 +634,7 @@ private:
       levelIndexSets[he.level()]->indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.add(me.domains);
       markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
-      applyToCodims(_indexMap,markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
+      applyToCodims(fusion::zip(_indexMap,_sizeMap),markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
     applyToCodims(fusion::zip(_indexMap,_sizeMap,_multiIndexMap),updateSubIndices(*this));
     applyToCodims(fusion::zip(_codimSizes,_sizeMap),updatePerCodimSizes());
@@ -655,7 +655,7 @@ private:
       IndexType hostIndex = his.index(he);
       MapEntry<0>& me = im[hgt][hostIndex];
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
-      applyToCodims(_indexMap,markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
+      applyToCodims(fusion::zip(_indexMap,_sizeMap),markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
     applyToCodims(fusion::zip(_indexMap,_sizeMap,_multiIndexMap),updateSubIndices(*this));
     applyToCodims(fusion::zip(_codimSizes,_sizeMap),updatePerCodimSizes());
@@ -694,11 +694,13 @@ private:
     void apply(T& t) const {
       if (codim == 0)
         return;
+      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,0>::type>::type>::type IndexSet;
+      IndexSet& indexSet = const_cast<IndexSet&>(fusion::at_c<0>(t));
       const int size = _refEl.size(codim);
       for (int i = 0; i < size; ++i) {
         IndexType hostIndex = _his.subIndex(_he,i,codim);
         GeometryType gt = _refEl.type(i,codim);
-        detail::rw(t)[gt][hostIndex].domains.add(_domains);
+        indexSet.at(gt)[hostIndex].domains.add(_domains);
       }
     }
 
