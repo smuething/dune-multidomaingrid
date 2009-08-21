@@ -49,36 +49,36 @@ struct buildMap<buildForCodim,0> {
 };
 
 template<bool doDispatch, typename Impl, typename resulttype>
-struct dispatchIf {
+struct invokeIf {
 
   typedef resulttype result_type;
 
   template<int codim>
-  result_type dispatch() {
-    _impl.dispatch<codim>();
+  result_type invoke() {
+    _impl.invoke<codim>();
   }
 
   Impl& _impl;
 
-  dispatchIf(Impl& impl) :
+  invokeIf(Impl& impl) :
     _impl(impl)
   {}
 
 };
 
 template<typename Impl, typename resulttype>
-struct dispatchIf<false,Impl, resulttype> {
+struct invokeIf<false,Impl, resulttype> {
 
   typedef resulttype result_type;
 
   template<int codim>
-  result_type dispatch() {
+  result_type invoke() {
     DUNE_THROW(GridError,"codim not supported");
   }
 
   Impl& _impl;
 
-  dispatchIf(Impl& impl) :
+  invokeIf(Impl& impl) :
     _impl(impl)
   {}
 
@@ -89,10 +89,10 @@ struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,cod
 
   typedef resulttype result_type;
 
-  result_type dispatcha(int cc) {
+  result_type dispatch(int cc) {
     if (cc == codim)
-      return dispatchIf<MDGridTraits::template Codim<codim>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template dispatch<codim>();
-    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1>&>(*this).dispatcha(cc);
+      return invokeIf<MDGridTraits::template Codim<codim>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template invoke<codim>();
+    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1>&>(*this).dispatch(cc);
   }
 
 };
@@ -102,9 +102,9 @@ struct dispatchToCodim<Impl,resulttype,MDGridTraits,0> {
 
   typedef resulttype result_type;
 
-  result_type dispatcha(int cc) {
+  result_type dispatch(int cc) {
     if (cc == 0)
-      return dispatchIf<MDGridTraits::template Codim<0>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template dispatch<0>();
+      return invokeIf<MDGridTraits::template Codim<0>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template invoke<0>();
     DUNE_THROW(GridError,"invalid codimension specified");
   }
 
@@ -336,7 +336,7 @@ public:
   struct getSubIndexForSubDomain : public dispatchToCodim<getSubIndexForSubDomain,IndexType> {
 
     template<int codim>
-    IndexType dispatch() const {
+    IndexType invoke() const {
       const MapEntry<codim>& me = _indexSet.indexMap<codim>().at(_gt)[_hostIndex];
       assert(me.domains.contains(_subDomain));
       if (me.domains.simple()) {
@@ -364,7 +364,7 @@ public:
     return getSubIndexForSubDomain(subDomain,
                                    GenericReferenceElements<ctype,dimension>::general(he.type()).type(i,codim),
                                    _hostGridView.indexSet().subIndex(he,i,codim),
-                                   *this).dispatcha(codim);
+                                   *this).dispatch(codim);
   }
 
   const std::vector<GeometryType>& geomTypesForSubDomain(DomainType subDomain, int codim) const {
@@ -374,7 +374,7 @@ public:
   struct getGeometryTypeSizeForSubDomain : public dispatchToCodim<getGeometryTypeSizeForSubDomain,IndexType> {
 
     template<int codim>
-    IndexType dispatch() const {
+    IndexType invoke() const {
       return _indexSet.sizeMap<codim>().find(_gt)->second[_subDomain];
     }
 
@@ -391,13 +391,13 @@ public:
   };
 
   IndexType sizeForSubDomain(DomainType subDomain, GeometryType type) const {
-    return getGeometryTypeSizeForSubDomain(subDomain,type,*this).dispatcha(dimension-type.dim());
+    return getGeometryTypeSizeForSubDomain(subDomain,type,*this).dispatch(dimension-type.dim());
   }
 
   struct getCodimSizeForSubDomain : public dispatchToCodim<getCodimSizeForSubDomain,IndexType> {
 
     template<int codim>
-    IndexType dispatch() const {
+    IndexType invoke() const {
       return _indexSet.codimSizes<codim>()[_subDomain];
     }
 
@@ -412,7 +412,7 @@ public:
   };
 
   IndexType sizeForSubDomain(DomainType subDomain, int codim) const {
-    return getCodimSizeForSubDomain(subDomain,*this).dispatcha(codim);
+    return getCodimSizeForSubDomain(subDomain,*this).dispatch(codim);
   }
 
   template<typename EntityType>
