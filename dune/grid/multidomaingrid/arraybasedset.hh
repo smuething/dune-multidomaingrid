@@ -62,7 +62,7 @@ public:
   }
 
   template<typename Set>
-  bool containsSet(const Set& set) const {
+  bool containsAll(const Set& set) const {
     return setContains(*this,set);
   }
 
@@ -113,7 +113,7 @@ public:
   }
 
   template<typename Set>
-  void addSet(const Set& set) {
+  void addAll(const Set& set) {
     setAdd(*this,set);
   }
 
