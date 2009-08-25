@@ -278,7 +278,7 @@ inline bool setContains(const A& a, const B& b) {
 }
 
 template<typename A, typename B>
-inline bool setAdd(A& a, const B& b) {
+inline void setAdd(A& a, const B& b) {
   std::for_each(b.begin(),b.end(),boost::bind(&A::add,ref(a),_1));
 }
 

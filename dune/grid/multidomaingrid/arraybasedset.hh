@@ -141,7 +141,7 @@ inline bool setContains(const ArrayBasedSet<SubDomainType,capacity>& a,
 }
 
 template<typename SubDomainType, std::size_t capacity>
-inline bool setAdd(ArrayBasedSet<SubDomainType,capacity>& a,
+inline void setAdd(ArrayBasedSet<SubDomainType,capacity>& a,
                    const ArrayBasedSet<SubDomainType,capacity>& b) {
   std::array<SubDomainType,2*capacity> tmp;
   typename std::array<SubDomainType,2*capacity>::iterator it = std::set_union(a._set.begin(), a._set.begin() + a._size,
