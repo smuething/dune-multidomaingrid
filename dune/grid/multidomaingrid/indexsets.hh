@@ -631,7 +631,7 @@ private:
       const GeometryType hgt = he.type();
       IndexType hostIndex = his.index(he);
       MapEntry<0>& me = im[hgt][hostIndex];
-      levelIndexSets[he.level()]->indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.add(me.domains);
+      levelIndexSets[he.level()]->indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.addAll(me.domains);
       markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
       applyToCodims(fusion::zip(_indexMap,_sizeMap),markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
@@ -682,9 +682,9 @@ private:
     while (he->level() > 0) {
       he = he->father();
       SubDomainSet& fatherDomains = levelIndexSets[he->level()]->indexMap<0>()[he->type()][levelIndexSets[he->level()]->_hostGridView.indexSet().index(*he)].domains;
-      if (fatherDomains.contains(domains))
+      if (fatherDomains.containsAll(domains))
         break;
-      fatherDomains.add(domains);
+      fatherDomains.addAll(domains);
     }
   }
 
@@ -700,7 +700,7 @@ private:
       for (int i = 0; i < size; ++i) {
         IndexType hostIndex = _his.subIndex(_he,i,codim);
         GeometryType gt = _refEl.type(i,codim);
-        indexSet.at(gt)[hostIndex].domains.add(_domains);
+        indexSet.at(gt)[hostIndex].domains.addAll(_domains);
       }
     }
 

@@ -8,8 +8,11 @@
 #include <dune/common/typetraits.hh>
 #include <dune/common/iteratorfacades.hh>
 #include <dune/common/exceptions.hh>
+#include <algorithm>
+#include <boost/bind.hpp>
 #include <cassert>
 #include <strings.h>
+#include <dune/grid/multidomaingrid/utility.hh>
 
 namespace Dune {
 
@@ -18,6 +21,15 @@ namespace mdgrid {
 // forward declarations
 template<typename SubDomainType, std::size_t capacity>
 class IntegralTypeSubDomainSet;
+
+template<typename SubDomainType, std::size_t capacity>
+bool setContains(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
+                 const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+
+template<typename SubDomainType, std::size_t capacity>
+void setAdd(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
+            const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+
 
 namespace sds_detail {
 
@@ -171,6 +183,12 @@ namespace sds_detail {
 template<typename SubDomainType, std::size_t capacity>
 class IntegralTypeSubDomainSet {
 
+  friend bool setContains<>(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
+                          const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+
+  friend void setAdd<>(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
+                     const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+
   typedef typename sds_detail::SetStorageChooser<capacity>::type SetStorage;
   static const SetStorage base = 1;
 
@@ -195,8 +213,9 @@ public:
     return (base << domain) & _set;
   }
 
-  bool contains(const This& set) const {
-    return (_set & set._set) == set._set;
+  template<typename Set>
+  bool containsAll(const Set& set) const {
+    return setContains(*this,set);
   }
 
   bool simple() const {
@@ -238,8 +257,9 @@ public:
     _set = base << domain;
   }
 
-  void add(const This& rhs) {
-    _set |= rhs._set;
+  template<typename Set>
+  void addAll(const Set& rhs) {
+    setAdd(*this,rhs);
   }
 
   IntegralTypeSubDomainSet() :
@@ -251,6 +271,29 @@ private:
 
 };
 
+
+template<typename A, typename B>
+inline bool setContains(const A& a, const B& b) {
+  return util::all_of(b.begin(),b.end(),boost::bind(&A::contains,ref(a),_1));
+}
+
+template<typename A, typename B>
+inline bool setAdd(A& a, const B& b) {
+  std::for_each(b.begin(),b.end(),boost::bind(&A::add,ref(a),_1));
+}
+
+
+template<typename SubDomainType, std::size_t capacity>
+inline bool setContains(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
+                        const IntegralTypeSubDomainSet<SubDomainType,capacity>& b) {
+  return (a._set & b._set) == a._set;
+}
+
+template<typename SubDomainType, std::size_t capacity>
+inline void setAdd(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
+                   const IntegralTypeSubDomainSet<SubDomainType,capacity>& b) {
+  a._set |= b._set;
+}
 
 } // namespace mdgrid
 
