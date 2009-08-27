@@ -279,12 +279,12 @@ private:
 
 template<typename A, typename B>
 inline bool setContains(const A& a, const B& b) {
-  return util::all_of(b.begin(),b.end(),boost::bind(&A::contains,ref(a),_1));
+  return util::all_of(b.begin(),b.end(),boost::bind(&A::contains,boost::ref(a),_1));
 }
 
 template<typename A, typename B>
 inline void setAdd(A& a, const B& b) {
-  std::for_each(b.begin(),b.end(),boost::bind(&A::add,ref(a),_1));
+  std::for_each(b.begin(),b.end(),boost::bind(&A::add,boost::ref(a),_1));
 }
 
 
