@@ -328,6 +328,9 @@ public:
   }
 
   const typename Traits::LevelIndexSet& levelIndexSet(int level) const {
+    if (!_grid.supportLevelIndexSets()) {
+      DUNE_THROW(GridError,"level index set support not enabled for this grid");
+    }
     assert(level <= maxLevel());
     return *_levelIndexSets[level];
   }
@@ -389,8 +392,10 @@ public:
   }
 
   void update() const {
-    while (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size())));
+    if (_grid.supportLevelIndexSets()) {
+      while (_levelIndexSets.size() <= maxLevel()) {
+        _levelIndexSets.push_back(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size())));
+      }
     }
   }
 

@@ -631,8 +631,11 @@ private:
       const GeometryType hgt = he.type();
       IndexType hostIndex = his.index(he);
       MapEntry<0>& me = im[hgt][hostIndex];
-      levelIndexSets[he.level()]->indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.addAll(me.domains);
-      markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
+
+      if (_grid.supportLevelIndexSets()) {
+        levelIndexSets[he.level()]->indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.addAll(me.domains);
+        markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
+      }
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
       applyToCodims(fusion::zip(_indexMap,_sizeMap),markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
