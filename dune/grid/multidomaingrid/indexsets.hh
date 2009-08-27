@@ -316,7 +316,7 @@ public:
     if (me.domains.simple()) {
       return me.index;
     } else {
-      return multiIndexMap<cc>()[me.index].at(subDomain);
+      return multiIndexMap<cc>()[me.index].at(me.domains.domainOffset(subDomain));
     }
   }
 
@@ -329,7 +329,7 @@ public:
     if (me.domains.simple()) {
       return me.index;
     } else {
-      return multiIndexMap<cc>()[me.index].at(subDomain);
+      return multiIndexMap<cc>()[me.index].at(me.domains.domainOffset(subDomain));
     }
   }
 
@@ -342,7 +342,7 @@ public:
       if (me.domains.simple()) {
         return me.index;
       } else {
-        return _indexSet.multiIndexMap<codim>()[me.index][_subDomain];
+        return _indexSet.multiIndexMap<codim>()[me.index].at(me.domains.domainOffset(_subDomain));
       }
     }
 
@@ -672,7 +672,7 @@ private:
       multiIndexMap.push_back(MultiIndexContainer());
       MultiIndexContainer& mic = multiIndexMap.back();
       for (typename SubDomainSet::Iterator it = me.domains.begin(); it != me.domains.end(); ++it) {
-	mic[*it] = sizes[*it]++;
+	mic[me.domains.domainOffset(*it)] = sizes[*it]++;
       }
     }
   }
