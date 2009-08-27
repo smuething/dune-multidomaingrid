@@ -44,7 +44,7 @@ public:
   static const SubDomainType emptyTag = boost::integer_traits<SubDomainType>::const_max;
   typedef SubDomainType DomainType;
   typedef const SubDomainType* Iterator;
-  typedef SingleValueSet<SubDomainType,1> This;
+  typedef SingleValueSet<SubDomainType> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
@@ -61,7 +61,7 @@ public:
   }
 
   template<typename Set>
-  bool containsSet(const Set& set) const {
+  bool containsAll(const Set& set) const {
     return setContains(*this,set);
   }
 
@@ -100,12 +100,12 @@ public:
   }
 
   template<typename Set>
-  void addSet(const Set& set) {
+  void addAll(const Set& set) {
     setAdd(*this,set);
   }
 
   int domainOffset(DomainType domain) const {
-    assert(_set != emptyTag);
+    assert(_set == domain);
     return 0;
   }
 
