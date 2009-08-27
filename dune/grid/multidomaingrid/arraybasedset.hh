@@ -94,10 +94,11 @@ public:
   }
 
   void add(DomainType domain) {
-    assert(_size < maxSize);
-    assert(!std::binary_search(_set.begin(),_set.begin()+_size,domain));
-    _set[_size++] = domain;
-    std::sort(_set.begin(),_set.begin()+_size);
+    if (!std::binary_search(_set.begin(),_set.begin()+_size,domain)) {
+      assert(_size < maxSize);
+      _set[_size++] = domain;
+      std::sort(_set.begin(),_set.begin()+_size);
+    }
   }
 
   void remove(DomainType domain) {

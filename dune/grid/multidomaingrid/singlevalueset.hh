@@ -86,7 +86,7 @@ public:
   }
 
   void add(DomainType domain) {
-    assert(_set == emptyTag);
+    assert(_set == emptyTag || _set == domain);
     _set = domain;
   }
 
@@ -126,9 +126,9 @@ inline bool setContains(const SingleValueSet<SubDomainType>& a,
 }
 
 template<typename SubDomainType>
-inline bool setAdd(SingleValueSet<SubDomainType>& a,
+inline void setAdd(SingleValueSet<SubDomainType>& a,
                    const SingleValueSet<SubDomainType>& b) {
-  assert(a._set == SingleValueSet<SubDomainType>::emptyTag);
+  assert(a._set == SingleValueSet<SubDomainType>::emptyTag || a._set == b._set);
   a._set = b._set;
 }
 
