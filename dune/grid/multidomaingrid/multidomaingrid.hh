@@ -271,12 +271,13 @@ public:
   typedef LeafSubDomainInterfaceIterator<const ThisType> LeafSubDomainInterfaceIteratorType;
   typedef LevelSubDomainInterfaceIterator<const ThisType> LevelSubDomainInterfaceIteratorType;
 
-  explicit MultiDomainGrid(HostGrid& hostGrid) :
+  explicit MultiDomainGrid(HostGrid& hostGrid, bool supportLevelIndexSets = true) :
     _hostGrid(hostGrid),
     _leafIndexSet(*this,hostGrid.leafView()),
     _globalIdSet(*this),
     _localIdSet(*this),
     _state(fixed),
+    _supportLevelIndexSets(supportLevelIndexSets),
     _subDomainGrid(*this,0)
   {
     updateIndexSets();
@@ -372,6 +373,9 @@ public:
   }
 
   const typename Traits::LevelIndexSet& levelIndexSet(int level) const {
+    if (!_supportLevelIndexSets) {
+      DUNE_THROW(GridError,"level index set support not enabled for this grid");
+    }
     assert(level <= maxLevel());
     return *_levelIndexSets[level];
   }
@@ -438,8 +442,10 @@ public:
 
   void preUpdateSubDomains() {
     assert(_state == marking);
-    for (int l = 0; l <= maxLevel(); ++l) {
-      _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
+    if (_supportLevelIndexSets) {
+      for (int l = 0; l <= maxLevel(); ++l) {
+        _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
+      }
     }
     _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
     _state = preUpdate;
@@ -448,8 +454,10 @@ public:
   void updateSubDomains() {
     assert(_state == preUpdate);
     _leafIndexSet.swap(*_tmpLeafIndexSet);
-    for (int l = 0; l <= maxLevel(); ++l) {
-      _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
+    if (_supportLevelIndexSets) {
+      for (int l = 0; l <= maxLevel(); ++l) {
+        _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
+      }
     }
     _state = postUpdate;
   }
@@ -491,6 +499,10 @@ public:
     return SubDomainGridPointer(*this,subDomain);
   }
 
+  bool supportLevelIndexSets() const {
+    return _supportLevelIndexSets;
+  }
+
 private:
 
   HostGrid& _hostGrid;
@@ -505,6 +517,7 @@ private:
   LocalIdSetImp _localIdSet;
 
   State _state;
+  const bool _supportLevelIndexSets;
 
   mutable SubDomainGrid _subDomainGrid;
 
@@ -536,8 +549,10 @@ private:
 
   void updateIndexSets() {
     // make sure we have enough LevelIndexSets
-    while (_levelIndexSets.size() <= maxLevel()) {
-      _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
+    if (_supportLevelIndexSets) {
+      while (_levelIndexSets.size() <= maxLevel()) {
+        _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
+      }
     }
 
     _leafIndexSet.reset(true);
