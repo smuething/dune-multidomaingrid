@@ -262,6 +262,11 @@ public:
     setAdd(*this,rhs);
   }
 
+  int domainOffset(DomainType domain) const {
+    assert(domain >= 0 && domain < maxSize);
+    return domain;
+  }
+
   IntegralTypeSubDomainSet() :
     _set(0)
   {}
