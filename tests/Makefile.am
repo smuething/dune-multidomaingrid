@@ -16,7 +16,7 @@ testwrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS)
 testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testwrapper_LIBS = $(ALL_PKG_LIBS)
 
-check_PROGRAMS = test-wrapper testpartitioning
+check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers
 
 test_wrapper_SOURCES = test-wrapper.cc
 test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
@@ -27,3 +27,8 @@ testpartitioning_SOURCES = testpartitioning.cc
 testpartitioning_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
 testpartitioning_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testpartitioning_LIBS = $(ALL_PKG_LIBS)
+
+testlargedomainnumbers_SOURCES = testlargedomainnumbers.cc
+testlargedomainnumbers_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+testlargedomainnumbers_LDFLAGS = $(ALL_PKG_LDFLAGS)
+testlargedomainnumbers_LIBS = $(ALL_PKG_LIBS)
