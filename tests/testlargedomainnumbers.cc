@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     //typedef Dune::YaspGrid<2> GridType;
     Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
-    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::MDGridTraits<GridType::dimension,1> > Grid;
+    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::ArrayBasedTraits<GridType::dimension,1,65536> > Grid;
     Grid grid(wgrid,false);
     grid.globalRefine(8);
     typedef Grid::LeafGridView GridView;

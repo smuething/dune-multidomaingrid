@@ -39,7 +39,7 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
     std::vector<int> sdv1(gv.indexSet().size(2),0);
     for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
       typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::MDGridTraits::template Codim<0>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
+      const typename GridView::Grid::MDGridTraits::template Codim<2>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
       hvid[idx] = idx;
       sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     //typedef Dune::YaspGrid<2> GridType;
     Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
-    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::MDGridTraits<GridType::dimension,4> > Grid;
+    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
     Grid grid(wgrid);
     grid.globalRefine(5);
     typedef Grid::LeafGridView GridView;
@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
 	if (y > 0.3 && y < 0.7) {
 	  if (x < 0.8)
             grid.addToSubDomain(1,e);
-	  if (x > 0.6)
+	  else // if (x > 0.6)
             grid.addToSubDomain(0,e);
 	} else {
             grid.addToSubDomain(0,e);

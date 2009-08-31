@@ -4,6 +4,10 @@
 
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/push_back.hpp>
+#include <boost/integer_traits.hpp>
+#include <dune/grid/multidomaingrid/subdomainset.hh>
+#include <dune/grid/multidomaingrid/arraybasedset.hh>
+#include <dune/grid/multidomaingrid/singlevalueset.hh>
 
 namespace Dune {
 
@@ -28,38 +32,80 @@ struct makeBoolVectorHelper<sequence,val,0> {
 template<int dim, bool val>
 struct makeBoolVector {
 
-  typedef typename makeBoolVectorHelper<mpl::vector_c<bool,val>,dim-1,val>::type type;
+  typedef typename fusion::result_of::as_vector<typename makeBoolVectorHelper<mpl::vector_c<bool,val>,dim-1,val>::type>::type type;
 
 };
 
-template<int dim, std::size_t subDomainsPerCell> //, typename supportedCodims = typename makeBoolVector<dim,true>::type >
-struct MDGridTraits {
+template<int dim, int codim>
+struct AllCodims {
+  static const bool supported = true;
+};
+
+template<int dim, int codim>
+struct CellAndVertexCodims {
+  static const bool supported = (codim == 0 || codim == dim);
+};
+
+template<int dim, std::size_t subDomainsPerCell, std::size_t subDomainCount, template<int dim, int codim> class supportedCodims = AllCodims>
+struct ArrayBasedTraits {
 
   typedef int SubDomainType;
   static const SubDomainType empty = -1;
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
-  static const SubDomainType maxSubDomainIndex = maxSubDomainsPerCell - 1;
+  static const SubDomainType maxSubDomainIndex = subDomainCount;
 
-  //typedef supportedCodims supportedCodimensions;
-
-  struct EmptyCodimBase {};
+  struct EmptyCodimBase {
+    typedef int SizeContainer;
+    typedef int MultiIndexContainer;
+    typedef int SubDomainSet;
+  };
 
   template<int codim>
-  struct Codim {
-    static const bool supported = true;
-    static const std::size_t maxSubDomainsPerEntity = maxSubDomainsPerCell;
+  struct CodimBase {
+    static const std::size_t maxSubDomainsPerEntity = (2<<(codim)) * maxSubDomainsPerCell;
+    typedef Dune::mdgrid::ArrayBasedSet<SubDomainType,maxSubDomainsPerEntity> SubDomainSet;
+    typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
+    typedef std::array<int,maxSubDomainIndex> SizeContainer;
+  };
+
+  template<int codim>
+  struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
+    static const bool supported = supportedCodims<dim,codim>::supported;
+  };
+
+};
+
+template<int dim, std::size_t maxSubDomains, template<int dim, int codim> class supportedCodims = AllCodims >
+struct FewSubDomainsTraits {
+
+  typedef int SubDomainType;
+  static const SubDomainType empty = -1;
+  static const int dimension = dim;
+
+  static const std::size_t maxSubDomainsPerCell = maxSubDomains;
+  static const SubDomainType maxSubDomainIndex = maxSubDomains - 1;
+
+  struct EmptyCodimBase {
+    typedef int SizeContainer;
+    typedef int MultiIndexContainer;
+    typedef int SubDomainSet;
+  };
+
+  template<int codim>
+  struct CodimBase {
+    static const std::size_t maxSubDomainsPerEntity = maxSubDomains;
     typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainType,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
-    typedef std::array<int,maxSubDomainsPerEntity> SizeContainer;
+    typedef std::array<int,maxSubDomainIndex> SizeContainer;
   };
-  /*
+
   template<int codim>
-  struct Codim : public SelectType<mpl::at_c<supportedCodimensions,codim>::type::value,CodimBase<codim>,EmptyCodimBase>::Type {
-    static const bool supported = mpl::at_c<supportedCodimensions,codim>::type::value;
+  struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
+    static const bool supported = supportedCodims<dim,codim>::supported;
   };
-  */
+
 };
 
 } // namespace mdrid
