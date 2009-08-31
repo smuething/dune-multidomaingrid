@@ -32,6 +32,8 @@ class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfa
   typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
   typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
 
+  typedef typename GridImp::SubDomainGrid::Traits::template Codim<0>::Entity SubDomainEntity;
+
   typedef typename GridImp::ctype ctype;
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;
@@ -53,7 +55,9 @@ protected:
     _hostIterator(end ? hostGridView.template end<0>() : hostGridView.template begin<0>()),
     _hostEnd(hostGridView.template end<0>()),
     _hostIntersectionIterator(hostGridView.ibegin(*hostGridView.template begin<0>())),
-    _hostIntersectionEnd(hostGridView.iend(*hostGridView.template begin<0>()))
+    _hostIntersectionEnd(hostGridView.iend(*hostGridView.template begin<0>())),
+    _inverseHostIntersection(hostGridView.ibegin(*hostGridView.template begin<0>())),
+    _inverseHostIntersectionValid(false)
   {
     if (incrementToNextValidEntity()) {
       incrementToNextValidPosition();
@@ -102,9 +106,29 @@ public:
   void increment() {
     ++_hostIntersectionIterator;
     incrementToNextValidPosition();
+    _inverseHostIntersectionValid = false;
     _geometry.clear();
     _geometryInInside.clear();
     _geometryInOutside.clear();
+  }
+
+  void findInverseHostIntersection() {
+    assert(_hostIntersectionIterator->neighbor());
+    _inverseHostIntersection = _hostGridView.ibegin(*_hostIntersectionIterator->outside());
+    while (_hostIntersectionIterator->inside() != _inverseHostIntersection->outside()) {
+      ++_inverseHostIntersection;
+    }
+    _inverseHostIntersectionValid = true;
+  }
+
+  HostIntersectionIterator secondHostIntersection() {
+    if (!_inverseHostIntersectionValid)
+      findInverseHostIntersection();
+    return _inverseHostIntersection;
+  }
+
+  HostIntersectionIterator firstHostIntersection() {
+    return _hostIntersectionIterator;
   }
 
   const Intersection& dereference() const {
@@ -188,6 +212,14 @@ public:
     return -_hostIntersectionIterator->unitOuterNormal(local);
   }
 
+  SubDomainType domain1() const {
+    return _domain1;
+  }
+
+  SubDomainType domain2() const {
+    return _domain2;
+  }
+
 private:
 
   GridView _gridView;
@@ -201,6 +233,9 @@ private:
 
   HostIntersectionIterator _hostIntersectionIterator;
   HostIntersectionIterator _hostIntersectionEnd;
+
+  HostIntersectionIterator _inverseHostIntersection;
+  bool _inverseHostIntersectionValid;
 
   MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
