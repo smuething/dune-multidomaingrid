@@ -415,7 +415,7 @@ public:
 
   typename Traits::LeafIntersectionIterator getSubDomainInterfaceIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
     assert(_subDomain == it.domain1() || _subDomain == it.domain2());
-    if (subDomain == it.domain1())
+    if (_subDomain == it.domain1())
       return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.firstHostIntersection());
     else
       return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.secondHostIntersection());
@@ -423,7 +423,7 @@ public:
 
   typename Traits::LevelIntersectionIterator getSubDomainInterfaceIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
     assert(_subDomain == it.domain1() || _subDomain == it.domain2());
-    if (subDomain == it.domain1())
+    if (_subDomain == it.domain1())
       return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.firstHostIntersection());
     else
       return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.secondHostIntersection());
