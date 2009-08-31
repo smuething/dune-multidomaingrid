@@ -404,13 +404,29 @@ public:
   }
 
   template<int cc>
-  typename Traits::template Codim<cc>::EntityPointer getSubDomainEntity(const typename MDGrid::Traits::template Codim<cc>::Entity& mdEntity) const {
+  typename Traits::template Codim<cc>::EntityPointer toSubDomainEntityPointer(const typename MDGrid::Traits::template Codim<cc>::Entity& mdEntity) const {
     return EntityPointerWrapper<cc,const SubDomainGrid<MDGrid> >(*this,_grid.hostEntityPointer(mdEntity));
   }
 
   template<typename EntityType>
-  typename Traits::template Codim<EntityType::codimension>::EntityPointer getSubDomainEntity(const EntityType& mdEntity) const {
-    return getSubDomainEntity<EntityType::codimension>(mdEntity);
+  typename Traits::template Codim<EntityType::codimension>::EntityPointer toSubDomainEntityPointer(const EntityType& mdEntity) const {
+    return toSubDomainEntityPointer<EntityType::codimension>(mdEntity);
+  }
+
+  typename Traits::LeafIntersectionIterator getSubDomainInterfaceIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
+    assert(_subDomain == it.domain1() || _subDomain == it.domain2());
+    if (subDomain == it.domain1())
+      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.firstHostIntersection());
+    else
+      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.secondHostIntersection());
+  }
+
+  typename Traits::LevelIntersectionIterator getSubDomainInterfaceIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
+    assert(_subDomain == it.domain1() || _subDomain == it.domain2());
+    if (subDomain == it.domain1())
+      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.firstHostIntersection());
+    else
+      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.secondHostIntersection());
   }
 
 private:
