@@ -394,7 +394,7 @@ public:
   void update() const {
     if (_grid.supportLevelIndexSets()) {
       while (_levelIndexSets.size() <= maxLevel()) {
-        _levelIndexSets.push_back(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size())));
+        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size()))));
       }
     }
   }

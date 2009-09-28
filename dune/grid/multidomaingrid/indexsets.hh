@@ -1,6 +1,7 @@
 #ifndef DUNE_MULTIDOMAINGRID_INDEXSETS_HH
 #define DUNE_MULTIDOMAINGRID_INDEXSETS_HH
 
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include <array>
@@ -573,7 +574,7 @@ private:
           indexMap[*it].resize(_his.size(*it));
         }
         // reset SizeMap counter
-        sizeMap[*it].assign(0);
+        std::fill(sizeMap[*it].begin(),sizeMap[*it].end(),0);
       }
       // clear MultiIndexMap
       multiIndexMap.clear();
@@ -608,7 +609,7 @@ private:
       typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,1>::type>::type>::type SizeMap;
       PerCodimSize& perCodimSize = const_cast<PerCodimSize&>(fusion::at_c<0>(t));
       SizeMap& sizeMap = const_cast<SizeMap&>(fusion::at_c<1>(t));
-      perCodimSize.assign(0);
+      std::fill(perCodimSize.begin(),perCodimSize.end(),0);
       // collect per-geometrytype sizes into codim size structure
       std::for_each(util::value_iterator(sizeMap.begin()),
 		    util::value_iterator(sizeMap.end()),

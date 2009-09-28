@@ -23,6 +23,8 @@ AC_CONFIG_FILES([
   dune/Makefile
   dune/grid/Makefile
   dune/grid/multidomaingrid/Makefile
+  doc/Makefile
+  doc/doxygen/Makefile
   tests/Makefile
   dune-multidomaingrid.pc
 ])

@@ -41,6 +41,11 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename T>
+boost::shared_ptr<T> make_shared_ptr(T* ptr) {
+  return boost::shared_ptr<T>(ptr);
+}
+
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
@@ -176,6 +181,13 @@ struct MultiDomainGridFamily {
 
 };
 
+
+//! A meta grid for dividing an existing DUNE grid into subdomains that can be accessed as a grid in their own right.
+/**
+ * \tparam HostGrid             The type of the underlying grid implementation.
+ * \tparam MDGridTraitsType     A traits type for customizing how the MultiDomainGrid manages the partitioning information.
+ */
+
 template<typename HostGrid, typename MDGridTraitsType>
 class MultiDomainGrid :
     public GridDefaultImplementation<HostGrid::dimension,
@@ -271,6 +283,12 @@ public:
   typedef Dune::mdgrid::LeafSubDomainInterfaceIterator<const ThisType> LeafSubDomainInterfaceIterator;
   typedef Dune::mdgrid::LevelSubDomainInterfaceIterator<const ThisType> LevelSubDomainInterfaceIterator;
 
+  //! Constructs a new MultiDomainGrid from the given host grid.
+  /**
+   *
+   * \param hostGrid                the host grid that will be wrapped by the MultiDomainGrid
+   * \param supportLevelIndexSets   flag indicating support for level index sets on subdomains
+   */
   explicit MultiDomainGrid(HostGrid& hostGrid, bool supportLevelIndexSets = true) :
     _hostGrid(hostGrid),
     _leafIndexSet(*this,hostGrid.leafView()),
@@ -284,19 +302,23 @@ public:
     _subDomainGrid.update();
   }
 
+  //! \copydoc Dune::Grid::name()
   std::string name() const {
     return "MultiDomainGrid";
   }
 
+  //! \copydoc Dune::Grid::level()
   std::size_t maxLevel() const {
     return _hostGrid.maxLevel();
   }
 
+  //! \copydoc Dune::Grid::lbegin()
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
     return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lbegin<codim>(level));
   }
 
+  //! \copydoc Dune::Grid::lend()
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
     return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lend<codim>(level));
@@ -434,23 +456,44 @@ public:
     return _hostGrid.comm();
   }
 
+  //! Prepares the grid for (re-)assigning cells to subdomains.
+  /**
+   * After calling this method, it becomes possible to invoke the various methods
+   * for cell assignment to subdomains. When you are done marking, call preUpdateSubDomains().
+   *
+   * IMPORTANT: Reassigning subdomains and grid adaptation are mutually exclusive,
+   * it is not possibly to do both at the same time. This restriction is enforced
+   * by the grid.
+   */
   void startSubDomainMarking() {
     assert(_state == fixed);
     _tmpLeafIndexSet.reset(new LeafIndexSetImp(_leafIndexSet));
     _state = marking;
   }
 
+  //! Calculates the new subdomain layout, but does not update the current subdomains yet.
+  /**
+   * After calling this method, you can query the grid for the changes that will occur when the
+   * new subdomain layout becomes active. This includes the possibility to obtain the new indices
+   * entities will be assigned in the modified subdomains.
+   *
+   * To switch the grid over to the new layout, call updateSubDomains().
+   */
   void preUpdateSubDomains() {
     assert(_state == marking);
     if (_supportLevelIndexSets) {
       for (int l = 0; l <= maxLevel(); ++l) {
-        _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
+        _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(l))));
       }
     }
     _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
     _state = preUpdate;
   }
 
+  //! Switches the subdomain layout over to the new layout.
+  /**
+   *
+   */
   void updateSubDomains() {
     assert(_state == preUpdate);
     _leafIndexSet.swap(*_tmpLeafIndexSet);
@@ -462,6 +505,7 @@ public:
     _state = postUpdate;
   }
 
+  //! clears the saved state of the subdomain layout that was active before the last call to updateSubDomains().
   void postUpdateSubDomains() {
     assert(_state == postUpdate);
     _tmpLevelIndexSets.clear();
@@ -469,36 +513,40 @@ public:
     _state = fixed;
   }
 
+  //! Adds the given leaf entity to the specified subdomain.
   void addToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == marking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->addToSubDomain(subDomain,e);
   }
 
-
+  //! Removes the given leaf entity from the specified subdomain.
   void removeFromSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == marking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->removeFromSubDomain(subDomain,e);
   }
 
-
+  //! Assigns the given leaf entity to the specified subdomain, clearing any previous subdomain assignments.
   void assignToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == marking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
 
+  //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   const SubDomainGrid& subDomain(SubDomainType subDomain) const {
     _subDomainGrid.reset(subDomain);
     _subDomainGrid.update();
     return _subDomainGrid;
   }
 
+  //! Returns a SubDomainGridPointer to the SubDomainGrid associated with the given subdomain.
   SubDomainGridPointer subDomainPointer(SubDomainType subDomain) const {
     return SubDomainGridPointer(*this,subDomain);
   }
 
+  //! Indicates whether this MultiDomainGrid instance supports level index sets on its SubDomainGrids.
   bool supportLevelIndexSets() const {
     return _supportLevelIndexSets;
   }
@@ -551,7 +599,7 @@ private:
     // make sure we have enough LevelIndexSets
     if (_supportLevelIndexSets) {
       while (_levelIndexSets.size() <= maxLevel()) {
-        _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
+        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size()))));
       }
     }
 

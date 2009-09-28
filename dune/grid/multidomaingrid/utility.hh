@@ -2,6 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_UTILITY_HH
 
 #include <tuple>
+#include <dune/common/geometrytype.hh>
 #include <dune/common/iteratorfacades.hh>
 
 namespace Dune {
