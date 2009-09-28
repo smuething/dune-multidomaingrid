@@ -2,19 +2,19 @@ dunedir = $(includedir)/dune
 
 include $(top_srcdir)/am/global-rules
 
-noinst_PROGRAMS = testsubdomainset testindexset testwrapper
+#noinst_PROGRAMS = testindexset testwrapper
 
-testsubdomainset_SOURCES = testsubdomainset.cc
+#testsubdomainset_SOURCES = testsubdomainset.cc
 
-testindexset_SOURCES = testindexset.cc
-testindexset_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
-testindexset_LDFLAGS = $(ALL_PKG_LDFLAGS)
-testindexset_LIBS = $(ALL_PKG_LIBS)
+#testindexset_SOURCES = testindexset.cc
+#testindexset_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+#testindexset_LDFLAGS = $(ALL_PKG_LDFLAGS)
+#testindexset_LIBS = $(ALL_PKG_LIBS)
 
-testwrapper_SOURCES = testwrapper.cc
-testwrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
-testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
-testwrapper_LIBS = $(ALL_PKG_LIBS)
+#testwrapper_SOURCES = testwrapper.cc
+#testwrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+#testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
+#testwrapper_LIBS = $(ALL_PKG_LIBS)
 
 check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers
 
