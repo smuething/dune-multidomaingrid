@@ -41,6 +41,11 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename T>
+boost::shared_ptr<T> make_shared_ptr(T* ptr) {
+  return boost::shared_ptr<T>(ptr);
+}
+
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
@@ -444,7 +449,7 @@ public:
     assert(_state == marking);
     if (_supportLevelIndexSets) {
       for (int l = 0; l <= maxLevel(); ++l) {
-        _tmpLevelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(l)));
+        _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(l))));
       }
     }
     _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
@@ -551,7 +556,7 @@ private:
     // make sure we have enough LevelIndexSets
     if (_supportLevelIndexSets) {
       while (_levelIndexSets.size() <= maxLevel()) {
-        _levelIndexSets.push_back(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size())));
+        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size()))));
       }
     }
 
