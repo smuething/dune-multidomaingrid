@@ -214,9 +214,6 @@ class SubDomainGrid :
   template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
 
-  template<typename>
-  friend class SubDomainGridPointer;
-
   typedef SubDomainGrid<MDGrid> GridImp;
   typedef MDGrid MDGridType;
 
@@ -429,10 +426,9 @@ private:
     _localIdSet(*this,grid._hostGrid.localIdSet()),
     _leafIndexSet(*this,grid.leafIndexSet())
   {
-    // do not call automatically - creates a problem in MultiDomainGrid ctor
-    // update();
+    update();
   }
-
+  /*
   void reset(const SubDomainGrid& rhs) {
     assert(_grid == rhs._grid);
     _subDomain = rhs._subDomain;
@@ -441,7 +437,7 @@ private:
   void reset(const SubDomainType subDomain) {
     _subDomain = subDomain;
   }
-
+  */
   template<typename EntityType>
   bool containsHostEntity(const EntityType& e) const {
     return levelIndexSet(e.level()).containsHostEntity(e);
@@ -456,6 +452,9 @@ private:
   const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
     return *(getRealImplementation(e).hostEntityPointer());
   }
+
+  SubDomainGrid(const SubDomainGrid& rv);
+  SubDomainGrid& operator=(const SubDomainGrid& rv);
 
 };
 

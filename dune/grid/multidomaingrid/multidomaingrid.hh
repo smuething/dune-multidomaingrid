@@ -21,7 +21,6 @@ namespace detail {
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>
-#include <dune/grid/multidomaingrid/subdomaingrid/subdomaingridpointer.hh>
 
 #include <dune/grid/multidomaingrid/geometry.hh>
 #include <dune/grid/multidomaingrid/entity.hh>
@@ -247,9 +246,6 @@ class MultiDomainGrid :
   template <typename>
   friend class LevelSubDomainInterfaceIterator;
 
-  template<typename>
-  friend class subdomain::SubDomainGridPointer;
-
   typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
   typedef HostGrid HostGridType;
 
@@ -278,7 +274,6 @@ public:
   static const SubDomainType maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
 
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
-  typedef subdomain::SubDomainGridPointer<SubDomainGrid> SubDomainGridPointer;
 
   typedef LeafSubDomainInterfaceIterator<const ThisType> LeafSubDomainInterfaceIteratorType;
   typedef LevelSubDomainInterfaceIterator<const ThisType> LevelSubDomainInterfaceIteratorType;
@@ -295,11 +290,9 @@ public:
     _globalIdSet(*this),
     _localIdSet(*this),
     _state(fixed),
-    _supportLevelIndexSets(supportLevelIndexSets),
-    _subDomainGrid(*this,0)
+    _supportLevelIndexSets(supportLevelIndexSets)
   {
     updateIndexSets();
-    _subDomainGrid.update();
   }
 
   //! \copydoc Dune::Grid::name()
@@ -536,14 +529,12 @@ public:
 
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   const SubDomainGrid& subDomain(SubDomainType subDomain) const {
-    _subDomainGrid.reset(subDomain);
-    _subDomainGrid.update();
-    return _subDomainGrid;
-  }
-
-  //! Returns a SubDomainGridPointer to the SubDomainGrid associated with the given subdomain.
-  SubDomainGridPointer subDomainPointer(SubDomainType subDomain) const {
-    return SubDomainGridPointer(*this,subDomain);
+    boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
+    if (!subGridPointer) {
+      subGridPointer.reset(new SubDomainGrid(*this,subDomain));
+      // subGridPointer->update();
+    }
+    return *subGridPointer;
   }
 
   //! Indicates whether this MultiDomainGrid instance supports level index sets on its SubDomainGrids.
@@ -567,7 +558,7 @@ private:
   State _state;
   const bool _supportLevelIndexSets;
 
-  mutable SubDomainGrid _subDomainGrid;
+  mutable std::map<SubDomainType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
 
   template<typename Entity>
   struct HostEntity {
