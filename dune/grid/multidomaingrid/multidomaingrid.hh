@@ -268,11 +268,19 @@ public:
   typedef MDGridTraitsType MDGridTraits;
   typedef typename HostGrid::ctype ctype;
 
+  //! The (integer) type used to identify subdomains.
   typedef typename MDGridTraits::SubDomainType SubDomainType;
 
+  //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
+  //! The largest allowed index for a subdomain.
+  /**
+   * \note As subdomain indices always start at 0, this constant also determines the maximum
+   * number of possible subdomains.
+   */
   static const SubDomainType maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
 
+  //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
 
   typedef LeafSubDomainInterfaceIterator<const ThisType> LeafSubDomainInterfaceIteratorType;
@@ -295,23 +303,21 @@ public:
     updateIndexSets();
   }
 
-  //! \copydoc Dune::Grid::name()
+  //! The grid identifier.
   std::string name() const {
     return "MultiDomainGrid";
   }
 
-  //! \copydoc Dune::Grid::level()
+  //! The current maximum level of the grid.
   std::size_t maxLevel() const {
     return _hostGrid.maxLevel();
   }
 
-  //! \copydoc Dune::Grid::lbegin()
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
     return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lbegin<codim>(level));
   }
 
-  //! \copydoc Dune::Grid::lend()
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
     return LevelIteratorWrapper<codim,All_Partition,const GridImp>(_hostGrid.template lend<codim>(level));
@@ -347,6 +353,16 @@ public:
     return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafend<codim,PiType>());
   }
 
+  //! Returns an iterator over the leaf interface of two subdomains.
+  /**
+   * The resulting iterator will visit all cell intersections that are part of both subdomains.
+   *
+   * \attention The iterator assumes the two subdomains to be non-overlapping! If there is an overlap,
+   * some intersections will be iterated over twice!
+   *
+   * \param subDomain1 the first subdomain
+   * \param subDomain2 the second subdomain
+   */
   LeafSubDomainInterfaceIteratorType leafSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2) const {
     return LeafSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2);
   }
