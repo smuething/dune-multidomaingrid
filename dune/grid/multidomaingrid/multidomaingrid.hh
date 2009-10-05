@@ -64,6 +64,8 @@ struct MultiDomainGridFamily {
             template<int,PartitionIteratorType,class> class LeafIteratorImp,
             class LevelIndexSetImp, class LeafIndexSetImp,
             class GlobalIdSetImp, class GIDType, class LocalIdSetImp, class LIDType, class CCType,
+            template<class> class LeafSubDomainInterfaceIteratorImp,
+            template<class> class LevelSubDomainInterfaceIteratorImp,
             template<class,PartitionIteratorType> class LevelGridViewTraits = DefaultLevelGridViewTraits,
             template<class,PartitionIteratorType> class LeafGridViewTraits = DefaultLeafGridViewTraits
             >
@@ -153,6 +155,9 @@ struct MultiDomainGridFamily {
 
     /** \brief The type of the collective communication. */
     typedef CCType CollectiveCommunication;
+
+    typedef LeafSubDomainInterfaceIteratorImp<const GridImp> LeafSubDomainInterfaceIterator;
+    typedef LevelSubDomainInterfaceIteratorImp<const GridImp> LevelSubDomainInterfaceIterator;
   };
 
   typedef MultiDomainGridTraits<
@@ -175,7 +180,9 @@ struct MultiDomainGridFamily {
     typename HostGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const MultiDomainGrid<HostGrid,MDGridTraits>, typename HostGrid::Traits::LocalIdSet>,
     typename HostGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<HostGrid>
+    CollectiveCommunication<HostGrid>,
+    LeafSubDomainInterfaceIterator,
+    LevelSubDomainInterfaceIterator
     > Traits;
 
 };
@@ -283,8 +290,8 @@ public:
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
 
-  typedef LeafSubDomainInterfaceIterator<const ThisType> LeafSubDomainInterfaceIteratorType;
-  typedef LevelSubDomainInterfaceIterator<const ThisType> LevelSubDomainInterfaceIteratorType;
+  typedef typename Traits::LeafSubDomainInterfaceIterator LeafSubDomainInterfaceIterator;
+  typedef typename Traits::LevelSubDomainInterfaceIterator LevelSubDomainInterfaceIterator;
 
   //! Constructs a new MultiDomainGrid from the given host grid.
   /**
@@ -363,20 +370,20 @@ public:
    * \param subDomain1 the first subdomain
    * \param subDomain2 the second subdomain
    */
-  LeafSubDomainInterfaceIteratorType leafSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2) const {
-    return LeafSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2);
+  LeafSubDomainInterfaceIterator leafSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2) const {
+    return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2);
   }
 
-  LeafSubDomainInterfaceIteratorType leafSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2) const {
-    return LeafSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2,true);
+  LeafSubDomainInterfaceIterator leafSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2) const {
+    return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2,true);
   }
 
-  LevelSubDomainInterfaceIteratorType levelSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
-    return LevelSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2,level);
+  LevelSubDomainInterfaceIterator levelSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
+    return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level);
   }
 
-  LevelSubDomainInterfaceIteratorType levelSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
-    return LevelSubDomainInterfaceIteratorType(*this,subDomain1,subDomain2,level,true);
+  LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
+    return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level,true);
   }
 
   int size(int level, int codim) const {
