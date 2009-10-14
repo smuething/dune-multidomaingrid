@@ -60,7 +60,7 @@ protected:
     }
   }
 
-public:
+private:
 
   bool incrementToNextValidEntity() {
     while (_hostIterator != _hostEnd) {
@@ -110,6 +110,9 @@ public:
   const Intersection& dereference() const {
     return reinterpret_cast<const Intersection&>(*this);
   }
+
+
+public:
 
   const Intersection& operator*() const {
     return dereference();
