@@ -122,18 +122,22 @@ public:
     return &(dereference());
   }
 
+  //! Returns an EntityPointer to the corresponding cell in the first subdomain.
   EntityPointer firstCell() const {
     return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->inside());
   }
 
+  //! Returns an EntityPointer to the corresponding cell in the second subdomain.
   EntityPointer secondCell() const {
     return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->outside());
   }
 
+  //! Returns true if this intersection is conforming.
   bool conforming() const {
     return _hostIntersectionIterator->conforming();
   }
 
+  //! Returns the local geometry in the corresponding cell of the first subdomain.
   const LocalGeometry& geometryInFirstCell() const {
     if (!_geometryInInside.isSet()) {
       _geometryInInside.reset(_hostIntersectionIterator->geometryInInside());
@@ -141,6 +145,7 @@ public:
     return _geometryInInside;
   }
 
+  //! Returns the local geometry in the corresponding cell of the second subdomain.
   const LocalGeometry& geometryInSecondCell() const {
     if (!_geometryInOutside.isSet()) {
       _geometryInOutside.reset(_hostIntersectionIterator->geometryInOutside());
@@ -148,6 +153,7 @@ public:
     return _geometryInOutside;
   }
 
+  //! Returns the global geometry of the intersection.
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
       _geometry.reset(_hostIntersectionIterator->geometry());
@@ -155,14 +161,19 @@ public:
     return _geometry;
   }
 
+  //! Returns the GeometryType of this intersection.
   GeometryType type() const {
     return _hostIntersectionIterator->type();
   }
 
+  //! Returns the subindex of the corresponding face in the cell belonging to the
+  //! first subdomain.
   int indexInFirstCell() const {
     return _hostIntersectionIterator->indexInInside();
   }
 
+  //! Returns the subindex of the corresponding face in the cell belonging to the
+  //! second subdomain.
   int indexInSecondCell() const {
     return _hostIntersectionIterator->indexInOutside();
   }

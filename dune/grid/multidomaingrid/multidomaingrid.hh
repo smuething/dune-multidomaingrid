@@ -290,7 +290,11 @@ public:
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
 
+
+  //! The type of the iterators over the codim 1 interface between two subdomains on the leaf view.
   typedef typename Traits::LeafSubDomainInterfaceIterator LeafSubDomainInterfaceIterator;
+
+  //! The type of the iterators over the codim 1 interface between two subdomains on a level view.
   typedef typename Traits::LevelSubDomainInterfaceIterator LevelSubDomainInterfaceIterator;
 
   //! Constructs a new MultiDomainGrid from the given host grid.
