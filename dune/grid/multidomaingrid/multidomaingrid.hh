@@ -691,6 +691,7 @@ private:
       typename AdaptationStateMap::iterator asmit = _adaptationStateMap.find(localIdSet().id(*ep));
       while(asmit == _adaptationStateMap.end()) {
         ep = ep->father();
+        asmit = _adaptationStateMap.find(localIdSet().id(*ep));
       }
       _leafIndexSet.addToSubDomains(asmit->second, *it);
     }
