@@ -264,11 +264,9 @@ class MultiDomainGrid :
 
   typedef IdSetWrapper<const GridImp, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
 
-  typedef std::map<LocalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> AdaptationStateMap;
+  typedef std::map<typename LocalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> AdaptationStateMap;
 
-  enum State { fixed, marking, preUpdate, postUpdate };
-
-  enum AdaptState { fixed, preAdapt, postAdapt };
+  enum State { fixed, marking, preUpdate, postUpdate, preAdapt, postAdapt };
 
   typedef GridImp ThisType;
 
@@ -596,7 +594,7 @@ private:
   LocalIdSetImp _localIdSet;
 
   State _state;
-  AdaptState _adaptState;
+  State _adaptState;
   const bool _supportLevelIndexSets;
 
   mutable std::map<SubDomainType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
