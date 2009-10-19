@@ -64,7 +64,7 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
     vtkWriter.addVertexData(sdv0,"vertex_subdomain0");
     vtkWriter.addVertexData(sdv1,"vertex_subdomain1");
     vtkWriter.addVertexData(hvid,"vertex_hostIndex");
-    vtkWriter.write(filename,Dune::VTKOptions::binary);
+    vtkWriter.write(filename,Dune::VTKOptions::ascii);
 }
 
 template<typename GridView>
@@ -84,7 +84,7 @@ void vtkOut2(GridView gv,std::string filename) {
     Dune::VTKWriter<GridView> vtkWriter(gv);
     vtkWriter.addCellData(cid,"cellIndex");
     vtkWriter.addVertexData(vid,"vertexIndex");
-    vtkWriter.write(filename,Dune::VTKOptions::binary);
+    vtkWriter.write(filename,Dune::VTKOptions::ascii);
 }
 
 int main(int argc, char** argv) {
