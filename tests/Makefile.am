@@ -11,7 +11,7 @@ include $(top_srcdir)/am/global-rules
 #testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
 #testwrapper_LIBS = $(ALL_PKG_LIBS)
 
-check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers
+check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers testadaptation
 
 test_wrapper_SOURCES = test-wrapper.cc
 test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
@@ -25,5 +25,10 @@ testpartitioning_LIBS = $(ALL_PKG_LIBS)
 
 testlargedomainnumbers_SOURCES = testlargedomainnumbers.cc
 testlargedomainnumbers_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+testlargedomainnumbers_LDFLAGS = $(ALL_PKG_LDFLAGS)
+testlargedomainnumbers_LIBS = $(ALL_PKG_LIBS)
+
+testlargedomainnumbers_SOURCES = testadaptation.cc
+testlargedomainnumbers_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
 testlargedomainnumbers_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testlargedomainnumbers_LIBS = $(ALL_PKG_LIBS)
