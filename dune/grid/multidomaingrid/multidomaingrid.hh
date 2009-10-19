@@ -266,6 +266,8 @@ class MultiDomainGrid :
 
   enum State { fixed, marking, preUpdate, postUpdate };
 
+  enum AdaptState { fixed, preAdapt, postAdapt };
+
   typedef GridImp ThisType;
 
 public:
@@ -309,6 +311,7 @@ public:
     _globalIdSet(*this),
     _localIdSet(*this),
     _state(fixed),
+    _adaptState(fixed),
     _supportLevelIndexSets(supportLevelIndexSets)
   {
     updateIndexSets();
@@ -440,19 +443,22 @@ public:
   }
 
   bool preAdapt() {
-    assert(_state == fixed);
+    assert(_state == fixed && _adaptState == fixed);
+    _adaptState = preAdapt;
     return _hostGrid.preAdapt();
   }
 
   bool adapt() {
-    assert(_state == fixed);
+    assert(_state == fixed && _adaptState == preAdapt);
+    _adaptState = postAdapt;
     bool r = _hostGrid.adapt();
     updateIndexSets();
     return r;
   }
 
   void postAdapt() {
-    assert(_state == fixed);
+    assert(_state == fixed && _adaptState == postAdapt);
+    _adaptState = fixed;
     _hostGrid.postAdapt();
   }
 
@@ -486,7 +492,7 @@ public:
    * by the grid.
    */
   void startSubDomainMarking() {
-    assert(_state == fixed);
+    assert(_state == fixed && _adaptState == fixed);
     _tmpLeafIndexSet.reset(new LeafIndexSetImp(_leafIndexSet));
     _state = marking;
   }
@@ -500,7 +506,7 @@ public:
    * To switch the grid over to the new layout, call updateSubDomains().
    */
   void preUpdateSubDomains() {
-    assert(_state == marking);
+    assert(_state == marking && _adaptState == fixed);
     if (_supportLevelIndexSets) {
       for (int l = 0; l <= maxLevel(); ++l) {
         _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(l))));
@@ -515,7 +521,7 @@ public:
    *
    */
   void updateSubDomains() {
-    assert(_state == preUpdate);
+    assert(_state == preUpdate && _adaptState == fixed);
     _leafIndexSet.swap(*_tmpLeafIndexSet);
     if (_supportLevelIndexSets) {
       for (int l = 0; l <= maxLevel(); ++l) {
@@ -527,7 +533,7 @@ public:
 
   //! clears the saved state of the subdomain layout that was active before the last call to updateSubDomains().
   void postUpdateSubDomains() {
-    assert(_state == postUpdate);
+    assert(_state == postUpdate && _adaptState == fixed);
     _tmpLevelIndexSets.clear();
     _tmpLeafIndexSet.reset(NULL);
     _state = fixed;
@@ -583,6 +589,7 @@ private:
   LocalIdSetImp _localIdSet;
 
   State _state;
+  AdaptState _adaptState;
   const bool _supportLevelIndexSets;
 
   mutable std::map<SubDomainType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
