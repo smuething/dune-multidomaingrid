@@ -445,13 +445,16 @@ public:
   bool preAdapt() {
     assert(_state == fixed && _adaptState == fixed);
     _adaptState = preAdapt;
-    return _hostGrid.preAdapt();
+    bool result = _hostGrid.preAdapt();
+    saveMultiDomainState();
+    return result;
   }
 
   bool adapt() {
     assert(_state == fixed && _adaptState == preAdapt);
     _adaptState = postAdapt;
     bool r = _hostGrid.adapt();
+    restoreMultiDomainState();
     updateIndexSets();
     return r;
   }
@@ -633,6 +636,12 @@ private:
 
     _globalIdSet.update(_hostGrid.globalIdSet());
     _localIdSet.update(_hostGrid.localIdSet());
+  }
+
+  void saveMultiDomainState() {
+  }
+
+  void restoreMultiDomainState() {
   }
 
 };
