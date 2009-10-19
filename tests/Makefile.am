@@ -28,7 +28,7 @@ testlargedomainnumbers_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PK
 testlargedomainnumbers_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testlargedomainnumbers_LIBS = $(ALL_PKG_LIBS)
 
-testlargedomainnumbers_SOURCES = testadaptation.cc
-testlargedomainnumbers_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
-testlargedomainnumbers_LDFLAGS = $(ALL_PKG_LDFLAGS)
-testlargedomainnumbers_LIBS = $(ALL_PKG_LIBS)
+testadaptation_SOURCES = testadaptation.cc
+testadaptation_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+testadaptation_LDFLAGS = $(ALL_PKG_LDFLAGS)
+testadaptation_LIBS = $(ALL_PKG_LIBS)
