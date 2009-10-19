@@ -180,7 +180,7 @@ struct MultiDomainGridFamily {
     typename HostGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const MultiDomainGrid<HostGrid,MDGridTraits>, typename HostGrid::Traits::LocalIdSet>,
     typename HostGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<HostGrid>,
+    typename HostGrid::CollectiveCommunication,
     LeafSubDomainInterfaceIterator,
     LevelSubDomainInterfaceIterator
     > Traits;
