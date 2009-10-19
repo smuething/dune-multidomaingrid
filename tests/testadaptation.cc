@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
     vtkOut2(grid.subDomain(0).leafView(),"0_subdomain0");
     vtkOut2(grid.subDomain(1).leafView(),"0_subdomain1");
 
-    grid.globalrefine(1);
+    grid.globalRefine(1);
 
     vtkOut(gv,"1_leafView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
     vtkOut(grid.levelView(0),"1_levelView0",grid.levelSubDomainInterfaceBegin(0,1,0),grid.levelSubDomainInterfaceEnd(0,1,0));
