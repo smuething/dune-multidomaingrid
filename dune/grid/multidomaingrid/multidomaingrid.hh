@@ -264,9 +264,7 @@ class MultiDomainGrid :
 
   typedef IdSetWrapper<const GridImp, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
 
-  typedef std::map<typename LocalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> AdaptationStateMap;
-
-  enum State { fixed, marking, preUpdate, postUpdate, preAdapt, postAdapt };
+  enum State { stateFixed, stateMarking, statePreUpdate, statePostUpdate, statePreAdapt, statePostAdapt };
 
   typedef GridImp ThisType;
 
@@ -276,6 +274,12 @@ public:
   typedef typename GridFamily::Traits Traits;
   typedef MDGridTraitsType MDGridTraits;
   typedef typename HostGrid::ctype ctype;
+
+private:
+
+  typedef std::map<typename Traits::LocalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> AdaptationStateMap;
+
+public:
 
   //! The (integer) type used to identify subdomains.
   typedef typename MDGridTraits::SubDomainType SubDomainType;
@@ -310,8 +314,8 @@ public:
     _leafIndexSet(*this,hostGrid.leafView()),
     _globalIdSet(*this),
     _localIdSet(*this),
-    _state(fixed),
-    _adaptState(fixed),
+    _state(stateFixed),
+    _adaptState(stateFixed),
     _supportLevelIndexSets(supportLevelIndexSets)
   {
     updateIndexSets();
@@ -437,24 +441,26 @@ public:
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
+    assert(_state == stateFixed);
     return _hostGrid.mark(refCount, hostEntity(e));
   }
 
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
+    assert(_state == stateFixed);
     return _hostGrid.getMark(hostEntity(e));
   }
 
   bool preAdapt() {
-    assert(_state == fixed && _adaptState == fixed);
-    _adaptState = preAdapt;
+    assert(_state == stateFixed && _adaptState == stateFixed);
+    _adaptState = statePreAdapt;
     bool result = _hostGrid.preAdapt();
     saveMultiDomainState();
     return result;
   }
 
   bool adapt() {
-    assert(_state == fixed && _adaptState == preAdapt);
-    _adaptState = postAdapt;
+    assert(_state == stateFixed && _adaptState == statePreAdapt);
+    _adaptState = statePostAdapt;
     bool result = _hostGrid.adapt();
     updateIndexSets();
     restoreMultiDomainState();
@@ -462,8 +468,8 @@ public:
   }
 
   void postAdapt() {
-    assert(_state == fixed && _adaptState == postAdapt);
-    _adaptState = fixed;
+    assert(_state == stateFixed && _adaptState == statePostAdapt);
+    _adaptState = stateFixed;
     _hostGrid.postAdapt();
   }
 
@@ -497,9 +503,9 @@ public:
    * by the grid.
    */
   void startSubDomainMarking() {
-    assert(_state == fixed && _adaptState == fixed);
+    assert(_state == stateFixed && _adaptState == stateFixed);
     _tmpLeafIndexSet.reset(new LeafIndexSetImp(_leafIndexSet));
-    _state = marking;
+    _state = stateMarking;
   }
 
   //! Calculates the new subdomain layout, but does not update the current subdomains yet.
@@ -511,14 +517,14 @@ public:
    * To switch the grid over to the new layout, call updateSubDomains().
    */
   void preUpdateSubDomains() {
-    assert(_state == marking && _adaptState == fixed);
+    assert(_state == stateMarking && _adaptState == stateFixed);
     if (_supportLevelIndexSets) {
       for (int l = 0; l <= maxLevel(); ++l) {
         _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(l))));
       }
     }
     _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
-    _state = preUpdate;
+    _state = statePreUpdate;
   }
 
   //! Switches the subdomain layout over to the new layout.
@@ -526,41 +532,41 @@ public:
    *
    */
   void updateSubDomains() {
-    assert(_state == preUpdate && _adaptState == fixed);
+    assert(_state == statePreUpdate && _adaptState == stateFixed);
     _leafIndexSet.swap(*_tmpLeafIndexSet);
     if (_supportLevelIndexSets) {
       for (int l = 0; l <= maxLevel(); ++l) {
         _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
       }
     }
-    _state = postUpdate;
+    _state = statePostUpdate;
   }
 
   //! clears the saved state of the subdomain layout that was active before the last call to updateSubDomains().
   void postUpdateSubDomains() {
-    assert(_state == postUpdate && _adaptState == fixed);
+    assert(_state == statePostUpdate && _adaptState == stateFixed);
     _tmpLevelIndexSets.clear();
     _tmpLeafIndexSet.reset(NULL);
-    _state = fixed;
+    _state = stateFixed;
   }
 
   //! Adds the given leaf entity to the specified subdomain.
   void addToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
-    assert(_state == marking);
+    assert(_state == stateMarking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->addToSubDomain(subDomain,e);
   }
 
   //! Removes the given leaf entity from the specified subdomain.
   void removeFromSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
-    assert(_state == marking);
+    assert(_state == stateMarking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->removeFromSubDomain(subDomain,e);
   }
 
   //! Assigns the given leaf entity to the specified subdomain, clearing any previous subdomain assignments.
   void assignToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
-    assert(_state == marking);
+    assert(_state == stateMarking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
@@ -643,22 +649,23 @@ private:
   }
 
   void saveMultiDomainState() {
-    LeafGridView gv = leafView();
-    typedef typename LeafGridView::Codim<0>::Iterator Iterator;
-    typedef typename LeafGridView::Codim<0>::EntityPointer EntityPointer;
-    typedef typename LeafGridView::Codim<0>::Entity Entity;
+    typedef typename ThisType::LeafGridView GV;
+    GV gv = this->leafView();
+    typedef typename GV::template Codim<0>::Iterator Iterator;
+    typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
+    typedef typename GV::template Codim<0>::Entity Entity;
     typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
-    for (Iterator it = gv.begin(); it != gv.end(); ++it) {
+    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
       const Entity& e = *it;
       const SubDomainSet& subDomains = gv.indexSet().subDomains(e);
       _adaptationStateMap[localIdSet().id(e)] = subDomains;
       EntityPointer ep(e);
-      while (e->mightVanish()) {
-        e = e->father();
-        LocalIdSet::IdType id = localIdSet().id(e);
+      while (ep->mightVanish()) {
+        ep = ep->father();
+        typename Traits::LocalIdSet::IdType id = localIdSet().id(*ep);
         // if the entity has not been added to the set, create a new entry
         // (entity returns false and does not change the map if there is already an entry for "id")
-        if (!_adaptationStateMap.insert(AdaptationStateMap::value_type(id,subDomains))) {
+        if (!_adaptationStateMap.insert(typename AdaptationStateMap::value_type(id,subDomains)).second) {
           // otherwise add the leaf entity's subdomains to the existing set of subdomains
           _adaptationStateMap[id].addAll(subDomains);
         }
@@ -667,24 +674,25 @@ private:
   }
 
   void restoreMultiDomainState() {
-    LeafGridView gv = leafView();
-    typedef typename LeafGridView::Codim<0>::Iterator Iterator;
-    typedef typename LeafGridView::Codim<0>::EntityPointer EntityPointer;
-    typedef typename LeafGridView::Codim<0>::Entity Entity;
+    typedef typename ThisType::LeafGridView GV;
+    GV gv = this->leafView();
+    typedef typename GV::template Codim<0>::Iterator Iterator;
+    typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
+    typedef typename GV::template Codim<0>::Entity Entity;
     typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
-    for (Iterator it = gv.begin(); it != gv.end(); ++it) {
-      const EntityPointer ep(it);
+    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
+      EntityPointer ep(it);
       // First try to exploit the information in the underlying grid
       while (ep->isNew()) {
         ep = ep->father();
       }
       // This might not work, as there are no isNew() marks for globalrefine()
       // We thus have to look up the former leaf entity in our adaptation map
-      AdaptationStateMap::iterator asmit = _adaptationStateMap.find(localIdSet().id(*ep));
+      typename AdaptationStateMap::iterator asmit = _adaptationStateMap.find(localIdSet().id(*ep));
       while(asmit == _adaptationStateMap.end()) {
         ep = ep->father();
       }
-      leafIndexSet().addToSubDomains(asmit->second, *it);
+      _leafIndexSet.addToSubDomains(asmit->second, *it);
     }
     _leafIndexSet.update(_levelIndexSets,false);
     _adaptationStateMap.clear();
