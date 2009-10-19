@@ -1,7 +1,10 @@
 #include "config.h"
+#define GRIDDIM 2
+#define ALUGRID_SIMPLEX
 #include <iostream>
 #include <dune/common/mpihelper.hh>
 #include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
+#include <dune/grid/alugrid.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/multidomaingrid.hh>
 
@@ -90,7 +93,7 @@ void vtkOut2(GridView gv,std::string filename) {
 int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
-    typedef Dune::ALUSimplexGrid<2> GridType;
+    //typedef Dune::ALUSimplexGrid<2,2> AdaptableGridType;
     Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
