@@ -31,8 +31,12 @@ namespace fusion = boost::fusion;
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
+//! @cond DEV_DOC
+
+//! \internal
 namespace detail {
 
+//! \internal template meta program for assembling the per-codim map vector
 template<template<int> class buildForCodim, int codim>
 struct buildMap {
 
@@ -42,6 +46,7 @@ struct buildMap {
 
 };
 
+//! \internal recursion limit for buildMap template meta program
 template<template<int> class buildForCodim>
 struct buildMap<buildForCodim,0> {
 
@@ -49,6 +54,14 @@ struct buildMap<buildForCodim,0> {
 
 };
 
+//! \internal Helper mechanism for dispatching a call to a possibly non-existent method
+/**
+ * This trick is necessary because some calls in the indexset (e.g. IndexSet::size(int codim) )
+ * pass the codim as a run-time parameter. But as we do not necessarily support all codimensions,
+ * we have to make sure that we only call the actual method if there is a data structure to
+ * operate on. This is handled by the template parameter doDispatch: The specialisation for
+ * doDispatch == false will simply throw an exception.
+ */
 template<bool doDispatch, typename Impl, typename resulttype>
 struct invokeIf {
 
@@ -67,6 +80,7 @@ struct invokeIf {
 
 };
 
+//! \internal
 template<typename Impl, typename resulttype>
 struct invokeIf<false,Impl, resulttype> {
 
@@ -85,6 +99,7 @@ struct invokeIf<false,Impl, resulttype> {
 
 };
 
+//! \internal Template meta program for dispatching a method to the correctly parameterised template method base on a run-time parameter
 template<typename Impl, typename resulttype, typename MDGridTraits, int codim>
 struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1> {
 
@@ -98,6 +113,7 @@ struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,cod
 
 };
 
+//! \internal Recursion limit for dispatchToCodim
 template<typename Impl, typename resulttype, typename MDGridTraits>
 struct dispatchToCodim<Impl,resulttype,MDGridTraits,0> {
 
@@ -111,6 +127,11 @@ struct dispatchToCodim<Impl,resulttype,MDGridTraits,0> {
 
 };
 
+/**
+ * \internal Helper structure for protecting calls at non-supported codims, similar to invokeIf.
+ *
+ * The main difference is that failures are silently ignored and that the called method may not return anything.
+ */
 template<bool doApply, typename Impl>
 struct applyIf {
 
@@ -127,6 +148,7 @@ struct applyIf {
 
 };
 
+//! \internal
 template<typename Impl>
 struct applyIf<false,Impl> {
 
@@ -142,6 +164,7 @@ struct applyIf<false,Impl> {
 
 };
 
+//! \internal Little helper function for casting away constness. Avoids having to spell out the typename.
 template<typename T>
 T& rw(const T& t) {
   return const_cast<T&>(t);
@@ -149,7 +172,11 @@ T& rw(const T& t) {
 
 }
 
+//! @endcond
 
+/**
+ * Index set for the MultiDomainGrid.
+ */
 template<typename GridImp, typename HostGridViewType>
 class IndexSetWrapper :
     public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,HostGridViewType>,
@@ -161,6 +188,12 @@ class IndexSetWrapper :
 
   template<typename, typename>
   friend class MultiDomainGrid;
+
+  template<typename, typename>
+  friend class subdomain::IndexSetWrapper;
+
+  template<typename, typename, typename, typename, typename>
+  friend class SubDomainInterfaceIterator;
 
   typedef IndexSetWrapper<GridImp,HostGridViewType> ThisType;
 
@@ -195,8 +228,10 @@ private:
     IndexType index;
   };
 
+  //! Placeholder struct for non-supported codimensions in data structures.
   struct NotSupported {};
 
+  //! TMP struct for selecting the index map for the requested codimension.
   template<int codim>
   struct buildIndexMapForCodim {
 
@@ -210,6 +245,7 @@ private:
                                 >::Type type;
   };
 
+  //! TMP struct for constructing the per-GeometryType size map for the requested codimension.
   template<int codim>
   struct buildSizeMapForCodim {
 
@@ -221,6 +257,7 @@ private:
                                 >::Type type;
   };
 
+  //! TMP struct for constructing the per-codimension index map for the requested codimension.
   template<int codim>
   struct buildCodimSizeMapForCodim {
 
@@ -232,7 +269,7 @@ private:
                                 >::Type type;
   };
 
-
+  //! TMP struct for constructing the per-codimension multi-index map for managing entities belonging to several subdomains.
   template<int codim>
   struct buildMultiIndexMapForCodim {
 
@@ -245,6 +282,7 @@ private:
   };
 
   typedef std::array<IndexType,maxSubDomains> SizeContainer;
+
   typedef typename detail::buildMap<buildIndexMapForCodim,dimension>::type IndexMap;
   typedef typename detail::buildMap<buildSizeMapForCodim,dimension>::type SizeMap;
   typedef typename detail::buildMap<buildCodimSizeMapForCodim,dimension>::type CodimSizeMap;
@@ -252,62 +290,77 @@ private:
 
   typedef std::vector<boost::shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
 
+  //! Convenience subclass of dispatchToCodim for automatically passing in the MDGridTraits and the dimension
   template<typename Impl,typename result_type>
   struct dispatchToCodim : public detail::dispatchToCodim<Impl,result_type,MDGridTraits,dimension> {};
 
 public:
 
+  //! Returns the index of the entity with codimension codim.
   template<int codim>
   IndexType index(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {
     return _hostGridView.indexSet().index(_grid.hostEntity(e));
   }
 
+  //! Returns the index of the entity.
   template<typename Entity>
   IndexType index(const Entity& e) const {
     return _hostGridView.indexSet().index(_grid.hostEntity(e));
   }
 
+  //! Returns the subdindex of the i-th subentity of e with codimension codim.
   template<int codim>
   IndexType subIndex(const Codim0Entity& e, int i) const {
     return _hostGridView.indexSet().subIndex(_grid.hostEntity(e),i,codim);
   }
 
+  //! Returns the subdindex of the i-th subentity of e with codimension codim.
   IndexType subIndex(const Codim0Entity& e, int i, unsigned int codim) const {
     return _hostGridView.indexSet().subIndex(_grid.hostEntity(e),i,codim);
   }
 
+  //! Returns a list of all geometry types with codimension codim contained in the grid.
   const std::vector<GeometryType>& geomTypes(int codim) const {
     return _hostGridView.indexSet().geomTypes(codim);
   }
 
+  //! Returns the number of entities with GeometryType type in the grid.
   IndexType size(GeometryType type) const {
     return _hostGridView.indexSet().size(type);
   }
 
+  //! Returns the number of entities with codimension codim in the grid.
   IndexType size(int codim) const {
     return _hostGridView.indexSet().size(codim);
   }
 
+  //! Returns true if the entity is contained in the grid.
   template<typename EntityType>
   bool contains(const EntityType& e) const {
     return _hostGridView.indexSet().contains(_grid.hostEntity(e));
   }
 
+  //! Returns a constant reference to the SubDomainSet of the given entity.
   template<typename EntityType>
   const typename MapEntry<EntityType::codimension>::SubDomainSet& subDomains(const EntityType& e) const {
     return subDomains<EntityType::codimension>(e);
   }
 
+  //! Returns a constant reference to the SubDomainSet of the given entity with codimension cc.
+  //! \tparam cc the codimension of the entity.
   template<int cc>
   const typename MapEntry<cc>::SubDomainSet& subDomains(const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
     return indexMap<cc>().find(e.type())->second[_hostGridView.indexSet().index(_grid.hostEntity(e))].domains;
   }
 
+  //! Returns the index of the entity in a specific subdomain.
   template<class EntityType>
   IndexType index(DomainType subDomain, const EntityType& e) const {
     return index<EntityType::codimension>(subDomain,e);
   }
 
+  //! Returns the index of the entity with codimension cc in a specific subdomain.
+  //! \tparam the codimension of the entity.
   template<int cc>
   IndexType index(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
     GeometryType gt = e.type();
@@ -320,6 +373,8 @@ public:
       return multiIndexMap<cc>()[me.index].at(me.domains.domainOffset(subDomain));
     }
   }
+
+private:
 
   template<int cc>
   IndexType indexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<cc>::Entity& he) const {
@@ -334,6 +389,7 @@ public:
     }
   }
 
+  //! functor template for retrieving a subindex.
   struct getSubIndexForSubDomain : public dispatchToCodim<getSubIndexForSubDomain,IndexType> {
 
     template<int codim>
@@ -424,6 +480,8 @@ public:
     return me.domains.contains(subDomain);
   }
 
+public:
+
   IndexType subIndex(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity& e, int i, int codim) const {
     return subIndexForSubDomain(subDomain,_grid.hostEntity(e),i,codim);
   }
@@ -440,6 +498,7 @@ public:
     return sizeForSubDomain(subDomain,codim);
   }
 
+  //! Returns true if the entity is contained in a specific subdomain.
   template<typename EntityType>
   bool contains(DomainType subDomain, const EntityType& e) const {
     const GeometryType gt = e.type();
@@ -503,6 +562,8 @@ private:
     _multiIndexMap(rhs._multiIndexMap)
   {}
 
+  //! Returns the index map for the given codimension.
+  //! \tparam cc The requested codimension.
   template<int cc>
   typename fusion::result_of::at_c<IndexMap,cc>::type indexMap() {
     return fusion::at_c<cc>(_indexMap);

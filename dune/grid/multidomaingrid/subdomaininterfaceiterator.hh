@@ -39,6 +39,9 @@ class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfa
   typedef FieldVector<ctype,dimensionworld> GlobalCoords;
   typedef FieldVector<ctype,dimension - 1> LocalCoords;
 
+  template<typename, typename, typename, typename>
+  friend class ForwardIteratorFacade;
+
 protected:
 
   SubDomainInterfaceIterator(const GridView& gridView,
@@ -59,6 +62,22 @@ protected:
       incrementToNextValidPosition();
     }
   }
+
+public:
+
+  // The following two methods have to be public because of non-member comparison operators in the
+  // IteratorFacade framework!
+
+  bool equals(const WrapperImp& rhs) const {
+    assert(_domain1 == rhs._domain1 && _domain2 == rhs._domain2);
+    return _hostIterator == rhs._hostIterator && (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator); //TODO: domains?
+  }
+
+  bool equals(const SubDomainInterfaceIterator& rhs) const {
+    assert(_domain1 == rhs._domain1 && _domain2 == rhs._domain2);
+    return _hostIterator == rhs._hostIterator && (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator); //TODO: domains?
+  }
+
 
 private:
 
@@ -87,16 +106,6 @@ private:
         return;
       }
     }
-  }
-
-  bool equals(const WrapperImp& rhs) const {
-    assert(_domain1 == rhs._domain1 && _domain2 == rhs._domain2);
-    return _hostIterator == rhs._hostIterator && (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator); //TODO: domains?
-  }
-
-  bool equals(const SubDomainInterfaceIterator& rhs) const {
-    assert(_domain1 == rhs._domain1 && _domain2 == rhs._domain2);
-    return _hostIterator == rhs._hostIterator && (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator); //TODO: domains?
   }
 
   void increment() {
