@@ -159,7 +159,7 @@ struct SubDomainGridFamily {
     typename MDGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::LocalIdSet>,
     typename MDGrid::Traits::LocalIdSet::IdType,
-    CollectiveCommunication<typename MDGrid::HostGridType>
+    typename MDGrid::HostGridType::CollectiveCommunication
     > Traits;
 
 };
