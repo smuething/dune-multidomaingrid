@@ -483,6 +483,12 @@ private:
     indexMap<0>()[gt][hostIndex].domains.set(subDomain);
   }
 
+  void addToSubDomains(const typename MDGridTraits::template Codim<0>::SubDomainSet& subDomains, const Codim0Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    indexMap<0>().at(gt)[hostIndex].domains.addAll(subDomains);
+  }
+
   IndexSetWrapper(const GridImp& grid, HostGridView hostGridView) :
     _grid(grid),
     _hostGridView(hostGridView)
