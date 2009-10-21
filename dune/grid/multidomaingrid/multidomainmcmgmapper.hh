@@ -155,7 +155,7 @@ public:
   void update()
   {
     static_cast<Base*>(this)->update();
-    for (SubDomainType subDomain = 0; subDomain < GV::Grid::maxNumberOfSubDomains; ++subDomain) {
+    for (SubDomainType subDomain = 0; subDomain < GV::Grid::maxSubDomainIndex; ++subDomain) {
       std::size_t& n = _n[subDomain];
       std::map<GeometryType,IndexType>& offset = _offset[subDomain];
       n=0; // zero data elements
@@ -174,9 +174,9 @@ public:
   }
 
 private:
-  std::array<std::size_t,GV::Grid::maxNumberOfSubDomains> _n;
+  std::array<std::size_t,GV::Grid::maxSubDomainIndex> _n;
   const typename GV::IndexSet& _is;
-  std::array<std::map<GeometryType,IndexType>,GV::Grid::maxNumberOfSubDomains> _offset; // provide a map with all geometry types
+  std::array<std::map<GeometryType,IndexType>,GV::Grid::maxSubDomainIndex> _offset; // provide a map with all geometry types
   mutable Layout<GV::dimension> _layout; // get layout object
 };
 
