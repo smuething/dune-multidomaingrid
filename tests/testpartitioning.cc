@@ -1,91 +1,10 @@
 #include "config.h"
-#include <iostream>
+
 #include <dune/common/mpihelper.hh>
 #include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
-#include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/multidomaingrid.hh>
+#include "output.hh"
 
-template<int dim>
-struct AllLayout
-{
-  bool contains(Dune::GeometryType gt) {
-    return true;
-  }
-};
-
-template<typename GridView, typename InterfaceIterator>
-void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIterator iend) {
-
-    Dune::MultiDomainMCMGMapper<GridView,AllLayout> mapper(gv);
-
-    typedef typename GridView::template Codim<0>::Iterator Iterator;
-    typedef typename GridView::template Codim<2>::Iterator VIterator;
-    std::vector<int> hcid(gv.indexSet().size(0),0);
-    std::vector<int> sdc0(gv.indexSet().size(0),0);
-
-    std::vector<int> sdc1(gv.indexSet().size(0),0);
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::MDGridTraits::template Codim<0>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
-      hcid[idx] = idx;
-      sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
-      sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
-      typename GridView::IndexSet::IndexType tmp;
-      assert(sdc0[idx] > -1 == mapper.contains(0,*it,tmp));
-      assert(sdc1[idx] > -1 == mapper.contains(1,*it,tmp));
-    }
-    std::vector<int> hvid(gv.indexSet().size(2),0);
-    std::vector<int> sdv0(gv.indexSet().size(2),0);
-    std::vector<int> sdv1(gv.indexSet().size(2),0);
-    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::MDGridTraits::template Codim<2>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
-      hvid[idx] = idx;
-      sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
-      sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
-      typename GridView::IndexSet::IndexType tmp;
-      assert(sdv0[idx] > -1 == mapper.contains(0,*it,tmp));
-      assert(sdv1[idx] > -1 == mapper.contains(1,*it,tmp));
-    }
-
-    std::vector<int> borderCells(gv.indexSet().size(0),0);
-    std::vector<int> borderVertices(gv.indexSet().size(2),0);
-
-    for(; iit != iend; ++iit) {
-      borderCells[gv.indexSet().index(*iit->firstCell())] = 1;
-      borderCells[gv.indexSet().index(*iit->secondCell())] = 2;
-    }
-
-    Dune::VTKWriter<GridView> vtkWriter(gv);
-    vtkWriter.addCellData(sdc0,"cell_subdomain0");
-    vtkWriter.addCellData(sdc1,"cell_subdomain1");
-    vtkWriter.addCellData(hcid,"cell_hostIndex");
-    vtkWriter.addCellData(borderCells,"borderCells");
-    vtkWriter.addVertexData(sdv0,"vertex_subdomain0");
-    vtkWriter.addVertexData(sdv1,"vertex_subdomain1");
-    vtkWriter.addVertexData(hvid,"vertex_hostIndex");
-    vtkWriter.write(filename,Dune::VTKOptions::ascii);
-}
-
-template<typename GridView>
-void vtkOut2(GridView gv,std::string filename) {
-    typedef typename GridView::template Codim<0>::Iterator Iterator;
-    typedef typename GridView::template Codim<2>::Iterator VIterator;
-    std::vector<int> cid(gv.indexSet().size(0),0);
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      cid[idx] = idx;
-    }
-    std::vector<int> vid(gv.indexSet().size(2),0);
-    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      vid[idx] = idx;
-    }
-    Dune::VTKWriter<GridView> vtkWriter(gv);
-    vtkWriter.addCellData(cid,"cellIndex");
-    vtkWriter.addVertexData(vid,"vertexIndex");
-    vtkWriter.write(filename,Dune::VTKOptions::ascii);
-}
 
 int main(int argc, char** argv) {
   try {
@@ -124,17 +43,7 @@ int main(int argc, char** argv) {
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
 
-    const Grid::SubDomainGrid& sd0 = grid.subDomain(0);
-    vtkOut(gv,"leafView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
-    vtkOut(grid.levelView(0),"levelView0",grid.levelSubDomainInterfaceBegin(0,1,0),grid.levelSubDomainInterfaceEnd(0,1,0));
-    vtkOut(grid.levelView(1),"levelView1",grid.levelSubDomainInterfaceBegin(0,1,1),grid.levelSubDomainInterfaceEnd(0,1,1));
-    vtkOut(grid.levelView(2),"levelView2",grid.levelSubDomainInterfaceBegin(0,1,2),grid.levelSubDomainInterfaceEnd(0,1,2));
-    vtkOut(grid.levelView(3),"levelView3",grid.levelSubDomainInterfaceBegin(0,1,3),grid.levelSubDomainInterfaceEnd(0,1,3));
-    vtkOut(grid.levelView(4),"levelView4",grid.levelSubDomainInterfaceBegin(0,1,4),grid.levelSubDomainInterfaceEnd(0,1,4));
-    vtkOut(grid.levelView(5),"levelView5",grid.levelSubDomainInterfaceBegin(0,1,5),grid.levelSubDomainInterfaceEnd(0,1,5));
-
-    vtkOut2(grid.subDomain(0).leafView(),"subdomain0");
-    vtkOut2(grid.subDomain(1).leafView(),"subdomain1");
+    printStatus(grid,"partitioning");
 
     /*for (int i = 0; i <= 2; ++i) {
       std::cout << "codim " << i << ":";
