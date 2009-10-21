@@ -291,7 +291,7 @@ inline void setAdd(A& a, const B& b) {
 template<typename SubDomainType, std::size_t capacity>
 inline bool setContains(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
                         const IntegralTypeSubDomainSet<SubDomainType,capacity>& b) {
-  return (a._set & b._set) == a._set;
+  return (a._set & b._set) == b._set;
 }
 
 template<typename SubDomainType, std::size_t capacity>
