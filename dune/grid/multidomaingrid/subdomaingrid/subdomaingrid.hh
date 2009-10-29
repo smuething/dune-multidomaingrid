@@ -410,6 +410,17 @@ public:
     return getSubDomainEntity<EntityType::codimension>(mdEntity);
   }
 
+
+  template<typename EntityType>
+  const typename MDGrid::template HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
+    return *(getRealImplementation(e).hostEntityPointer());
+  }
+
+  template<typename EntityType>
+  const typename MDGrid::template HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
+    return getRealImplementation(e).hostEntityPointer();
+  }
+
 private:
 
   const MDGrid& _grid;
@@ -441,16 +452,6 @@ private:
   template<typename EntityType>
   bool containsHostEntity(const EntityType& e) const {
     return levelIndexSet(e.level()).containsHostEntity(e);
-  }
-
-  template<typename Entity>
-  struct HostEntity {
-    typedef typename HostGridType::Traits::template Codim<Entity::codimension>::Entity type;
-  };
-
-  template<typename EntityType>
-  const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
-    return *(getRealImplementation(e).hostEntityPointer());
   }
 
   SubDomainGrid(const SubDomainGrid& rv);
