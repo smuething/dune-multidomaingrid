@@ -279,6 +279,18 @@ private:
 
   typedef std::map<typename Traits::LocalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> AdaptationStateMap;
 
+  // typedefs for extracting the host entity types from our own entities
+
+  template<typename Entity>
+  struct HostEntity {
+    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
+  };
+
+  template<typename Entity>
+  struct HostEntityPointer {
+    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
+  };
+
 public:
 
   //! The (integer) type used to identify subdomains.
@@ -586,6 +598,23 @@ public:
     return _supportLevelIndexSets;
   }
 
+  //! Returns a reference to the corresponding host entity.
+  /**
+   * \warning The returned reference will only be valid as long as the passed-in reference to the
+   * MultiDomainGrid entity! If you need a persistent reference to the host entity, use
+   * hostEntityPointer() instead.
+   */
+  template<typename EntityType>
+  const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
+    return *(getRealImplementation(e).hostEntityPointer());
+  }
+
+  //! Returns an EntityPointer to the corresponding host entity.
+  template<typename EntityType>
+  const typename HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
+    return getRealImplementation(e).hostEntityPointer();
+  }
+
 private:
 
   HostGrid& _hostGrid;
@@ -606,32 +635,6 @@ private:
   mutable std::map<SubDomainType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
 
   AdaptationStateMap _adaptationStateMap;
-
-  template<typename Entity>
-  struct HostEntity {
-    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::Entity type;
-  };
-
-  template<typename Entity>
-  struct HostEntityPointer {
-    typedef typename HostGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
-  };
-
-  /*
-  template<typename EntityType>
-  typename HostEntity<EntityType>::type& hostEntity(EntityType& e) const {
-    return getRealImplementation(e).wrappedEntity();
-    }*/
-
-  template<typename EntityType>
-  const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
-    return *(getRealImplementation(e).hostEntityPointer());
-  }
-
-  template<typename EntityType>
-  const typename HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
-    return getRealImplementation(e).hostEntityPointer();
-  }
 
   void updateIndexSets() {
     // make sure we have enough LevelIndexSets
