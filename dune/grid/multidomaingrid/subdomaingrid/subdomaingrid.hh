@@ -233,6 +233,7 @@ public:
   typedef typename GridFamily::Traits Traits;
   typedef typename MDGrid::ctype ctype;
   typedef typename MDGrid::SubDomainType SubDomainType;
+  typedef MDGridType MultiDomainGrid;
 
   std::string name() const {
     return "SubDomainGrid";
