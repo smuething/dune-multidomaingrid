@@ -5,6 +5,9 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename, typename>
+class MultiDomainGrid;
+
 namespace subdomain {
 
 template<int codim, int dim, typename GridImp>
@@ -83,6 +86,9 @@ class EntityWrapper :
 
   template<typename>
   friend class SubDomainGrid;
+
+  template<typename,typename>
+  friend class Dune::mdgrid::MultiDomainGrid;
 
   template<int, int, typename, template<int,int,typename> class>
   friend class Entity;
@@ -167,6 +173,9 @@ class EntityWrapper<0,dim,GridImp> :
 
   template<typename>
   friend class SubDomainGrid;
+
+  template<typename,typename>
+  friend class Dune::mdgrid::MultiDomainGrid;
 
   template<int, int, typename, template<int,int,typename> class>
   friend class Entity;
