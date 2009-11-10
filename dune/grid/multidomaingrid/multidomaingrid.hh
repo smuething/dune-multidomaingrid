@@ -291,6 +291,19 @@ private:
     typedef typename HostGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
   };
 
+  // typedefs for extracting the multidomain entity types from subdomain entities
+
+  template<typename Entity>
+  struct MultiDomainEntity {
+    typedef typename Traits::template Codim<Entity::codimension>::Entity type;
+  };
+
+  template<typename Entity>
+  struct MultiDomainEntityPointer {
+    typedef typename Traits::template Codim<Entity::codimension>::EntityPointer type;
+  };
+
+
 public:
 
   //! The (integer) type used to identify subdomains.
@@ -611,8 +624,19 @@ public:
 
   //! Returns an EntityPointer to the corresponding host entity.
   template<typename EntityType>
-  const typename HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
+  const typename HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
     return getRealImplementation(e).hostEntityPointer();
+  }
+
+  template<typename EntityType>
+  const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
+    return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
+  }
+
+  //! Returns an EntityPointer to the corresponding MultiDomain entity.
+  template<typename EntityType>
+  const typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
+    return getRealImplementation(e).multiDomainEntityPointer();
   }
 
 private:

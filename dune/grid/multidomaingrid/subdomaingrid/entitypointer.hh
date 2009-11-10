@@ -22,18 +22,18 @@ public:
   typedef typename GridImp::Traits::template Codim<codim>::Entity Entity;
   typedef EntityPointerWrapper<codim,GridImp> Base;
 
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
 
-  EntityPointerWrapper(const GridImp& grid, const HostEntityPointer& hostEntityPointer) :
-    _entityWrapper(grid,hostEntityPointer)
+  EntityPointerWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
+    _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
   EntityPointerWrapper(const EntityWrapper<codim,dim,GridImp>& entity) :
-    _entityWrapper(entity._grid,entity._hostEntityPointer)
+    _entityWrapper(entity._grid,entity._multiDomainEntityPointer)
   {}
 
   bool equals(const EntityPointerWrapper<codim,GridImp>& rhs) const {
-    return _entityWrapper.hostEntityPointer() == rhs._entityWrapper.hostEntityPointer();
+    return _entityWrapper.multiDomainEntityPointer() == rhs._entityWrapper.multiDomainEntityPointer();
   }
 
   Entity& dereference() const {
