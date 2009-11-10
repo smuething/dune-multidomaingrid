@@ -300,7 +300,7 @@ private:
     return _multiDomainEntityPointer;
   }
 
-  const HostEntityPointer& hostEntityPointer() const {
+  const HostEntityPointer hostEntityPointer() const {
     return _grid._grid.hostEntityPointer(*_multiDomainEntityPointer);
   }
 
