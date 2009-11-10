@@ -20,6 +20,7 @@ int main(int argc, char** argv) {
     typedef GridView::Codim<0>::Iterator Iterator;
     typedef GridView::Codim<2>::Iterator VIterator;
     typedef GridView::Codim<0>::Entity Entity;
+    typedef GridView::Codim<2>::Entity Vertex;
     typedef GridView::Codim<0>::Geometry Geometry;
     grid.startSubDomainMarking();
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
@@ -42,6 +43,15 @@ int main(int argc, char** argv) {
     grid.preUpdateSubDomains();
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
+
+    Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p0 = grid.subDomain(0).leafView().begin<0>();
+    const Entity& e0 = grid.subDomain(0).multiDomainEntity(*p0);
+    const Entity& e02 = grid.multiDomainEntity(*p0);
+
+    Grid::SubDomainGrid::LeafGridView::Codim<2>::EntityPointer p1 = grid.subDomain(0).leafView().begin<2>();
+    const Vertex& e1 = grid.subDomain(0).multiDomainEntity(*p1);
+    const Vertex& e12 = grid.multiDomainEntity(*p1);
+
 
     printStatus(grid,"partitioning");
 
