@@ -628,6 +628,17 @@ public:
     return getRealImplementation(e).hostEntityPointer();
   }
 
+  template<typename EntityType>
+  const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
+    return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
+  }
+
+  //! Returns an EntityPointer to the corresponding MultiDomain entity.
+  template<typename EntityType>
+  const typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
+    return getRealImplementation(e).multiDomainEntityPointer();
+  }
+
 private:
 
   HostGrid& _hostGrid;
