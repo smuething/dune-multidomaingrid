@@ -107,6 +107,10 @@ struct SubDomainGridFamily {
       };
     private:
       friend class Dune::Entity<cd, dim, const GridImp, EntityImp>;
+
+
+
+
       typedef EntityPointerImp<cd,const GridImp> EntityPointerImpl;
     };
 
@@ -235,6 +239,22 @@ public:
   typedef typename MDGrid::SubDomainType SubDomainType;
   typedef MDGridType MultiDomainGrid;
 
+private:
+
+  // typedefs for extracting the multidomain entity types from our own entities
+
+  template<typename Entity>
+  struct MultiDomainEntity {
+    typedef typename MultiDomainGrid::Traits::template Codim<Entity::codimension>::Entity type;
+  };
+
+  template<typename Entity>
+  struct MultiDomainEntityPointer {
+    typedef typename MultiDomainGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
+  };
+
+public:
+
   std::string name() const {
     return "SubDomainGrid";
   }
@@ -246,57 +266,57 @@ public:
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
     return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
-                                                                   _grid._hostGrid.template lbegin<codim>(level),
-                                                                   _grid._hostGrid.template lend<codim>(level));
+                                                                   _grid.template lbegin<codim>(level),
+                                                                   _grid.template lend<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
     return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
-                                                                   _grid._hostGrid.template lend<codim>(level),
-                                                                   _grid._hostGrid.template lend<codim>(level));
+                                                                   _grid.template lend<codim>(level),
+                                                                   _grid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
     return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
-                                                            _grid._hostGrid.template lbegin<codim,PiType>(level),
-                                                            _grid._hostGrid.template lend<codim,PiType>(level));
+                                                            _grid.template lbegin<codim,PiType>(level),
+                                                            _grid.template lend<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
     return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
-                                                            _grid._hostGrid.template lend<codim,PiType>(level),
-                                                            _grid._hostGrid.template lend<codim,PiType>(level));
+                                                            _grid.template lend<codim,PiType>(level),
+                                                            _grid.template lend<codim,PiType>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
     return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
-                                                                  _grid._hostGrid.template leafbegin<codim>(),
-                                                                  _grid._hostGrid.template leafend<codim>());
+                                                                  _grid.template leafbegin<codim>(),
+                                                                  _grid.template leafend<codim>());
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafend() const {
     return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
-                                                                  _grid._hostGrid.template leafend<codim>(),
-                                                                  _grid._hostGrid.template leafend<codim>());
+                                                                  _grid.template leafend<codim>(),
+                                                                  _grid.template leafend<codim>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
     return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
-                                                           _grid._hostGrid.template leafbegin<codim,PiType>(),
-                                                           _grid._hostGrid.template leafend<codim,PiType>());
+                                                           _grid.template leafbegin<codim,PiType>(),
+                                                           _grid.template leafend<codim,PiType>());
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
     return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
-                                                           _grid._hostGrid.template leafend<codim,PiType>(),
-                                                           _grid._hostGrid.template leafend<codim,PiType>());
+                                                           _grid.template leafend<codim,PiType>(),
+                                                           _grid.template leafend<codim,PiType>());
   }
 
   int size(int level, int codim) const {
@@ -314,6 +334,7 @@ public:
   }
 
   int size(GeometryType type) const {
+    // TODO: check this (perhaps return sum over levelindexsets?)
     return _leafIndexSet.size(type);
   }
 
@@ -411,6 +432,15 @@ public:
     return getSubDomainEntity<EntityType::codimension>(mdEntity);
   }
 
+  template<typename EntityType>
+  const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
+    return *(getRealImplementation(e).multiDomainEntityPointer());
+  }
+
+  template<typename EntityType>
+  typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
+    return getRealImplementation(e).multiDomainEntityPointer();
+  }
 
   template<typename EntityType>
   const typename MDGrid::template HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
@@ -418,7 +448,7 @@ public:
   }
 
   template<typename EntityType>
-  const typename MDGrid::template HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
+  typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
     return getRealImplementation(e).hostEntityPointer();
   }
 
@@ -450,6 +480,12 @@ private:
     _subDomain = subDomain;
   }
   */
+
+  template<typename EntityType>
+  bool containsMultiDomainEntity(const EntityType& e) const {
+    return levelIndexSet(e.level()).containsMultiDomainEntity(e);
+  }
+
   template<typename EntityType>
   bool containsHostEntity(const EntityType& e) const {
     return levelIndexSet(e.level()).containsHostEntity(e);
