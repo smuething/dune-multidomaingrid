@@ -636,7 +636,7 @@ public:
   //! Returns an EntityPointer to the corresponding MultiDomain entity.
   template<typename EntityType>
   const typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
-    return getRealImplementation(e).multiDomainEntityPointer();
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
   }
 
 private:
