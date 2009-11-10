@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
     Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p0 = grid.subDomain(0).leafView().begin<0>();
     const Entity& e0 = grid.subDomain(0).multiDomainEntity(*p0);
     const Entity& e02 = grid.multiDomainEntity(*p0);
+    Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p02 = grid.subDomain(0).subDomainEntityPointer(e0);
 
     Grid::SubDomainGrid::LeafGridView::Codim<2>::EntityPointer p1 = grid.subDomain(0).leafView().begin<2>();
     const Vertex& e1 = grid.subDomain(0).multiDomainEntity(*p1);
