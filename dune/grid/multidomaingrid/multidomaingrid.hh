@@ -291,6 +291,19 @@ private:
     typedef typename HostGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
   };
 
+  // typedefs for extracting the multidomain entity types from subdomain entities
+
+  template<typename Entity>
+  struct MultiDomainEntity {
+    typedef typename Traits::template Codim<Entity::codimension>::Entity type;
+  };
+
+  template<typename Entity>
+  struct MultiDomainEntityPointer {
+    typedef typename Traits::template Codim<Entity::codimension>::EntityPointer type;
+  };
+
+
 public:
 
   //! The (integer) type used to identify subdomains.

@@ -239,20 +239,6 @@ public:
   typedef typename MDGrid::SubDomainType SubDomainType;
   typedef MDGridType MultiDomainGrid;
 
-private:
-
-  // typedefs for extracting the multidomain entity types from our own entities
-
-  template<typename Entity>
-  struct MultiDomainEntity {
-    typedef typename MultiDomainGrid::Traits::template Codim<Entity::codimension>::Entity type;
-  };
-
-  template<typename Entity>
-  struct MultiDomainEntityPointer {
-    typedef typename MultiDomainGrid::Traits::template Codim<Entity::codimension>::EntityPointer type;
-  };
-
 public:
 
   std::string name() const {
@@ -433,12 +419,12 @@ public:
   }
 
   template<typename EntityType>
-  const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
+  const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
     return *(getRealImplementation(e).multiDomainEntityPointer());
   }
 
   template<typename EntityType>
-  typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
+  typename MDGrid::template MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
     return getRealImplementation(e).multiDomainEntityPointer();
   }
 
