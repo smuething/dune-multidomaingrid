@@ -611,7 +611,7 @@ public:
 
   //! Returns an EntityPointer to the corresponding host entity.
   template<typename EntityType>
-  const typename HostEntityPointer<EntityType>::type& hostEntityPointer(const EntityType& e) const {
+  const typename HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
     return getRealImplementation(e).hostEntityPointer();
   }
 
