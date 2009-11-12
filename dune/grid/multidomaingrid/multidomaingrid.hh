@@ -606,6 +606,16 @@ public:
     return *subGridPointer;
   }
 
+  //! Returns a reference to the SubDomainGrid associated with the given subdomain.
+  SubDomainGrid& subDomain(SubDomainType subDomain) {
+    boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
+    if (!subGridPointer) {
+      subGridPointer.reset(new SubDomainGrid(*this,subDomain));
+      // subGridPointer->update();
+    }
+    return *subGridPointer;
+  }
+
   //! Indicates whether this MultiDomainGrid instance supports level index sets on its SubDomainGrids.
   bool supportLevelIndexSets() const {
     return _supportLevelIndexSets;
