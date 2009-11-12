@@ -35,7 +35,7 @@ void check_yasp(bool p0=false) {
   //#else
   Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
 
-  typedef Dune::MultiDomainGrid<Dune::YaspGrid<dim> > MDGrid;
+  typedef Dune::MultiDomainGrid<Dune::YaspGrid<dim>,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
 
   MDGrid grid(wgrid);
   //#endif
