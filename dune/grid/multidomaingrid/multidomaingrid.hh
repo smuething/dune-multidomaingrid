@@ -247,11 +247,17 @@ class MultiDomainGrid :
   template<typename>
   friend struct subdomain::SubDomainGridFamily;
 
+  template<int,int,typename>
+  friend class subdomain::EntityWrapper;
+
   template <typename>
   friend class LeafSubDomainInterfaceIterator;
 
   template <typename>
   friend class LevelSubDomainInterfaceIterator;
+
+  template<typename,typename,typename,typename,typename>
+  friend class subdomain::IntersectionIteratorWrapper;
 
   typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
   typedef HostGrid HostGridType;
