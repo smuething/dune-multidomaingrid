@@ -97,7 +97,7 @@ public:
 
   template<typename EntityType>
   bool contains(const EntityType& e) const {
-    return _mdIndexSet.contains(_grid.domain(),_grid.multiDoEntity(e));
+    return _mdIndexSet.contains(_grid.domain(),_grid.multiDomainEntity(e));
   }
 
   bool operator==(const IndexSetWrapper& rhs) const {
