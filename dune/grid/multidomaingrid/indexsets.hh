@@ -69,7 +69,7 @@ struct invokeIf {
 
   template<int codim>
   result_type invoke() {
-    _impl.invoke<codim>();
+    return _impl.invoke<codim>();
   }
 
   Impl& _impl;
