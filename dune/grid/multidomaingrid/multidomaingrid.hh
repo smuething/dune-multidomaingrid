@@ -550,7 +550,7 @@ public:
   void preUpdateSubDomains() {
     assert(_state == stateMarking && _adaptState == stateFixed);
     if (_supportLevelIndexSets) {
-      for (int l = 0; l <= maxLevel(); ++l) {
+      for (unsigned int l = 0; l <= maxLevel(); ++l) {
         _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(l))));
       }
     }
@@ -566,7 +566,7 @@ public:
     assert(_state == statePreUpdate && _adaptState == stateFixed);
     _leafIndexSet.swap(*_tmpLeafIndexSet);
     if (_supportLevelIndexSets) {
-      for (int l = 0; l <= maxLevel(); ++l) {
+      for (unsigned int l = 0; l <= maxLevel(); ++l) {
         _levelIndexSets[l]->swap(*_tmpLevelIndexSets[l]);
       }
     }
