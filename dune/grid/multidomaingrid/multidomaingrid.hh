@@ -485,13 +485,13 @@ public:
     assert(_state == stateFixed && _adaptState == stateFixed);
     _adaptState = statePreAdapt;
     bool result = _hostGrid.preAdapt();
-    saveMultiDomainState();
     return result;
   }
 
   bool adapt() {
     assert(_state == stateFixed && _adaptState == statePreAdapt);
     _adaptState = statePostAdapt;
+    saveMultiDomainState();
     bool result = _hostGrid.adapt();
     updateIndexSets();
     restoreMultiDomainState();
