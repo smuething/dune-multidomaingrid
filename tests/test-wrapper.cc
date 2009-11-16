@@ -55,7 +55,7 @@ void check_yasp(bool p0=false) {
     //IndexSet::SubDomainSet& sds = is.subDomainSet(e);
     Dune::FieldVector<typename MDGrid::ctype,dim> c = e.geometry().global(Dune::GenericReferenceElements<typename MDGrid::ctype,dim>::general(e.type()).position(0,0));
     double x = c[0];
-    double y = c[1];
+    double y = dim > 1 ? c[1] : 0.5;
     if (x > 0.2) {
       if (y > 0.3 && y < 0.7) {
         if (x < 0.8)
