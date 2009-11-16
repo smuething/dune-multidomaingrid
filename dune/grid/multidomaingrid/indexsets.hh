@@ -683,7 +683,6 @@ private:
 
 
   void updateLevelIndexSet() {
-    std::cerr << "updating levelindexset with address " << this << std::endl;
     const HostIndexSet& his = _hostGridView.indexSet();
     HostEntityIterator end = _hostGridView.template end<0>();
     typename Containers<0>::IndexMap& im = indexMap<0>();
