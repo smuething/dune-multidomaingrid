@@ -52,6 +52,7 @@ class HierarchicIteratorWrapper :
     assert(_grid == rhs._grid);
     _multiDomainIterator == rhs._multiDomainIterator;
     _multiDomainEnd = rhs._multiDomainEnd;
+    return *this;
   }
 
   const GridImp& _grid;

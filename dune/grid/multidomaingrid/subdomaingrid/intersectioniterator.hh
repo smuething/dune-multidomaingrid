@@ -50,6 +50,7 @@ protected:
     _geometry.clear();
     _geometryInInside.clear();
     _geometryInOutside.clear();
+    return *this;
   }
 
 private:

@@ -54,6 +54,7 @@ class LeafIteratorWrapper :
     assert(_indexSet == rhs._indexSet);
     _multiDomainIterator = rhs._multiDomainIterator;
     _end = rhs._end;
+    return *this;
   }
 
   const IndexSet& _indexSet;
