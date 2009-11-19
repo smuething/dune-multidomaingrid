@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <dune/grid/yaspgrid.hh>
+#include <dune/grid/sgrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 
 #include <dune/grid/test/gridcheck.cc>
@@ -33,9 +34,16 @@ void check_yasp(bool p0=false) {
   //#if HAVE_MPI
   //Dune::YaspGrid<dim> grid(MPI_COMM_WORLD,Len,s,p,overlap);
   //#else
-  Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
 
-  typedef Dune::MultiDomainGrid<Dune::YaspGrid<dim>,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
+  //typedef Dune::YaspGrid<dim> HostGrid;
+  //Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
+
+  int n[] = { 5,5,5 };
+  double h[] = { 1.0, 2.0, 3.0 };
+  typedef Dune::SGrid<dim,dim> HostGrid;
+  Dune::SGrid<dim,dim> wgrid(n,h);
+
+  typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
 
   MDGrid grid(wgrid);
   //#endif

@@ -53,8 +53,30 @@ int main(int argc, char** argv) {
     const Vertex& e1 = grid.subDomain(0).multiDomainEntity(*p1);
     const Vertex& e12 = grid.multiDomainEntity(*p1);
 
+    printStatus(grid,"partitioning1");
 
-    printStatus(grid,"partitioning");
+    grid.startSubDomainMarking();
+    for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
+      const Entity& e = *it;
+      const Grid::MDGridTraits::Codim<0>::SubDomainSet& domains = gv.indexSet().subDomains(e);
+      if (domains.contains(0) && domains.contains(1)) {
+        grid.removeFromSubDomain(0,e);
+        grid.removeFromSubDomain(1,e);
+      } else if (domains.contains(0)) {
+        grid.assignToSubDomain(1,e);
+      } else if (domains.contains(1)) {
+        grid.assignToSubDomain(0,e);
+      } else {
+        grid.addToSubDomain(0,e);
+        grid.addToSubDomain(1,e);
+      }
+    }
+
+    grid.preUpdateSubDomains();
+    grid.updateSubDomains();
+    grid.postUpdateSubDomains();
+
+    printStatus(grid,"partitioning2");
 
     /*for (int i = 0; i <= 2; ++i) {
       std::cout << "codim " << i << ":";
