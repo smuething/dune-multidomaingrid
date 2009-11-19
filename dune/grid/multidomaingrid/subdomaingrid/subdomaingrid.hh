@@ -438,20 +438,20 @@ public:
     return getRealImplementation(e).hostEntityPointer();
   }
 
-  typename Traits::LeafIntersectionIterator getSubDomainInterfaceIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
+  typename Traits::LeafIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
     assert(_subDomain == it.domain1() || _subDomain == it.domain2());
     if (_subDomain == it.domain1())
-      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.firstHostIntersection());
+      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.firstMultiDomainIntersectionIterator());
     else
-      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.secondHostIntersection());
+      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it.secondMultiDomainIntersectionIterator());
   }
 
-  typename Traits::LevelIntersectionIterator getSubDomainInterfaceIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
+  typename Traits::LevelIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
     assert(_subDomain == it.domain1() || _subDomain == it.domain2());
     if (_subDomain == it.domain1())
-      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.firstHostIntersection());
+      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.firstCell()->level(),it.firstMultiDomainIntersectionIterator());
     else
-      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.secondHostIntersection());
+      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.secondCell()->level(),it.secondMultiDomainIntersectionIterator());
   }
 
 private:

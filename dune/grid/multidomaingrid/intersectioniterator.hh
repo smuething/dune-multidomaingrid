@@ -176,6 +176,9 @@ class LeafIntersectionIteratorWrapper :
   template<int, int, typename>
   friend class EntityWrapper;
 
+  template<typename,typename>
+  friend class MultiDomainGrid;
+
   typedef typename GridImp::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LeafIntersection Intersection;
 
@@ -208,6 +211,9 @@ class LevelIntersectionIteratorWrapper :
 
   template<int, int, typename>
   friend class EntityWrapper;
+
+  template<typename,typename>
+  friend class MultiDomainGrid;
 
   typedef typename GridImp::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;

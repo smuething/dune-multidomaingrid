@@ -257,6 +257,9 @@ class MultiDomainGrid :
   friend class LevelSubDomainInterfaceIterator;
 
   template<typename,typename,typename,typename,typename>
+  friend class SubDomainInterfaceIterator;
+
+  template<typename,typename,typename,typename,typename>
   friend class subdomain::IntersectionIteratorWrapper;
 
   typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
@@ -740,6 +743,11 @@ private:
     }
     _leafIndexSet.update(_levelIndexSets,false);
     _adaptationStateMap.clear();
+  }
+
+  template<typename GridView, typename HostGridView>
+  typename GridView::IntersectionIterator multiDomainIntersectionIterator(typename HostGridView::IntersectionIterator iit) const {
+    return typename GridView::IntersectionIterator::ImplementationType(iit);
   }
 
 };

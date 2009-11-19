@@ -252,6 +252,9 @@ class LevelIntersectionIteratorWrapper :
   template<int, int, typename>
   friend class EntityWrapper;
 
+  template<typename>
+  friend class SubDomainGrid;
+
   typedef typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator MultiDomainIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;
 

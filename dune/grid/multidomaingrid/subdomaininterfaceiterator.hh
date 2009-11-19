@@ -24,6 +24,7 @@ class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfa
 
   typedef typename HostGridView::template Codim<0>::Iterator HostIterator;
   typedef typename HostGridView::IntersectionIterator HostIntersectionIterator;
+  typedef typename GridView::IntersectionIterator MultiDomainIntersectionIterator;
   typedef IntersectionType Intersection;
   typedef typename GridImp::SubDomainType SubDomainType;
 
@@ -121,7 +122,7 @@ private:
     _geometryInOutside.clear();
   }
 
-  void findInverseHostIntersection() {
+  void findInverseHostIntersection() const {
     assert(_hostIntersectionIterator->neighbor());
     _inverseHostIntersection = _hostGridView.ibegin(*_hostIntersectionIterator->outside());
     while (_hostIntersectionIterator->inside() != _inverseHostIntersection->outside()) {
@@ -130,15 +131,27 @@ private:
     _inverseHostIntersectionValid = true;
   }
 
-  HostIntersectionIterator secondHostIntersection() {
+  HostIntersectionIterator secondHostIntersectionIterator() const {
     if (!_inverseHostIntersectionValid)
       findInverseHostIntersection();
     return _inverseHostIntersection;
   }
 
-  HostIntersectionIterator firstHostIntersection() {
+  HostIntersectionIterator firstHostIntersectionIterator() const {
     return _hostIntersectionIterator;
   }
+
+public:
+
+  MultiDomainIntersectionIterator secondMultiDomainIntersectionIterator() const {
+    return _gridView.grid().template multiDomainIntersectionIterator<GridView,HostGridView>(secondHostIntersectionIterator());
+  }
+
+  MultiDomainIntersectionIterator firstMultiDomainIntersectionIterator() const {
+    return _gridView.grid().template multiDomainIntersectionIterator<GridView,HostGridView>(firstHostIntersectionIterator());
+  }
+
+private:
 
   const Intersection& dereference() const {
     return reinterpret_cast<const Intersection&>(*this);
@@ -257,8 +270,8 @@ private:
   HostIntersectionIterator _hostIntersectionIterator;
   HostIntersectionIterator _hostIntersectionEnd;
 
-  HostIntersectionIterator _inverseHostIntersection;
-  bool _inverseHostIntersectionValid;
+  mutable HostIntersectionIterator _inverseHostIntersection;
+  mutable bool _inverseHostIntersectionValid;
 
   MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
