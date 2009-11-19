@@ -17,6 +17,9 @@ class IntersectionIteratorWrapper {
   template<class, template<class> class>
   friend class Intersection;
 
+  template<typename,typename,typename,typename,typename>
+  friend class subdomain::IntersectionIteratorWrapper;
+
   typedef HostIntersectionIteratorType HostIntersectionIterator;
   typedef IntersectionType Intersection;
 
@@ -40,6 +43,10 @@ protected:
   {}
 
 private:
+
+  const HostIntersectionIterator& hostIntersectionIterator() const {
+    return _hostIterator;
+  }
 
   bool equals(const WrapperImp& rhs) const {
     return _hostIterator == rhs._hostIterator;
@@ -163,6 +170,9 @@ class LeafIntersectionIteratorWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
+  template<typename,typename,typename,typename,typename>
+  friend class subdomain::IntersectionIteratorWrapper;
+
   template<int, int, typename>
   friend class EntityWrapper;
 
@@ -192,6 +202,9 @@ class LevelIntersectionIteratorWrapper :
 
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
+
+  template<typename,typename,typename,typename,typename>
+  friend class subdomain::IntersectionIteratorWrapper;
 
   template<int, int, typename>
   friend class EntityWrapper;

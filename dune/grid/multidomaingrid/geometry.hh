@@ -85,6 +85,10 @@ public:
     return _wrappedGeometry->operator[](i);
   }
 
+  bool affine() const {
+    return _wrappedGeometry->affine();
+  }
+
   GlobalCoords corner(int i) const {
     return _wrappedGeometry->corner(i);
   }

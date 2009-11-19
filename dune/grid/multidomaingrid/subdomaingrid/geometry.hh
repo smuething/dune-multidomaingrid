@@ -84,6 +84,10 @@ public:
     return _hostGeometry->operator[](i);
   }
 
+  bool affine() const {
+    return _hostGeometry->affine();
+  }
+
   GlobalCoords corner(int i) const {
     return _hostGeometry->corner(i);
   }

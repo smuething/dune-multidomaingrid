@@ -24,39 +24,40 @@ class HierarchicIteratorWrapper :
   template<typename, typename>
   friend class EntityPointer;
 
-  typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity::HierarchicIterator HostHierarchicIterator;
+  typedef typename GridImp::MDGridType::Traits::template Codim<0>::Entity::HierarchicIterator MultiDomainHierarchicIterator;
   typedef typename GridImp::Traits::LevelIndexSet IndexSet;
 
-  explicit HierarchicIteratorWrapper(const GridImp& grid, const HostHierarchicIterator& hostIterator, const HostHierarchicIterator& hostEnd) :
-    EntityPointerWrapper<0,GridImp>(grid,hostIterator),
+  explicit HierarchicIteratorWrapper(const GridImp& grid, const MultiDomainHierarchicIterator& multiDomainIterator, const MultiDomainHierarchicIterator& multiDomainEnd) :
+    EntityPointerWrapper<0,GridImp>(grid,multiDomainIterator),
     _grid(grid),
-    _hostIterator(hostIterator),
-    _hostEnd(hostEnd)
+    _multiDomainIterator(multiDomainIterator),
+    _multiDomainEnd(multiDomainEnd)
   {
     incrementToNextValidPosition();
   }
 
   void incrementToNextValidPosition() {
-    while(_hostIterator != _hostEnd && !_grid.containsHostEntity(*_hostIterator)) {
-      ++_hostIterator;
+    while(_multiDomainIterator != _multiDomainEnd && !_grid.containsMultiDomainEntity(*_multiDomainIterator)) {
+      ++_multiDomainIterator;
     }
-    this->_entityWrapper.reset(_hostIterator);
+    this->_entityWrapper.reset(_multiDomainIterator);
   }
 
   void increment() {
-    ++_hostIterator;
+    ++_multiDomainIterator;
     incrementToNextValidPosition();
   }
 
   const HierarchicIteratorWrapper& operator=(const HierarchicIteratorWrapper& rhs) {
     assert(_grid == rhs._grid);
-    _hostIterator == rhs._hostIterator;
-    _hostEnd = rhs._hostEnd;
+    _multiDomainIterator == rhs._multiDomainIterator;
+    _multiDomainEnd = rhs._multiDomainEnd;
+    return *this;
   }
 
   const GridImp& _grid;
-  HostHierarchicIterator _hostIterator;
-  HostHierarchicIterator _hostEnd;
+  MultiDomainHierarchicIterator _multiDomainIterator;
+  MultiDomainHierarchicIterator _multiDomainEnd;
 
 };
 

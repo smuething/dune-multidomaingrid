@@ -22,39 +22,40 @@ class LevelIteratorWrapper :
   template<typename,typename>
   friend class EntityPointer;
 
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator HostLevelIterator;
+  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator MultiDomainLevelIterator;
   typedef typename GridImp::Traits::LevelIndexSet IndexSet;
 
-  LevelIteratorWrapper(const IndexSet& indexSet, const HostLevelIterator& hostIterator, const HostLevelIterator& endIterator) :
-    EntityPointerWrapper<codim,GridImp>(indexSet._grid,hostIterator),
+  LevelIteratorWrapper(const IndexSet& indexSet, const MultiDomainLevelIterator& multiDomainIterator, const MultiDomainLevelIterator& endIterator) :
+    EntityPointerWrapper<codim,GridImp>(indexSet._grid,multiDomainIterator),
     _indexSet(indexSet),
-    _hostIterator(hostIterator),
+    _multiDomainIterator(multiDomainIterator),
     _end(endIterator)
   {
     incrementToNextValidPosition();
   }
 
   void incrementToNextValidPosition() {
-    while(_hostIterator != _end && !_indexSet.containsHostEntity(*_hostIterator)) {
-      ++_hostIterator;
+    while(_multiDomainIterator != _end && !_indexSet.containsMultiDomainEntity(*_multiDomainIterator)) {
+      ++_multiDomainIterator;
     }
-    this->_entityWrapper.reset(_hostIterator);
+    this->_entityWrapper.reset(_multiDomainIterator);
   }
 
   void increment() {
-    ++_hostIterator;
+    ++_multiDomainIterator;
     incrementToNextValidPosition();
   }
 
   const LevelIteratorWrapper& operator=(const LevelIteratorWrapper& rhs) {
     assert(_indexSet == rhs._indexSet);
-    _hostIterator = rhs._hostIterator;
+    _multiDomainIterator = rhs._multiDomainIterator;
     _end = rhs._end;
+    return *this;
   }
 
   const IndexSet& _indexSet;
-  HostLevelIterator _hostIterator;
-  HostLevelIterator _end;
+  MultiDomainLevelIterator _multiDomainIterator;
+  MultiDomainLevelIterator _end;
 
 };
 

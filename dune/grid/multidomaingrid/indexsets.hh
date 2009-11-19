@@ -31,24 +31,37 @@ namespace fusion = boost::fusion;
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
+//! @cond DEV_DOC
+
+//! \internal
 namespace detail {
 
-template<template<int> class buildForCodim, int codim>
+//! \internal template meta program for assembling the per-codim map vector
+template<template<int> class StructForCodim, int codim>
 struct buildMap {
 
-  typedef typename mpl::push_back<typename buildMap<buildForCodim,codim-1>::type,
-                                  typename buildForCodim<codim>::type
+  typedef typename mpl::push_back<typename buildMap<StructForCodim,codim-1>::type,
+                                  StructForCodim<codim>
                                   >::type type;
 
 };
 
-template<template<int> class buildForCodim>
-struct buildMap<buildForCodim,0> {
+//! \internal recursion limit for buildMap template meta program
+template<template<int> class StructForCodim>
+struct buildMap<StructForCodim,0> {
 
-  typedef fusion::vector<typename buildForCodim<0>::type> type;
+  typedef fusion::vector<StructForCodim<0> > type;
 
 };
 
+//! \internal Helper mechanism for dispatching a call to a possibly non-existent method
+/**
+ * This trick is necessary because some calls in the indexset (e.g. IndexSet::size(int codim) )
+ * pass the codim as a run-time parameter. But as we do not necessarily support all codimensions,
+ * we have to make sure that we only call the actual method if there is a data structure to
+ * operate on. This is handled by the template parameter doDispatch: The specialisation for
+ * doDispatch == false will simply throw an exception.
+ */
 template<bool doDispatch, typename Impl, typename resulttype>
 struct invokeIf {
 
@@ -56,7 +69,7 @@ struct invokeIf {
 
   template<int codim>
   result_type invoke() {
-    _impl.invoke<codim>();
+    return _impl.invoke<codim>();
   }
 
   Impl& _impl;
@@ -67,6 +80,7 @@ struct invokeIf {
 
 };
 
+//! \internal
 template<typename Impl, typename resulttype>
 struct invokeIf<false,Impl, resulttype> {
 
@@ -85,6 +99,7 @@ struct invokeIf<false,Impl, resulttype> {
 
 };
 
+//! \internal Template meta program for dispatching a method to the correctly parameterised template method base on a run-time parameter
 template<typename Impl, typename resulttype, typename MDGridTraits, int codim>
 struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1> {
 
@@ -98,6 +113,7 @@ struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,cod
 
 };
 
+//! \internal Recursion limit for dispatchToCodim
 template<typename Impl, typename resulttype, typename MDGridTraits>
 struct dispatchToCodim<Impl,resulttype,MDGridTraits,0> {
 
@@ -111,6 +127,11 @@ struct dispatchToCodim<Impl,resulttype,MDGridTraits,0> {
 
 };
 
+/**
+ * \internal Helper structure for protecting calls at non-supported codims, similar to invokeIf.
+ *
+ * The main difference is that failures are silently ignored and that the called method may not return anything.
+ */
 template<bool doApply, typename Impl>
 struct applyIf {
 
@@ -127,6 +148,7 @@ struct applyIf {
 
 };
 
+//! \internal
 template<typename Impl>
 struct applyIf<false,Impl> {
 
@@ -142,6 +164,7 @@ struct applyIf<false,Impl> {
 
 };
 
+//! \internal Little helper function for casting away constness. Avoids having to spell out the typename.
 template<typename T>
 T& rw(const T& t) {
   return const_cast<T&>(t);
@@ -149,7 +172,11 @@ T& rw(const T& t) {
 
 }
 
+//! @endcond
 
+/**
+ * Index set for the MultiDomainGrid.
+ */
 template<typename GridImp, typename HostGridViewType>
 class IndexSetWrapper :
     public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,HostGridViewType>,
@@ -161,6 +188,12 @@ class IndexSetWrapper :
 
   template<typename, typename>
   friend class MultiDomainGrid;
+
+  template<typename, typename>
+  friend class subdomain::IndexSetWrapper;
+
+  template<typename, typename, typename, typename, typename>
+  friend class SubDomainInterfaceIterator;
 
   typedef IndexSetWrapper<GridImp,HostGridViewType> ThisType;
 
@@ -195,10 +228,11 @@ private:
     IndexType index;
   };
 
+  //! Placeholder struct for non-supported codimensions in data structures.
   struct NotSupported {};
 
   template<int codim>
-  struct buildIndexMapForCodim {
+  struct Containers {
 
     static const bool supported = remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::supported;
 
@@ -207,107 +241,106 @@ private:
     typedef typename SelectType<supported,
                                 std::map<GeometryType,std::vector<MapEntry<codim> > >,
                                 NotSupported
-                                >::Type type;
-  };
-
-  template<int codim>
-  struct buildSizeMapForCodim {
-
-    static const bool supported = remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::supported;
+                                >::Type IndexMap;
 
     typedef typename SelectType<supported,
                                 std::map<GeometryType,typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::SizeContainer>,
                                 NotSupported
-                                >::Type type;
-  };
-
-  template<int codim>
-  struct buildCodimSizeMapForCodim {
-
-    static const bool supported = remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::supported;
+                                >::Type SizeMap;
 
     typedef typename SelectType<supported,
                                 typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::SizeContainer,
                                 NotSupported
-                                >::Type type;
-  };
-
-
-  template<int codim>
-  struct buildMultiIndexMapForCodim {
-
-    static const bool supported = remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::supported;
+                                >::Type CodimSizeMap;
 
     typedef typename SelectType<supported,
                                 std::vector<typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::MultiIndexContainer>,
                                 NotSupported
-                                >::Type type;
+                                >::Type MultiIndexMap;
+
+    IndexMap indexMap;
+    SizeMap sizeMap;
+    CodimSizeMap codimSizeMap;
+    MultiIndexMap multiIndexMap;
+
   };
 
-  typedef std::array<IndexType,maxSubDomains> SizeContainer;
-  typedef typename detail::buildMap<buildIndexMapForCodim,dimension>::type IndexMap;
-  typedef typename detail::buildMap<buildSizeMapForCodim,dimension>::type SizeMap;
-  typedef typename detail::buildMap<buildCodimSizeMapForCodim,dimension>::type CodimSizeMap;
-  typedef typename detail::buildMap<buildMultiIndexMapForCodim,dimension>::type MultiIndexMap;
+  typedef typename detail::buildMap<Containers,dimension>::type ContainerMap;
 
   typedef std::vector<boost::shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
 
+  //! Convenience subclass of dispatchToCodim for automatically passing in the MDGridTraits and the dimension
   template<typename Impl,typename result_type>
   struct dispatchToCodim : public detail::dispatchToCodim<Impl,result_type,MDGridTraits,dimension> {};
 
 public:
 
+  //! Returns the index of the entity with codimension codim.
   template<int codim>
   IndexType index(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {
     return _hostGridView.indexSet().index(_grid.hostEntity(e));
   }
 
+  //! Returns the index of the entity.
   template<typename Entity>
   IndexType index(const Entity& e) const {
     return _hostGridView.indexSet().index(_grid.hostEntity(e));
   }
 
+  //! Returns the subdindex of the i-th subentity of e with codimension codim.
   template<int codim>
   IndexType subIndex(const Codim0Entity& e, int i) const {
     return _hostGridView.indexSet().subIndex(_grid.hostEntity(e),i,codim);
   }
 
+  //! Returns the subdindex of the i-th subentity of e with codimension codim.
   IndexType subIndex(const Codim0Entity& e, int i, unsigned int codim) const {
-    return _hostGridView.indexSet().subIndex(_grid.hostEntity(e),i,codim);
+    IndexType r = _hostGridView.indexSet().subIndex(_grid.hostEntity(e),i,codim);
+    return r;
   }
 
+  //! Returns a list of all geometry types with codimension codim contained in the grid.
   const std::vector<GeometryType>& geomTypes(int codim) const {
     return _hostGridView.indexSet().geomTypes(codim);
   }
 
+  //! Returns the number of entities with GeometryType type in the grid.
   IndexType size(GeometryType type) const {
     return _hostGridView.indexSet().size(type);
   }
 
+  //! Returns the number of entities with codimension codim in the grid.
   IndexType size(int codim) const {
     return _hostGridView.indexSet().size(codim);
   }
 
+  //! Returns true if the entity is contained in the grid.
   template<typename EntityType>
   bool contains(const EntityType& e) const {
     return _hostGridView.indexSet().contains(_grid.hostEntity(e));
   }
 
+  //! Returns a constant reference to the SubDomainSet of the given entity.
   template<typename EntityType>
   const typename MapEntry<EntityType::codimension>::SubDomainSet& subDomains(const EntityType& e) const {
     return subDomains<EntityType::codimension>(e);
   }
 
+  //! Returns a constant reference to the SubDomainSet of the given entity with codimension cc.
+  //! \tparam cc the codimension of the entity.
   template<int cc>
   const typename MapEntry<cc>::SubDomainSet& subDomains(const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
     return indexMap<cc>().find(e.type())->second[_hostGridView.indexSet().index(_grid.hostEntity(e))].domains;
   }
 
+  //! Returns the index of the entity in a specific subdomain.
   template<class EntityType>
   IndexType index(DomainType subDomain, const EntityType& e) const {
     return index<EntityType::codimension>(subDomain,e);
   }
 
+  //! Returns the index of the entity with codimension cc in a specific subdomain.
+  //! \tparam the codimension of the entity.
   template<int cc>
   IndexType index(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
     GeometryType gt = e.type();
@@ -320,6 +353,8 @@ public:
       return multiIndexMap<cc>()[me.index].at(me.domains.domainOffset(subDomain));
     }
   }
+
+private:
 
   template<int cc>
   IndexType indexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<cc>::Entity& he) const {
@@ -334,6 +369,7 @@ public:
     }
   }
 
+  //! functor template for retrieving a subindex.
   struct getSubIndexForSubDomain : public dispatchToCodim<getSubIndexForSubDomain,IndexType> {
 
     template<int codim>
@@ -424,6 +460,8 @@ public:
     return me.domains.contains(subDomain);
   }
 
+public:
+
   IndexType subIndex(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity& e, int i, int codim) const {
     return subIndexForSubDomain(subDomain,_grid.hostEntity(e),i,codim);
   }
@@ -440,6 +478,7 @@ public:
     return sizeForSubDomain(subDomain,codim);
   }
 
+  //! Returns true if the entity is contained in a specific subdomain.
   template<typename EntityType>
   bool contains(DomainType subDomain, const EntityType& e) const {
     const GeometryType gt = e.type();
@@ -452,17 +491,11 @@ private:
 
   const GridImp& _grid;
   HostGridView _hostGridView;
-  IndexMap _indexMap;
-  SizeMap _sizeMap;
-  CodimSizeMap _codimSizes;
-  MultiIndexMap _multiIndexMap;
+  ContainerMap _containers;
 
   void swap(ThisType& rhs) {
     assert(&_grid == &rhs._grid);
-    std::swap(_indexMap,rhs._indexMap);
-    std::swap(_sizeMap,rhs._sizeMap);
-    std::swap(_codimSizes,rhs._codimSizes);
-    std::swap(_multiIndexMap,rhs._multiIndexMap);
+    std::swap(_containers,rhs._containers);
   }
 
   void addToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
@@ -483,6 +516,12 @@ private:
     indexMap<0>()[gt][hostIndex].domains.set(subDomain);
   }
 
+  void addToSubDomains(const typename MDGridTraits::template Codim<0>::SubDomainSet& subDomains, const Codim0Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    indexMap<0>().at(gt)[hostIndex].domains.addAll(subDomains);
+  }
+
   IndexSetWrapper(const GridImp& grid, HostGridView hostGridView) :
     _grid(grid),
     _hostGridView(hostGridView)
@@ -491,60 +530,59 @@ private:
   explicit IndexSetWrapper(const ThisType& rhs) :
     _grid(rhs._grid),
     _hostGridView(rhs._hostGridView),
-    _indexMap(rhs._indexMap),
-    _sizeMap(rhs._sizeMap),
-    _codimSizes(rhs._codimSizes),
-    _multiIndexMap(rhs._multiIndexMap)
-  {}
+    _containers(rhs._containers)
+    {}
 
+  //! Returns the index map for the given codimension.
+  //! \tparam cc The requested codimension.
   template<int cc>
-  typename fusion::result_of::at_c<IndexMap,cc>::type indexMap() {
-    return fusion::at_c<cc>(_indexMap);
-  }
-
-  template<int cc>
-  typename fusion::result_of::at_c<SizeMap,cc>::type sizeMap() {
-    return fusion::at_c<cc>(_sizeMap);
+  typename Containers<cc>::IndexMap& indexMap() {
+    return fusion::at_c<cc>(_containers).indexMap;
   }
 
   template<int cc>
-  typename fusion::result_of::at_c<CodimSizeMap,cc>::type codimSizes() {
-    return fusion::at_c<cc>(_codimSizes);
+  typename Containers<cc>::SizeMap& sizeMap() {
+    return fusion::at_c<cc>(_containers).sizeMap;
   }
 
   template<int cc>
-  typename fusion::result_of::at_c<MultiIndexMap,cc>::type multiIndexMap() {
-    return fusion::at_c<cc>(_multiIndexMap);
+  typename Containers<cc>::CodimSizeMap& codimSizes() {
+    return fusion::at_c<cc>(_containers).codimSizeMap;
   }
 
   template<int cc>
-  typename fusion::result_of::at_c<const IndexMap,cc>::type indexMap() const {
-    return fusion::at_c<cc>(_indexMap);
+  typename Containers<cc>::MultiIndexMap& multiIndexMap() {
+    return fusion::at_c<cc>(_containers).multiIndexMap;
   }
 
   template<int cc>
-  typename fusion::result_of::at_c<const SizeMap,cc>::type sizeMap() const {
-    return fusion::at_c<cc>(_sizeMap);
+  const typename Containers<cc>::IndexMap& indexMap() const {
+    return fusion::at_c<cc>(_containers).indexMap;
   }
 
   template<int cc>
-  typename fusion::result_of::at_c<const CodimSizeMap,cc>::type codimSizes() const {
-    return fusion::at_c<cc>(_codimSizes);
+  const typename Containers<cc>::SizeMap& sizeMap() const {
+    return fusion::at_c<cc>(_containers).sizeMap;
   }
 
   template<int cc>
-  typename fusion::result_of::at_c<const MultiIndexMap,cc>::type multiIndexMap() const {
-    return fusion::at_c<cc>(_multiIndexMap);
+  const typename Containers<cc>::CodimSizeMap& codimSizes() const {
+    return fusion::at_c<cc>(_containers).codimSizeMap;
   }
 
-  template<typename Sequence, typename Functor>
-  void applyToCodims(Sequence seq, Functor func) const {
-    fusion::for_each(fusion::zip(mpl::range_c<int,0,dimension+1>(),seq),func);
+  template<int cc>
+  const typename Containers<cc>::MultiIndexMap& multiIndexMap() const {
+    return fusion::at_c<cc>(_containers).multiIndexMap;
   }
 
-  template<typename Sequence, typename Functor>
-  void applyToCodims(Sequence seq, Functor func) {
-    fusion::for_each(fusion::zip(mpl::range_c<int,0,dimension+1>(),seq),func);
+  template<typename Functor>
+  void applyToCodims(Functor func) const {
+    fusion::for_each(fusion::zip(mpl::range_c<int,0,dimension+1>(),_containers),func);
+  }
+
+  template<typename Functor>
+  void applyToCodims(Functor func) {
+    fusion::for_each(fusion::zip(mpl::range_c<int,0,dimension+1>(),_containers),func);
   }
 
   template<typename Impl>
@@ -553,31 +591,33 @@ private:
     template<typename T>
     void operator()(T t) const {
       typedef mpl::int_<fusion::result_of::value_at_c<T,0>::type::value> codim;
-      detail::applyIf<MDGridTraits::template Codim<codim::value>::supported,const Impl>(static_cast<const Impl&>(*this)).template apply<codim::value>(fusion::at_c<1>(t));
+      // remove const from the container reference - scary....
+      typedef typename std::add_lvalue_reference<
+        typename std::remove_const<
+          typename std::remove_reference<
+            typename fusion::result_of::value_at_c<T,1>::type
+          >::type
+        >::type
+      >::type ContainerReference;
+      detail::applyIf<MDGridTraits::template Codim<codim::value>::supported,const Impl>(static_cast<const Impl&>(*this)).template apply<codim::value>(const_cast<ContainerReference>(fusion::at_c<1>(t)));
     }
 
   };
 
   struct resetPerCodim : public applyToCodim<resetPerCodim> {
 
-    template<int codim, typename T>
-    void apply(T& t) const {
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,0>::type>::type>::type IndexMap;
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,1>::type>::type>::type SizeMap;
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,3>::type>::type>::type MultiIndexMap;
-      IndexMap& indexMap = const_cast<IndexMap&>(fusion::at_c<0>(t));
-      SizeMap& sizeMap = const_cast<SizeMap&>(fusion::at_c<1>(t));
-      MultiIndexMap& multiIndexMap = const_cast<MultiIndexMap&>(fusion::at_c<3>(t));
+    template<int codim>
+    void apply(Containers<codim>& c) const {
       for (std::vector<GeometryType>::const_iterator it = _his.geomTypes(codim).begin(); it != _his.geomTypes(codim).end(); ++it) {
         if (_full) {
           // resize index map
-          indexMap[*it].resize(_his.size(*it));
+          c.indexMap[*it].resize(_his.size(*it));
         }
         // reset SizeMap counter
-        std::fill(sizeMap[*it].begin(),sizeMap[*it].end(),0);
+        std::fill(c.sizeMap[*it].begin(),c.sizeMap[*it].end(),0);
       }
       // clear MultiIndexMap
-      multiIndexMap.clear();
+      c.multiIndexMap.clear();
     }
 
     resetPerCodim(bool full, const HostIndexSet& his) :
@@ -592,28 +632,22 @@ private:
   void reset(bool full) {
     const HostIndexSet& his = _hostGridView.indexSet();
     if (full) {
-      IndexMap him;
-      SizeMap hsm;
-      std::swap(_indexMap,him);
-      std::swap(_sizeMap,hsm);
+      ContainerMap cm = ContainerMap();
+      std::swap(_containers,cm);
     }
-    applyToCodims(fusion::zip(_indexMap,_sizeMap,_codimSizes,_multiIndexMap),resetPerCodim(full,his));
+    applyToCodims(resetPerCodim(full,his));
   }
 
   struct updatePerCodimSizes : public applyToCodim<updatePerCodimSizes> {
 
-    template<int codim, typename T>
-    void apply(T& t) const {
+    template<int codim>
+    void apply(Containers<codim>& c) const {
       // reset size for this codim to zero
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,0>::type>::type>::type PerCodimSize;
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,1>::type>::type>::type SizeMap;
-      PerCodimSize& perCodimSize = const_cast<PerCodimSize&>(fusion::at_c<0>(t));
-      SizeMap& sizeMap = const_cast<SizeMap&>(fusion::at_c<1>(t));
-      std::fill(perCodimSize.begin(),perCodimSize.end(),0);
+      std::fill(c.codimSizeMap.begin(),c.codimSizeMap.end(),0);
       // collect per-geometrytype sizes into codim size structure
-      std::for_each(util::value_iterator(sizeMap.begin()),
-		    util::value_iterator(sizeMap.end()),
-		    util::collect_elementwise<std::plus<IndexType> >(perCodimSize));
+      std::for_each(util::value_iterator(c.sizeMap.begin()),
+		    util::value_iterator(c.sizeMap.end()),
+		    util::collect_elementwise<std::plus<IndexType> >(c.codimSizeMap));
     }
 
   };
@@ -625,8 +659,8 @@ private:
       (*it)->reset(full);
     }
     HostEntityIterator end = _hostGridView.template end<0>();
-    typename fusion::result_of::at_c<IndexMap,0>::type im = indexMap<0>();
-    typename fusion::result_of::at_c<SizeMap,0>::type sm = sizeMap<0>();
+    typename Containers<0>::IndexMap& im = indexMap<0>();
+    typename Containers<0>::SizeMap& sm = sizeMap<0>();
     for (HostEntityIterator it  = _hostGridView.template begin<0>(); it != end; ++it) {
       const HostEntity& he = *it;
       const GeometryType hgt = he.type();
@@ -638,10 +672,10 @@ private:
         markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
       }
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
-      applyToCodims(fusion::zip(_indexMap,_sizeMap),markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
+      applyToCodims(markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
-    applyToCodims(fusion::zip(_indexMap,_sizeMap,_multiIndexMap),updateSubIndices(*this));
-    applyToCodims(fusion::zip(_codimSizes,_sizeMap),updatePerCodimSizes());
+    applyToCodims(updateSubIndices(*this));
+    applyToCodims(updatePerCodimSizes());
     for(typename LevelIndexSets::iterator it = levelIndexSets.begin(); it != levelIndexSets.end(); ++it) {
       (*it)->updateLevelIndexSet();
     }
@@ -651,23 +685,25 @@ private:
   void updateLevelIndexSet() {
     const HostIndexSet& his = _hostGridView.indexSet();
     HostEntityIterator end = _hostGridView.template end<0>();
-    typename fusion::result_of::at_c<IndexMap,0>::type im = indexMap<0>();
-    typename fusion::result_of::at_c<SizeMap,0>::type sm = sizeMap<0>();
+    typename Containers<0>::IndexMap& im = indexMap<0>();
+    typename Containers<0>::SizeMap& sm = sizeMap<0>();
     for (HostEntityIterator it  = _hostGridView.template begin<0>(); it != end; ++it) {
       const HostEntity& he = *it;
       const GeometryType hgt = he.type();
       IndexType hostIndex = his.index(he);
       MapEntry<0>& me = im[hgt][hostIndex];
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
-      applyToCodims(fusion::zip(_indexMap,_sizeMap),markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
+      applyToCodims(markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
-    applyToCodims(fusion::zip(_indexMap,_sizeMap,_multiIndexMap),updateSubIndices(*this));
-    applyToCodims(fusion::zip(_codimSizes,_sizeMap),updatePerCodimSizes());
+    applyToCodims(updateSubIndices(*this));
+    applyToCodims(updatePerCodimSizes());
   }
 
   template<int codim, typename SizeContainer, typename MultiIndexContainer>
   void updateMapEntry(MapEntry<codim>& me, SizeContainer& sizes, std::vector<MultiIndexContainer>& multiIndexMap) {
     switch (me.domains.state()) {
+    case SubDomainSet::emptySet:
+      break;
     case SubDomainSet::simpleSet:
       me.index = sizes[*me.domains.begin()]++;
       break;
@@ -694,17 +730,15 @@ private:
 
   struct markSubIndices : public applyToCodim<const markSubIndices> {
 
-    template<int codim, typename T>
-    void apply(T& t) const {
+    template<int codim>
+    void apply(Containers<codim>& c) const {
       if (codim == 0)
         return;
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,0>::type>::type>::type IndexSet;
-      IndexSet& indexSet = const_cast<IndexSet&>(fusion::at_c<0>(t));
       const int size = _refEl.size(codim);
       for (int i = 0; i < size; ++i) {
         IndexType hostIndex = _his.subIndex(_he,i,codim);
         GeometryType gt = _refEl.type(i,codim);
-        indexSet.at(gt)[hostIndex].domains.addAll(_domains);
+        c.indexMap.at(gt)[hostIndex].domains.addAll(_domains);
       }
     }
 
@@ -726,23 +760,17 @@ private:
 
   struct updateSubIndices : public applyToCodim<const updateSubIndices> {
 
-    template<int codim, typename T>
-    void apply(T& t) const {
+    template<int codim>
+    void apply(Containers<codim>& c) const {
       if (codim == 0)
         return;
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,0>::type>::type>::type IndexMap;
-      IndexMap& indexMap = const_cast<IndexMap&>(fusion::at_c<0>(t));
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,1>::type>::type>::type SizeMap;
-      SizeMap& sizeMap = const_cast<SizeMap&>(fusion::at_c<1>(t));
-      typedef typename std::remove_const<typename std::remove_reference<typename fusion::result_of::value_at_c<T,2>::type>::type>::type MultiIndexMap;
-      MultiIndexMap& multiIndexMap = const_cast<MultiIndexMap&>(fusion::at_c<2>(t));
-      const typename IndexMap::iterator end = indexMap.end();
-      for (typename IndexMap::iterator it = indexMap.begin(); it != end; ++it) {
+      const typename Containers<codim>::IndexMap::iterator end = c.indexMap.end();
+      for (typename Containers<codim>::IndexMap::iterator it = c.indexMap.begin(); it != end; ++it) {
         const GeometryType gt = it->first;
-        typedef typename remove_const<typename IndexMap::mapped_type>::type::iterator Iterator;
+        typedef typename remove_const<typename Containers<codim>::IndexMap::mapped_type>::type::iterator Iterator;
         const Iterator end2 = it->second.end();
         for (Iterator it2 = it->second.begin(); it2 != end2; ++it2)
-          _indexSet.updateMapEntry(*it2,sizeMap[gt],multiIndexMap);
+          _indexSet.updateMapEntry(*it2,c.sizeMap[gt],c.multiIndexMap);
       }
     }
 

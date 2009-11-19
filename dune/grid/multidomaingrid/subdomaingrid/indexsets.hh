@@ -66,7 +66,7 @@ public:
 
   template<int codim>
   IndexType index(const typename remove_const<GridImp>::type::Traits::template Codim<codim>::Entity& e) const {
-    return _mdIndexSet.template indexForSubDomain<codim>(_grid.domain(),_grid.hostEntity(e));
+    return _mdIndexSet.template index<codim>(_grid.domain(),_grid.multiDomainEntity(e));
   }
 
   template<typename Entity>
@@ -76,11 +76,11 @@ public:
 
   template<int codim>
   IndexType subIndex(const Codim0Entity& e, int i) const {
-    return _mdIndexSet.subIndexForSubDomain(_grid.domain(),_grid.hostEntity(e),i,codim);
+    return _mdIndexSet.subIndex(_grid.domain(),_grid.multiDomainEntity(e),i,codim);
   }
 
   IndexType subIndex(const Codim0Entity& e, int i, unsigned int codim) const {
-    return _mdIndexSet.subIndexForSubDomain(_grid.domain(),_grid.hostEntity(e),i,codim);
+    return _mdIndexSet.subIndex(_grid.domain(),_grid.multiDomainEntity(e),i,codim);
   }
 
   const std::vector<GeometryType>& geomTypes(int codim) const {
@@ -97,7 +97,7 @@ public:
 
   template<typename EntityType>
   bool contains(const EntityType& e) const {
-    return _mdIndexSet.containsForSubDomain(_grid.domain(),_grid.hostEntity(e));
+    return _mdIndexSet.contains(_grid.domain(),_grid.multiDomainEntity(e));
   }
 
   bool operator==(const IndexSetWrapper& rhs) const {
@@ -117,6 +117,11 @@ private:
   template<typename EntityType>
   bool containsHostEntity(const EntityType& he) const {
     return _mdIndexSet.containsForSubDomain(_grid.domain(),he);
+  }
+
+  template<typename EntityType>
+  bool containsMultiDomainEntity(const EntityType& mde) const {
+    return _mdIndexSet.contains(_grid.domain(),mde);
   }
 
 };

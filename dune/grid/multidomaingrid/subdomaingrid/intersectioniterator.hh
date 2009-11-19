@@ -10,7 +10,7 @@ namespace subdomain {
 template<typename GridImp,
 	 typename WrapperImp,
          typename IndexSet,
-	 typename HostIntersectionIteratorType,
+	 typename MultiDomainIntersectionIteratorType,
 	 typename IntersectionType>
 class IntersectionIteratorWrapper {
 
@@ -20,7 +20,7 @@ class IntersectionIteratorWrapper {
   template<class, template<class> class>
   friend class Intersection;
 
-  typedef HostIntersectionIteratorType HostIntersectionIterator;
+  typedef MultiDomainIntersectionIteratorType MultiDomainIntersectionIterator;
   typedef IntersectionType Intersection;
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
@@ -37,29 +37,34 @@ class IntersectionIteratorWrapper {
 
 protected:
 
-  IntersectionIteratorWrapper(const IndexSet& indexSet, const HostIntersectionIterator& hostIterator) :
+  IntersectionIteratorWrapper(const IndexSet& indexSet, const MultiDomainIntersectionIterator& multiDomainIterator) :
     _indexSet(indexSet),
-    _hostIterator(hostIterator),
+    _multiDomainIterator(multiDomainIterator),
     _outsideTested(false)
   {}
 
   const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
     assert(_indexSet == rhs._indexSet);
-    _hostIterator = rhs._hostIterator;
+    _multiDomainIterator = rhs._multiDomainIterator;
     _outsideTested = false;
     _geometry.clear();
     _geometryInInside.clear();
     _geometryInOutside.clear();
+    return *this;
   }
 
 private:
 
+  const typename GridImp::MultiDomainGrid::template ReturnImplementationType<MultiDomainIntersectionIterator>::ImplementationType::HostIntersectionIterator& hostIntersectionIterator() const {
+    return GridImp::MultiDomainGrid::getRealImplementation(_multiDomainIterator).hostIntersectionIterator();
+  }
+
   bool equals(const WrapperImp& rhs) const {
-    return _hostIterator == rhs._hostIterator;
+    return _multiDomainIterator == rhs._multiDomainIterator;
   }
 
   void increment() {
-    ++_hostIterator;
+    ++_multiDomainIterator;
     _geometry.clear();
     _geometryInInside.clear();
     _geometryInOutside.clear();
@@ -72,10 +77,10 @@ private:
 
   void checkOutside() const {
     if (!_outsideTested) {
-      if (_hostIterator->boundary()) {
+      if (_multiDomainIterator->boundary()) {
         _outsideType = otBoundary;
       } else {
-        if (_indexSet.containsHostEntity(*(_hostIterator->outside()))) {
+        if (_indexSet.containsMultiDomainEntity(*(_multiDomainIterator->outside()))) {
           _outsideType = otNeighbor;
         } else {
           _outsideType = otForeignCell;
@@ -90,7 +95,7 @@ private:
   }
 
   int boundaryId() const {
-    return _hostIterator->boundaryId();
+    return _multiDomainIterator->boundaryId();
   }
 
   bool neighbor() const {
@@ -99,22 +104,22 @@ private:
   }
 
   EntityPointer inside() const {
-    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_hostIterator->inside());
+    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIterator->inside());
   }
 
   EntityPointer outside() const {
     checkOutside();
     assert(_outsideType == otNeighbor);
-    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_hostIterator->outside());
+    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIterator->outside());
   }
 
   bool conforming() const {
-    return _hostIterator->conforming();
+    return _multiDomainIterator->conforming();
   }
 
   const LocalGeometry& geometryInInside() const {
     if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset(_hostIterator->geometryInInside());
+      _geometryInInside.reset((*hostIntersectionIterator()).geometryInInside());
     }
     return _geometryInInside;
   }
@@ -127,7 +132,7 @@ private:
     checkOutside();
     assert(_outsideType == otNeighbor);
     if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset(_hostIterator->geometryInOutside());
+      _geometryInOutside.reset((*hostIntersectionIterator()).geometryInOutside());
     }
     return _geometryInOutside;
   }
@@ -138,7 +143,7 @@ private:
 
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
-      _geometry.reset(_hostIterator->geometry());
+      _geometry.reset((*hostIntersectionIterator()).geometry());
     }
     return _geometry;
   }
@@ -148,39 +153,39 @@ private:
   }
 
   GeometryType type() const {
-    return _hostIterator->type();
+    return _multiDomainIterator->type();
   }
 
   int indexInInside() const {
-    return _hostIterator->indexInInside();
+    return _multiDomainIterator->indexInInside();
   }
 
   int numberInSelf() const {
-    return _hostIterator->numberInSelf();
+    return _multiDomainIterator->numberInSelf();
   }
 
   int indexInOutside() const {
     checkOutside();
     assert(_outsideType == otNeighbor);
-    return _hostIterator->indexInOutside();
+    return _multiDomainIterator->indexInOutside();
   }
 
   int numberInNeighbor() const {
     checkOutside();
     assert(_outsideType == otNeighbor);
-    return _hostIterator->numberInNeighbor();
+    return _multiDomainIterator->numberInNeighbor();
   }
 
   GlobalCoords outerNormal(const LocalCoords& local) const {
-    return _hostIterator->outerNormal(local);
+    return _multiDomainIterator->outerNormal(local);
   }
 
   GlobalCoords integrationOuterNormal(const LocalCoords& local) const {
-    return _hostIterator->integrationOuterNormal(local);
+    return _multiDomainIterator->integrationOuterNormal(local);
   }
 
   GlobalCoords unitOuterNormal(const LocalCoords& local) const {
-    return _hostIterator->unitOuterNormal(local);
+    return _multiDomainIterator->unitOuterNormal(local);
   }
 
 private:
@@ -188,7 +193,7 @@ private:
   enum OutsideType { otNeighbor, otForeignCell, otBoundary };
 
   const IndexSet& _indexSet;
-  HostIntersectionIterator _hostIterator;
+  MultiDomainIntersectionIterator _multiDomainIterator;
   MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
   mutable bool _outsideTested;
@@ -202,7 +207,7 @@ class LeafIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,
 				       LeafIntersectionIteratorWrapper<GridImp>,
                                        typename GridImp::Traits::LeafIndexSet,
-				       typename detail::HostGridAccessor<GridImp>::Traits::LeafIntersectionIterator,
+				       typename GridImp::MultiDomainGrid::Traits::LeafIntersectionIterator,
 				       typename GridImp::Traits::LeafIntersection>
 {
 
@@ -215,17 +220,17 @@ class LeafIntersectionIteratorWrapper :
   template<typename>
   friend class SubDomainGrid;
 
-  typedef typename GridImp::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
+  typedef typename GridImp::MultiDomainGrid::Traits::LeafIntersectionIterator MultiDomainIntersectionIterator;
   typedef typename GridImp::Traits::LeafIntersection Intersection;
 
   typedef IntersectionIteratorWrapper<GridImp,
 				      LeafIntersectionIteratorWrapper<GridImp>,
                                       typename GridImp::Traits::LeafIndexSet,
-				      HostIntersectionIterator,
+				      MultiDomainIntersectionIterator,
 				      Intersection> Base;
 
-  LeafIntersectionIteratorWrapper(const GridImp& grid, const HostIntersectionIterator& hostIterator) :
-    Base(grid.leafIndexSet(),hostIterator)
+  LeafIntersectionIteratorWrapper(const GridImp& grid, const MultiDomainIntersectionIterator& multiDomainIterator) :
+    Base(grid.leafIndexSet(),multiDomainIterator)
   {}
 
 };
@@ -236,7 +241,7 @@ class LevelIntersectionIteratorWrapper :
     public IntersectionIteratorWrapper<GridImp,
 				       LevelIntersectionIteratorWrapper<GridImp>,
                                        typename GridImp::Traits::LevelIndexSet,
-				       typename detail::HostGridAccessor<GridImp>::Traits::LevelIntersectionIterator,
+				       typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator,
 				       typename GridImp::Traits::LevelIntersection>
 
 {
@@ -247,17 +252,17 @@ class LevelIntersectionIteratorWrapper :
   template<int, int, typename>
   friend class EntityWrapper;
 
-  typedef typename GridImp::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
+  typedef typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator MultiDomainIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;
 
   typedef IntersectionIteratorWrapper<GridImp,
 				      LevelIntersectionIteratorWrapper<GridImp>,
                                       typename GridImp::Traits::LevelIndexSet,
-				      HostIntersectionIterator,
+				      MultiDomainIntersectionIterator,
 				      Intersection> Base;
 
-  LevelIntersectionIteratorWrapper(const GridImp& grid, int level, const HostIntersectionIterator& hostIterator) :
-    Base(grid.levelIndexSet(level),hostIterator)
+  LevelIntersectionIteratorWrapper(const GridImp& grid, int level, const MultiDomainIntersectionIterator& multiDomainIterator) :
+    Base(grid.levelIndexSet(level),multiDomainIterator)
   {}
 
 };

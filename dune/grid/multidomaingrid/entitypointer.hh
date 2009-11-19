@@ -11,6 +11,9 @@ class EntityPointerWrapper
 
   static const int dim = GridImp::dimension;
 
+  template<int, int, typename>
+  friend class subdomain::EntityWrapper;
+
 public:
 
   typedef EntityPointerWrapper EntityPointerImp;
@@ -44,6 +47,10 @@ public:
 
   int level() const {
     return _entityWrapper.level();
+  }
+
+  const HostEntityPointer& hostEntityPointer() const {
+    return _entityWrapper.hostEntityPointer();
   }
 
 protected:

@@ -1,4 +1,6 @@
 #include "config.h"
+#define GRIDDIM 2
+#define ALUGRID_SIMPLEX
 
 #include <dune/common/mpihelper.hh>
 #include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
@@ -6,10 +8,11 @@
 #include "output.hh"
 
 
+
 int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
-    //typedef Dune::YaspGrid<2> GridType;
+    //typedef Dune::ALUSimplexGrid<2,2> AdaptableGridType;
     Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
@@ -20,7 +23,6 @@ int main(int argc, char** argv) {
     typedef GridView::Codim<0>::Iterator Iterator;
     typedef GridView::Codim<2>::Iterator VIterator;
     typedef GridView::Codim<0>::Entity Entity;
-    typedef GridView::Codim<2>::Entity Vertex;
     typedef GridView::Codim<0>::Geometry Geometry;
     grid.startSubDomainMarking();
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
@@ -44,47 +46,48 @@ int main(int argc, char** argv) {
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
 
-    Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p0 = grid.subDomain(0).leafView().begin<0>();
-    const Entity& e0 = grid.subDomain(0).multiDomainEntity(*p0);
-    const Entity& e02 = grid.multiDomainEntity(*p0);
-    Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p02 = grid.subDomain(0).subDomainEntityPointer(e0);
+    int counter = 0;
 
-    Grid::SubDomainGrid::LeafGridView::Codim<2>::EntityPointer p1 = grid.subDomain(0).leafView().begin<2>();
-    const Vertex& e1 = grid.subDomain(0).multiDomainEntity(*p1);
-    const Vertex& e12 = grid.multiDomainEntity(*p1);
+    printStatus(grid,"adaptation",counter++);
 
-    printStatus(grid,"partitioning1");
+    grid.globalRefine(1);
 
-    grid.startSubDomainMarking();
+    printStatus(grid,"adaptation",counter++);
+
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
       const Entity& e = *it;
-      const Grid::MDGridTraits::Codim<0>::SubDomainSet& domains = gv.indexSet().subDomains(e);
-      if (domains.contains(0) && domains.contains(1)) {
-        grid.removeFromSubDomain(0,e);
-        grid.removeFromSubDomain(1,e);
-      } else if (domains.contains(0)) {
-        grid.assignToSubDomain(1,e);
-      } else if (domains.contains(1)) {
-        grid.assignToSubDomain(0,e);
+      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(Dune::GenericReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
+      double x = c[0];
+      double y = c[1];
+      if (y > 0.5) {
+        grid.mark(1,e);
       } else {
-        grid.addToSubDomain(0,e);
-        grid.addToSubDomain(1,e);
+        grid.mark(-1,e);
       }
     }
+    grid.preAdapt();
+    grid.adapt();
+    grid.postAdapt();
 
-    grid.preUpdateSubDomains();
-    grid.updateSubDomains();
-    grid.postUpdateSubDomains();
+    printStatus(grid,"adaptation",counter++);
 
-    printStatus(grid,"partitioning2");
-
-    /*for (int i = 0; i <= 2; ++i) {
-      std::cout << "codim " << i << ":";
-      for (int s = 0; s <= 2; ++s) {
-	std::cout << " " << is.size(i,s);
+    for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
+      const Entity& e = *it;
+      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(Dune::GenericReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
+      double x = c[0];
+      double y = c[1];
+      if (y > 0.5) {
+        grid.mark(-1,e);
+      } else {
+        grid.mark(1,e);
       }
-      std::cout << std::endl;
-      }*/
+    }
+    grid.preAdapt();
+    grid.adapt();
+    grid.postAdapt();
+
+    printStatus(grid,"adaptation",counter++);
+
   } catch (Dune::Exception& e) {
     std::cout << e << std::endl;
   }

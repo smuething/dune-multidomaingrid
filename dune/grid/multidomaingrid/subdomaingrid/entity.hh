@@ -5,6 +5,9 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename, typename>
+class MultiDomainGrid;
+
 namespace subdomain {
 
 template<int codim, int dim, typename GridImp>
@@ -45,21 +48,25 @@ class MakeableEntityWrapper :
   template<typename>
   friend class HierarchicIteratorWrapper;
 
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
 
-  MakeableEntityWrapper(const GridImp& grid, const HostEntityPointer& hostEntityPointer) :
-    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,hostEntityPointer))
+  MakeableEntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
+    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,multiDomainEntityPointer))
   {}
 
-  void reset(const HostEntityPointer& hostEntityPointer) {
-    this->getRealImp().reset(hostEntityPointer);
+  void reset(const MultiDomainEntityPointer multiDomainEntityPointer) {
+    this->getRealImp().reset(multiDomainEntityPointer);
   }
 
   void compactify() {
     this->getRealImp().compactify();
   }
 
-  const HostEntityPointer& hostEntityPointer() const {
+  const MultiDomainEntityPointer& multiDomainEntityPointer() const {
+    return this->getRealImp().multiDomainEntityPointer();
+  }
+
+  const MultiDomainEntityPointer& hostEntityPointer() const {
     return this->getRealImp().hostEntityPointer();
   }
 
@@ -80,66 +87,74 @@ class EntityWrapper :
   template<typename>
   friend class SubDomainGrid;
 
+  template<typename,typename>
+  friend class Dune::mdgrid::MultiDomainGrid;
+
   template<int, int, typename, template<int,int,typename> class>
   friend class Entity;
 
+  typedef typename GridImp::MultiDomainGrid::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
 public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
-  EntityWrapper(const GridImp& grid, const HostEntityPointer& e) :
+  EntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& e) :
     _grid(grid),
-    _hostEntityPointer(e)
+    _multiDomainEntityPointer(e)
   {}
 
   int level() const {
-    return _hostEntityPointer->level();
+    return _multiDomainEntityPointer->level();
   }
 
   PartitionType partitionType() const {
-    return _hostEntityPointer->partitionType();
+    return _multiDomainEntityPointer->partitionType();
   }
 
   template<int cc>
   int count() const {
-    return _hostEntityPointer->template count<cc>();
+    return _multiDomainEntityPointer->template count<cc>();
   }
 
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
-      _geometry.reset(_hostEntityPointer->geometry());
+      _geometry.reset(hostEntityPointer()->geometry());
     }
     return _geometry;
   }
 
-  private:
+private:
 
   const GridImp& _grid;
-  HostEntityPointer _hostEntityPointer;
+  MultiDomainEntityPointer _multiDomainEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
   const EntityWrapper& operator=(const EntityWrapper& rhs) {
     assert(_grid == rhs._grid);
-    reset(rhs._hostEntityPointer);
+    reset(rhs._multiDomainEntityPointer);
     return *this;
   }
 
-  void reset(const HostEntityPointer& hostEntityPointer) {
-    if (_hostEntityPointer != hostEntityPointer) {
+  void reset(const MultiDomainEntityPointer& multiDomainEntityPointer) {
+    if (_multiDomainEntityPointer != multiDomainEntityPointer) {
       _geometry.clear();
-      _hostEntityPointer = hostEntityPointer;
+      _multiDomainEntityPointer = multiDomainEntityPointer;
     }
   }
 
   void compactify() {
     _geometry.clear();
-    _hostEntityPointer.compactify();
+    _multiDomainEntityPointer.compactify();
+  }
+
+  const MultiDomainEntityPointer& multiDomainEntityPointer() const {
+    return _multiDomainEntityPointer;
   }
 
   const HostEntityPointer& hostEntityPointer() const {
-    return _hostEntityPointer;
+    return _grid._grid.getRealImplementation(_multiDomainEntityPointer).hostEntityPointer();
   }
 
 };
@@ -159,9 +174,13 @@ class EntityWrapper<0,dim,GridImp> :
   template<typename>
   friend class SubDomainGrid;
 
+  template<typename,typename>
+  friend class Dune::mdgrid::MultiDomainGrid;
+
   template<int, int, typename, template<int,int,typename> class>
   friend class Entity;
 
+  typedef typename GridImp::MDGridType::Traits::template Codim<0>::EntityPointer MultiDomainEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
 
 public:
@@ -174,120 +193,124 @@ public:
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
 
 
-  EntityWrapper(const GridImp& grid, const HostEntityPointer& e) :
+  EntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& e) :
     _grid(grid),
-    _hostEntityPointer(e)
+    _multiDomainEntityPointer(e)
   {}
 
   int level() const {
-    return _hostEntityPointer->level();
+    return _multiDomainEntityPointer->level();
   }
 
   PartitionType partitionType() const {
-    return _hostEntityPointer->partitionType();
+    return _multiDomainEntityPointer->partitionType();
   }
 
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
-      _geometry.reset(_hostEntityPointer->geometry());
+      _geometry.reset(hostEntityPointer()->geometry());
     }
     return _geometry;
   }
 
   template<int cc>
   int count() const {
-    return _hostEntityPointer->template count<cc>();
+    return hostEntityPointer()->template count<cc>();
   }
 
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
-    return EntityPointerWrapper<cc,GridImp>(_grid,_hostEntityPointer->subEntity<cc>(i));
+    return EntityPointerWrapper<cc,GridImp>(_grid,_multiDomainEntityPointer->subEntity<cc>(i));
   }
 
   LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_hostEntityPointer->ileafbegin());
+    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_multiDomainEntityPointer->ileafbegin());
   }
 
   LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_hostEntityPointer->ileafend());
+    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_multiDomainEntityPointer->ileafend());
   }
 
   LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_hostEntityPointer->ilevelbegin());
+    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_multiDomainEntityPointer->ilevelbegin());
   }
 
   LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_hostEntityPointer->ilevelend());
+    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_multiDomainEntityPointer->ilevelend());
   }
 
   EntityPointer father() const {
-    return EntityPointerWrapper<0,GridImp>(_grid,_hostEntityPointer->father());
+    return EntityPointerWrapper<0,GridImp>(_grid,_multiDomainEntityPointer->father());
   }
 
   bool isLeaf() const {
-    return _hostEntityPointer->isLeaf();
+    return _multiDomainEntityPointer->isLeaf();
   }
 
   bool isRegular() const {
-    return _hostEntityPointer->isRegular();
+    return _multiDomainEntityPointer->isRegular();
   }
 
   const LocalGeometry& geometryInFather() const {
     if (!_fatherGeometry.isSet()) {
-      _fatherGeometry.reset(_hostEntityPointer->geometryInFather());
+      _fatherGeometry.reset(hostEntityPointer()->geometryInFather());
     }
     return _fatherGeometry;
   }
 
   HierarchicIterator hbegin(int maxLevel) const {
     return HierarchicIteratorWrapper<GridImp>(_grid,
-                                              _hostEntityPointer->hbegin(maxLevel),
-                                              _hostEntityPointer->hend(maxLevel));
+                                              _multiDomainEntityPointer->hbegin(maxLevel),
+                                              _multiDomainEntityPointer->hend(maxLevel));
   }
 
   HierarchicIterator hend(int maxLevel) const {
     return HierarchicIteratorWrapper<GridImp>(_grid,
-                                              _hostEntityPointer->hend(maxLevel),
-                                              _hostEntityPointer->hend(maxLevel));
+                                              _multiDomainEntityPointer->hend(maxLevel),
+                                              _multiDomainEntityPointer->hend(maxLevel));
   }
 
   bool isNew() const {
-    return _hostEntityPointer->isNew();
+    return _multiDomainEntityPointer->isNew();
   }
 
   bool mightVanish() const {
-    return _hostEntityPointer->mightVanish();
+    return _multiDomainEntityPointer->mightVanish();
   }
 
 private:
 
   const GridImp& _grid;
-  HostEntityPointer _hostEntityPointer;
+  MultiDomainEntityPointer _multiDomainEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
   MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
 
   const EntityWrapper& operator=(const EntityWrapper& rhs) {
     assert(_grid == rhs._grid);
-    reset(rhs._hostEntityPointer);
+    reset(rhs._multiDomainEntityPointer);
     return *this;
   }
 
-  void reset(const HostEntityPointer& hostEntityPointer) {
-    if (_hostEntityPointer != hostEntityPointer) {
+  void reset(const MultiDomainEntityPointer& multiDomainEntityPointer) {
+    if (_multiDomainEntityPointer != multiDomainEntityPointer) {
       _geometry.clear();
       _fatherGeometry.clear();
-      _hostEntityPointer = hostEntityPointer;
+      _multiDomainEntityPointer = multiDomainEntityPointer;
     }
   }
 
   void compactify() {
     _geometry.clear();
     _fatherGeometry.clear();
-    _hostEntityPointer.compactify();
+    _multiDomainEntityPointer.compactify();
+  }
+
+  const MultiDomainEntityPointer& multiDomainEntityPointer() const {
+    return _multiDomainEntityPointer;
   }
 
   const HostEntityPointer& hostEntityPointer() const {
-    return _hostEntityPointer;
+    return _grid._grid.getRealImplementation(_multiDomainEntityPointer).hostEntityPointer();
   }
 
 };

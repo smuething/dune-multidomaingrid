@@ -30,36 +30,44 @@ template<typename SubDomainType, std::size_t capacity>
 void setAdd(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
             const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
 
+//! @cond DEV_DOC
 
+// \internal
 namespace sds_detail {
 
+  //! \internal
   template<typename T>
   struct Candidate;
 
+  //! \internal
   template<>
   struct Candidate<uint8_t> {
     typedef uint8_t type;
     typedef Candidate<uint16_t> next_candidate;
   };
 
+  //! \internal
   template<>
   struct Candidate<uint16_t> {
     typedef uint16_t type;
     typedef Candidate<uint32_t> next_candidate;
   };
 
+  //! \internal
   template<>
   struct Candidate<uint32_t> {
     typedef uint32_t type;
     typedef Candidate<uint64_t> next_candidate;
   };
 
+  //! \internal
   template<>
   struct Candidate<uint64_t> {
     typedef uint64_t type;
     typedef void next_candidate;
   };
 
+  //! \internal
   template<std::size_t capacity, typename candidate>
   struct SetStorageTester {
 
@@ -76,6 +84,9 @@ namespace sds_detail {
 
   };
 
+  /**
+   * \internal
+   */
   template<std::size_t capacity>
   struct SetStorageTester<capacity,void> {
 
@@ -83,11 +94,13 @@ namespace sds_detail {
 
   };
 
+  //! \internal
   template<std::size_t capacity>
   struct SetStorageChooser {
     typedef typename SetStorageTester<capacity,Candidate<uint8_t> >::type type;
   };
 
+  //! \internal
   template<typename T>
   class Log2 {
 
@@ -102,26 +115,31 @@ namespace sds_detail {
     }
   };
 
+  //! \internal asdf
   template<>
   std::size_t Log2<uint8_t>::doCalculation(uint8_t value) {
     return __builtin_ffs(value)-1;
   }
 
+  //! \internal
   template<>
   std::size_t Log2<uint16_t>::doCalculation(uint16_t value) {
     return __builtin_ffs(value)-1;
   }
 
+  //! \internal
   template<>
   std::size_t Log2<uint32_t>::doCalculation(uint32_t value) {
     return __builtin_ffsl(value)-1;
   }
 
+  //! \internal
   template<>
   std::size_t Log2<uint64_t>::doCalculation(uint64_t value) {
     return __builtin_ffsll(value)-1;
   }
 
+  //! \internal
   template<typename DomainType, typename SetStorage>
   class Iterator : public ForwardIteratorFacade<Iterator<DomainType,SetStorage>,
 						DomainType,
@@ -179,6 +197,8 @@ namespace sds_detail {
   };
 
 }
+
+//! @endcond
 
 template<typename SubDomainType, std::size_t capacity>
 class IntegralTypeSubDomainSet {
@@ -291,7 +311,7 @@ inline void setAdd(A& a, const B& b) {
 template<typename SubDomainType, std::size_t capacity>
 inline bool setContains(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
                         const IntegralTypeSubDomainSet<SubDomainType,capacity>& b) {
-  return (a._set & b._set) == a._set;
+  return (a._set & b._set) == b._set;
 }
 
 template<typename SubDomainType, std::size_t capacity>

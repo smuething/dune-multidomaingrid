@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <dune/grid/yaspgrid.hh>
+#include <dune/grid/sgrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 
 #include <dune/grid/test/gridcheck.cc>
@@ -33,9 +34,16 @@ void check_yasp(bool p0=false) {
   //#if HAVE_MPI
   //Dune::YaspGrid<dim> grid(MPI_COMM_WORLD,Len,s,p,overlap);
   //#else
-  Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
 
-  typedef Dune::MultiDomainGrid<Dune::YaspGrid<dim> > MDGrid;
+  //typedef Dune::YaspGrid<dim> HostGrid;
+  //Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
+
+  int n[] = { 5,5,5 };
+  double h[] = { 1.0, 2.0, 3.0 };
+  typedef Dune::SGrid<dim,dim> HostGrid;
+  Dune::SGrid<dim,dim> wgrid(n,h);
+
+  typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
 
   MDGrid grid(wgrid);
   //#endif
@@ -55,7 +63,7 @@ void check_yasp(bool p0=false) {
     //IndexSet::SubDomainSet& sds = is.subDomainSet(e);
     Dune::FieldVector<typename MDGrid::ctype,dim> c = e.geometry().global(Dune::GenericReferenceElements<typename MDGrid::ctype,dim>::general(e.type()).position(0,0));
     double x = c[0];
-    double y = c[1];
+    double y = dim > 1 ? c[1] : 0.5;
     if (x > 0.2) {
       if (y > 0.3 && y < 0.7) {
         if (x < 0.8)
