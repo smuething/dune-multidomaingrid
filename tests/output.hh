@@ -53,6 +53,7 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
     std::vector<int> borderVertices(gv.indexSet().size(2),0);
 
     for(; iit != iend; ++iit) {
+      gv.grid().subDomain(0).subDomainIntersectionIterator(iit);
       borderCells[gv.indexSet().index(*iit->firstCell())] = 1;
       borderCells[gv.indexSet().index(*iit->secondCell())] = 2;
     }
