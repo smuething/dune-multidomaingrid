@@ -582,7 +582,13 @@ private:
 
   template<typename Functor>
   void applyToCodims(Functor func) {
-    fusion::for_each(fusion::zip(mpl::range_c<int,0,dimension+1>(),_containers),func);
+    // we can't just use fusion::zip here as it will slap a const on the ContainerMap type,
+    // making it impossible to modify it in the called functor. So we just create the
+    // zip_view by hand... (idea lifted from fusion::swap()).
+    typedef mpl::range_c<int,0,dimension+1> CodimIndex;
+    typedef fusion::vector<CodimIndex&,ContainerMap&> References;
+    CodimIndex codimIndex;
+    fusion::for_each(fusion::zip_view<References>(References(codimIndex,_containers)),func);
   }
 
   template<typename Impl>
@@ -591,15 +597,7 @@ private:
     template<typename T>
     void operator()(T t) const {
       typedef mpl::int_<fusion::result_of::value_at_c<T,0>::type::value> codim;
-      // remove const from the container reference - scary....
-      typedef typename std::add_lvalue_reference<
-        typename std::remove_const<
-          typename std::remove_reference<
-            typename fusion::result_of::value_at_c<T,1>::type
-          >::type
-        >::type
-      >::type ContainerReference;
-      detail::applyIf<MDGridTraits::template Codim<codim::value>::supported,const Impl>(static_cast<const Impl&>(*this)).template apply<codim::value>(const_cast<ContainerReference>(fusion::at_c<1>(t)));
+      detail::applyIf<MDGridTraits::template Codim<codim::value>::supported,const Impl>(static_cast<const Impl&>(*this)).template apply<codim::value>(fusion::at_c<1>(t));
     }
 
   };
