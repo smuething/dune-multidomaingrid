@@ -109,11 +109,11 @@ collect_elementwise_struct<T,binary_function> collect_elementwise(T& result, bin
   return collect_elementwise_struct<T,binary_function>(result,f);
 }
 
-} // namespace Dune
+} // namespace util
 
 } // namespace mdgrid
 
-} // namespace util
+} // namespace Dune
 
 
 #endif // DUNE_MULTIDOMAINGRID_UTILITY_HH
