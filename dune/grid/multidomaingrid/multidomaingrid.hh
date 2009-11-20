@@ -539,6 +539,7 @@ public:
   void startSubDomainMarking() {
     assert(_state == stateFixed && _adaptState == stateFixed);
     _tmpLeafIndexSet.reset(new LeafIndexSetImp(_leafIndexSet));
+    _tmpLeafIndexSet->reset(false);
     _state = stateMarking;
   }
 
