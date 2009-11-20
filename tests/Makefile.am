@@ -11,7 +11,7 @@ include $(top_srcdir)/am/global-rules
 #testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
 #testwrapper_LIBS = $(ALL_PKG_LIBS)
 
-check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers testadaptation
+check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers testadaptation profilerepartitioning
 
 test_wrapper_SOURCES = test-wrapper.cc
 test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
@@ -32,3 +32,8 @@ testadaptation_SOURCES = testadaptation.cc
 testadaptation_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
 testadaptation_LDFLAGS = $(ALL_PKG_LDFLAGS) -lalugrid
 testadaptation_LIBS = $(ALL_PKG_LIBS) -lalugrid
+
+profilerepartitioning_SOURCES = profilerepartitioning.cc
+profilerepartitioning_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+profilerepartitioning_LDFLAGS = $(ALL_PKG_LDFLAGS)
+profilerepartitioning_LIBS = $(ALL_PKG_LIBS)
