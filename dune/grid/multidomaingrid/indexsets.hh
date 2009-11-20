@@ -510,6 +510,12 @@ private:
     indexMap<0>()[gt][hostIndex].domains.remove(subDomain);
   }
 
+  void removeFromAllSubDomains(const Codim0Entity& e) {
+    GeometryType gt = e.type();
+    IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
+    indexMap<0>()[gt][hostIndex].domains.clear();
+  }
+
   void assignToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));

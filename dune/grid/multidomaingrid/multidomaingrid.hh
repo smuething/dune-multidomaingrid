@@ -606,6 +606,12 @@ public:
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
 
+  void removeFromAllSubDomains(const typename Traits::template Codim<0>::Entity& e) {
+    assert(_state == stateMarking);
+    assert(e.isLeaf());
+    _tmpLeafIndexSet->removeFromAllSubDomains(e);
+  }
+
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   const SubDomainGrid& subDomain(SubDomainType subDomain) const {
     boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
