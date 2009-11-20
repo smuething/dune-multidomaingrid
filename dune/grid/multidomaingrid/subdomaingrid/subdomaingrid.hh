@@ -332,7 +332,7 @@ public:
     return _localIdSet;
   }
 
-  const typename Traits::LevelIndexSet& levelIndexSet(int level) const {
+  const typename Traits::LevelIndexSet& levelIndexSet(unsigned int level) const {
     if (!_grid.supportLevelIndexSets()) {
       DUNE_THROW(GridError,"level index set support not enabled for this grid");
     }

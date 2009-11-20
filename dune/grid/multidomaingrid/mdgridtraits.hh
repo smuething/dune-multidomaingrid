@@ -80,7 +80,7 @@ struct ArrayBasedTraits {
 template<int dim, std::size_t maxSubDomains, template<int dim, int codim> class supportedCodims = AllCodims >
 struct FewSubDomainsTraits {
 
-  typedef int SubDomainType;
+  typedef unsigned int SubDomainType;
   static const SubDomainType empty = -1;
   static const int dimension = dim;
 

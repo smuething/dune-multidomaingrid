@@ -32,8 +32,8 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
       sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
       typename GridView::IndexSet::IndexType tmp;
-      assert(sdc0[idx] > -1 == mapper.contains(0,*it,tmp));
-      assert(sdc1[idx] > -1 == mapper.contains(1,*it,tmp));
+      assert((sdc0[idx] > -1) == mapper.contains(0,*it,tmp));
+      assert((sdc1[idx] > -1) == mapper.contains(1,*it,tmp));
     }
     std::vector<int> hvid(gv.indexSet().size(2),0);
     std::vector<int> sdv0(gv.indexSet().size(2),0);
@@ -45,8 +45,8 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
       sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
       sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
       typename GridView::IndexSet::IndexType tmp;
-      assert(sdv0[idx] > -1 == mapper.contains(0,*it,tmp));
-      assert(sdv1[idx] > -1 == mapper.contains(1,*it,tmp));
+      assert((sdv0[idx] > -1) == mapper.contains(0,*it,tmp));
+      assert((sdv1[idx] > -1) == mapper.contains(1,*it,tmp));
     }
 
     std::vector<int> borderCells(gv.indexSet().size(0),0);
@@ -107,7 +107,7 @@ void printStatus(Grid& grid, std::string prefix, int counter = -1) {
   setup(s,prefix,counter) << "leafView";
   vtkOut(grid.leafView(),s.str(),grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
 
-  for (int level = 0; level <= grid.maxLevel(); ++level) {
+  for (unsigned int level = 0; level <= grid.maxLevel(); ++level) {
     setup(s,prefix,counter) << "levelView_" << std::setw(2) << std::setfill('0') << level;
     vtkOut(grid.levelView(level),s.str(),grid.levelSubDomainInterfaceBegin(0,1,level),grid.levelSubDomainInterfaceEnd(0,1,level));
   }
