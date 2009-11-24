@@ -349,7 +349,7 @@ public:
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
-    _grid.mark(refCount,multiDomainEntity(e));
+    return _grid.mark(refCount,multiDomainEntity(e));
   }
 
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
