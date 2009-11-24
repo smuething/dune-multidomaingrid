@@ -472,16 +472,6 @@ private:
   {
     update();
   }
-  /*
-  void reset(const SubDomainGrid& rhs) {
-    assert(_grid == rhs._grid);
-    _subDomain = rhs._subDomain;
-  }
-
-  void reset(const SubDomainType subDomain) {
-    _subDomain = subDomain;
-  }
-  */
 
   template<typename EntityType>
   bool containsMultiDomainEntity(const EntityType& e) const {
