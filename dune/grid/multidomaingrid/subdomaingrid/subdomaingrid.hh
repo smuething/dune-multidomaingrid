@@ -419,22 +419,22 @@ public:
   }
 
   template<typename EntityType>
-  const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
+  static const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
     return *(getRealImplementation(e).multiDomainEntityPointer());
   }
 
   template<typename EntityType>
-  typename MDGrid::template MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
+  static typename MDGrid::template MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
     return getRealImplementation(e).multiDomainEntityPointer();
   }
 
   template<typename EntityType>
-  const typename MDGrid::template HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
+  static const typename MDGrid::template HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
     return *(getRealImplementation(e).hostEntityPointer());
   }
 
   template<typename EntityType>
-  typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
+  static typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
     return getRealImplementation(e).hostEntityPointer();
   }
 
