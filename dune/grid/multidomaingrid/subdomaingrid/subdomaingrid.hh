@@ -349,11 +349,11 @@ public:
   }
 
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
-    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    _grid.mark(refCount,multiDomainEntity(e));
   }
 
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
-    DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
+    return _grid.getMark(multiDomainEntity(e));
   }
 
   bool preAdapt() {
