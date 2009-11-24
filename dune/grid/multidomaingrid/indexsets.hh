@@ -18,6 +18,7 @@
 #include <boost/fusion/include/mpl.hpp>
 #include <boost/fusion/algorithm/iteration.hpp>
 #include <boost/fusion/algorithm/transformation/zip.hpp>
+#include <boost/swap.hpp>
 
 #include <dune/grid/multidomaingrid/utility.hh>
 
@@ -263,6 +264,25 @@ private:
     CodimSizeMap codimSizeMap;
     MultiIndexMap multiIndexMap;
 
+    // containers should not be assignable
+    const Containers& operator=(const Containers& r);
+
+    Containers(const Containers& r) :
+      indexMap(r.indexMap),
+      sizeMap(r.sizeMap),
+      codimSizeMap(r.codimSizeMap),
+      multiIndexMap(r.multiIndexMap) {
+    }
+
+    void swap(Containers& rhs) {
+      boost::swap(indexMap,rhs.indexMap);
+      boost::swap(sizeMap,rhs.sizeMap);
+      boost::swap(codimSizeMap,rhs.codimSizeMap);
+      boost::swap(multiIndexMap,rhs.multiIndexMap);
+    }
+
+    Containers() {}
+
   };
 
   typedef typename detail::buildMap<Containers,dimension>::type ContainerMap;
@@ -495,7 +515,7 @@ private:
 
   void swap(ThisType& rhs) {
     assert(&_grid == &rhs._grid);
-    std::swap(_containers,rhs._containers);
+    util::swap(_containers,rhs._containers);
   }
 
   void addToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
@@ -637,7 +657,7 @@ private:
     const HostIndexSet& his = _hostGridView.indexSet();
     if (full) {
       ContainerMap cm = ContainerMap();
-      std::swap(_containers,cm);
+      util::swap(_containers,cm);
     }
     applyToCodims(resetPerCodim(full,his));
   }
