@@ -13,6 +13,7 @@
 #include <dune/grid/multidomaingrid/subdomaingrid/leafiterator.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/leveliterator.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/hierarchiciterator.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/intersection.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/intersectioniterator.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/indexsets.hh>
@@ -151,8 +152,8 @@ struct SubDomainGridFamily {
     EntityWrapper,
     EntityPointerWrapper,
     LevelIteratorWrapper,
-    LeafIntersectionIteratorWrapper, // leaf intersection
-    LevelIntersectionIteratorWrapper, // level intersection
+    LeafIntersectionWrapper, // leaf intersection
+    LevelIntersectionWrapper, // level intersection
     LeafIntersectionIteratorWrapper, // leaf intersection iterator
     LevelIntersectionIteratorWrapper, // level intersection iterator
     HierarchicIteratorWrapper,
@@ -212,11 +213,20 @@ class SubDomainGrid :
   template<typename GridImp>
   friend struct ::Dune::mdgrid::detail::HostGridAccessor;
 
+  template<typename,typename,typename,typename,typename>
+  friend class IntersectionIteratorWrapper;
+
   template<typename GridImp>
   friend class LeafIntersectionIteratorWrapper;
 
   template<typename GridImp>
+  friend class LeafIntersectionWrapper;
+
+  template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
+
+  template<typename GridImp>
+  friend class LevelIntersectionWrapper;
 
   typedef SubDomainGrid<MDGrid> GridImp;
   typedef MDGrid MDGridType;

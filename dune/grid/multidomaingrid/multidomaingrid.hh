@@ -28,6 +28,7 @@ namespace detail {
 #include <dune/grid/multidomaingrid/leafiterator.hh>
 #include <dune/grid/multidomaingrid/leveliterator.hh>
 #include <dune/grid/multidomaingrid/hierarchiciterator.hh>
+#include <dune/grid/multidomaingrid/intersection.hh>
 #include <dune/grid/multidomaingrid/intersectioniterator.hh>
 #include <dune/grid/multidomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/indexsets.hh>
@@ -168,8 +169,8 @@ struct MultiDomainGridFamily {
     EntityWrapper,
     EntityPointerWrapper,
     LevelIteratorWrapper,
-    LeafIntersectionIteratorWrapper, // leaf intersection
-    LevelIntersectionIteratorWrapper, // level intersection
+    LeafIntersectionWrapper, // leaf intersection
+    LevelIntersectionWrapper, // level intersection
     LeafIntersectionIteratorWrapper, // leaf intersection iterator
     LevelIntersectionIteratorWrapper, // level intersection iterator
     HierarchicIteratorWrapper,
@@ -235,11 +236,20 @@ class MultiDomainGrid :
   template<typename GridImp>
   friend struct detail::HostGridAccessor;
 
+  template<typename,typename,typename,typename>
+  friend class IntersectionIteratorWrapper;
+
   template<typename GridImp>
   friend class LeafIntersectionIteratorWrapper;
 
   template<typename GridImp>
+  friend class LeafIntersectionWrapper;
+
+  template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
+
+  template<typename GridImp>
+  friend class LevelIntersectionWrapper;
 
   template<typename>
   friend class subdomain::SubDomainGrid;
@@ -261,6 +271,9 @@ class MultiDomainGrid :
 
   template<typename,typename,typename,typename,typename>
   friend class subdomain::IntersectionIteratorWrapper;
+
+  template<typename,typename,typename,typename>
+  friend class subdomain::IntersectionWrapper;
 
   typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
   typedef HostGrid HostGridType;
