@@ -38,18 +38,14 @@ class IntersectionIteratorWrapper {
 protected:
 
   IntersectionIteratorWrapper(const IndexSet& indexSet, const MultiDomainIntersectionIterator& multiDomainIterator) :
-    _indexSet(indexSet),
     _multiDomainIterator(multiDomainIterator),
-    _outsideTested(false)
+    _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(indexSet,NULL))
   {}
 
   const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
-    assert(_indexSet == rhs._indexSet);
+    assert(_intersection._indexSet == rhs._intersection._indexSet);
     _multiDomainIterator = rhs._multiDomainIterator;
-    _outsideTested = false;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
+    _intersection.clear();
     return *this;
   }
 
@@ -64,141 +60,21 @@ private:
   }
 
   void increment() {
+    _intersection.clear();
     ++_multiDomainIterator;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
-    _outsideTested = false;
   }
 
   const Intersection& dereference() const {
-    return reinterpret_cast<const Intersection&>(*this);
-  }
-
-  void checkOutside() const {
-    if (!_outsideTested) {
-      if (_multiDomainIterator->boundary()) {
-        _outsideType = otBoundary;
-      } else {
-        if (_indexSet.containsMultiDomainEntity(*(_multiDomainIterator->outside()))) {
-          _outsideType = otNeighbor;
-        } else {
-          _outsideType = otForeignCell;
-        }
-      }
+    if (!_intersection.isSet()) {
+      _intersection.reset(*_multiDomainIterator);
     }
-  }
-
-  bool boundary() const {
-    checkOutside();
-    return _outsideType != otNeighbor;
-  }
-
-  int boundaryId() const {
-    return _multiDomainIterator->boundaryId();
-  }
-
-  bool neighbor() const {
-    checkOutside();
-    return _outsideType == otNeighbor;
-  }
-
-  EntityPointer inside() const {
-    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIterator->inside());
-  }
-
-  EntityPointer outside() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
-    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIterator->outside());
-  }
-
-  bool conforming() const {
-    return _multiDomainIterator->conforming();
-  }
-
-  const LocalGeometry& geometryInInside() const {
-    if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset((*hostIntersectionIterator()).geometryInInside());
-    }
-    return _geometryInInside;
-  }
-
-  const LocalGeometry& intersectionSelfLocal() const {
-    return geometryInInside();
-  }
-
-  const LocalGeometry& geometryInOutside() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
-    if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset((*hostIntersectionIterator()).geometryInOutside());
-    }
-    return _geometryInOutside;
-  }
-
-  const LocalGeometry& intersectionNeighborLocal() const {
-    return geometryInOutside();
-  }
-
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset((*hostIntersectionIterator()).geometry());
-    }
-    return _geometry;
-  }
-
-  const LocalGeometry& intersectionGlobal() const {
-    return geometry();
-  }
-
-  GeometryType type() const {
-    return _multiDomainIterator->type();
-  }
-
-  int indexInInside() const {
-    return _multiDomainIterator->indexInInside();
-  }
-
-  int numberInSelf() const {
-    return _multiDomainIterator->numberInSelf();
-  }
-
-  int indexInOutside() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
-    return _multiDomainIterator->indexInOutside();
-  }
-
-  int numberInNeighbor() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
-    return _multiDomainIterator->numberInNeighbor();
-  }
-
-  GlobalCoords outerNormal(const LocalCoords& local) const {
-    return _multiDomainIterator->outerNormal(local);
-  }
-
-  GlobalCoords integrationOuterNormal(const LocalCoords& local) const {
-    return _multiDomainIterator->integrationOuterNormal(local);
-  }
-
-  GlobalCoords unitOuterNormal(const LocalCoords& local) const {
-    return _multiDomainIterator->unitOuterNormal(local);
+    return _intersection;
   }
 
 private:
 
-  enum OutsideType { otNeighbor, otForeignCell, otBoundary };
-
-  const IndexSet& _indexSet;
   MultiDomainIntersectionIterator _multiDomainIterator;
-  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
-  mutable bool _outsideTested;
-  mutable OutsideType _outsideType;
-
+  IntersectionType _intersection;
 
 };
 

@@ -39,7 +39,8 @@ GridImp::ctype ctype;
 protected:
 
   explicit IntersectionIteratorWrapper(const HostIntersectionIterator& hostIterator) :
-    _hostIterator(hostIterator)
+    _hostIterator(hostIterator),
+    _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(NULL))
   {}
 
 private:
@@ -53,109 +54,19 @@ private:
   }
 
   void increment() {
+    _intersection.clear();
     ++_hostIterator;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
   }
 
   const Intersection& dereference() const {
-    return reinterpret_cast<const Intersection&>(*this);
-  }
-
-  bool boundary() const {
-    return _hostIterator->boundary();
-  }
-
-  int boundaryId() const {
-    return _hostIterator->boundaryId();
-  }
-
-  bool neighbor() const {
-    return _hostIterator->neighbor();
-  }
-
-  EntityPointer inside() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIterator->inside());
-  }
-
-  EntityPointer outside() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIterator->outside());
-  }
-
-  bool conforming() const {
-    return _hostIterator->conforming();
-  }
-
-  const LocalGeometry& geometryInInside() const {
-    if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset(_hostIterator->geometryInInside());
+    if (!_intersection.isSet()) {
+      _intersection.reset(*_hostIterator);
     }
-    return _geometryInInside;
+    return _intersection;
   }
 
-  const LocalGeometry& intersectionSelfLocal() const {
-    return geometryInInside();
-  }
-
-  const LocalGeometry& geometryInOutside() const {
-    if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset(_hostIterator->geometryInOutside());
-    }
-    return _geometryInOutside;
-  }
-
-  const LocalGeometry& intersectionNeighborLocal() const {
-    return geometryInOutside();
-  }
-
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(_hostIterator->geometry());
-    }
-    return _geometry;
-  }
-
-  const LocalGeometry& intersectionGlobal() const {
-    return geometry();
-  }
-
-  GeometryType type() const {
-    return _hostIterator->type();
-  }
-
-  int indexInInside() const {
-    return _hostIterator->indexInInside();
-  }
-
-  int numberInSelf() const {
-    return _hostIterator->numberInSelf();
-  }
-
-  int indexInOutside() const {
-    return _hostIterator->indexInOutside();
-  }
-
-  int numberInNeighbor() const {
-    return _hostIterator->numberInNeighbor();
-  }
-
-  GlobalCoords outerNormal(const LocalCoords& local) const {
-    return _hostIterator->outerNormal(local);
-  }
-
-  GlobalCoords integrationOuterNormal(const LocalCoords& local) const {
-    return _hostIterator->integrationOuterNormal(local);
-  }
-
-  GlobalCoords unitOuterNormal(const LocalCoords& local) const {
-    return _hostIterator->unitOuterNormal(local);
-  }
-
-private:
   HostIntersectionIterator _hostIterator;
-  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
-MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
+  Intersection _intersection;
 
 };
 
