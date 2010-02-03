@@ -19,8 +19,8 @@ class MakeableGeometryWrapper :
   template<int, int, typename>
   friend class EntityWrapper;
 
-  template<typename, typename, typename, typename>
-  friend class IntersectionIteratorWrapper;
+  template<typename, typename, typename>
+  friend class IntersectionWrapper;
 
   template<typename, typename, typename, typename, typename>
   friend class SubDomainInterfaceIterator;
