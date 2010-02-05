@@ -171,6 +171,10 @@ private:
     return _multiDomainIntersection->unitOuterNormal(local);
   }
 
+  GlobalCoords centerUnitOuterNormal() const {
+    return _multiDomainIntersection->centerUnitOuterNormal();
+  }
+
 private:
 
   bool isSet() const {

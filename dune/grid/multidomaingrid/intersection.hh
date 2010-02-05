@@ -140,6 +140,10 @@ private:
     return _hostIntersection->unitOuterNormal(local);
   }
 
+  GlobalCoords centerUnitOuterNormal() const {
+    return _hostIntersection->centerUnitOuterNormal();
+  }
+
 private:
 
   bool isSet() const {
