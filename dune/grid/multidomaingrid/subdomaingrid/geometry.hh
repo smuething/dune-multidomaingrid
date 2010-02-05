@@ -112,6 +112,10 @@ public:
     return _hostGeometry->volume();
   }
 
+  GlobalCoords center() const {
+    return _hostGeometry->center();
+  }
+
   const FieldMatrix<ctype,mydimension,coorddimension>&
   jacobianTransposed(const LocalCoords& local) const {
     return _hostGeometry->jacobianTransposed(local);

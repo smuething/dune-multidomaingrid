@@ -113,6 +113,10 @@ public:
     return _wrappedGeometry->volume();
   }
 
+  GlobalCoords center() const {
+    return _wrappedGeometry->center();
+  }
+
   const FieldMatrix<ctype,mydimension,coorddimension>&
   jacobianTransposed(const LocalCoords& local) const {
     return _wrappedGeometry->jacobianTransposed(local);
