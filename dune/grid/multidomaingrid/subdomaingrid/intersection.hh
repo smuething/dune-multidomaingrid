@@ -192,11 +192,11 @@ private:
     _outsideTested = false;
   }
 
-  void reset(const MultiDomainIntersection* multiDomainIntersection) {
+  void reset(const MultiDomainIntersection& multiDomainIntersection) {
     if (isSet()) {
       clear();
     }
-    _multiDomainIntersection = multiDomainIntersection;
+    _multiDomainIntersection = &multiDomainIntersection;
   }
 
   enum OutsideType { otNeighbor, otForeignCell, otBoundary };
