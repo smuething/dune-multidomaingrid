@@ -13,8 +13,11 @@ class IntersectionWrapper {
   template<class, template<class> class>
   friend class Intersection;
 
-  template<typename,typename,typename,typename,typename>
-  friend class subdomain::IntersectionIteratorWrapper;
+  template<typename,typename,typename,typename>
+  friend class subdomain::IntersectionWrapper;
+
+  template<typename,typename,typename,typename>
+  friend class IntersectionIteratorWrapper;
 
   typedef HostIntersectionType HostIntersection;
 

@@ -39,8 +39,8 @@ class IndexSetWrapper :
   template<int, PartitionIteratorType, typename>
   friend class LevelIteratorWrapper;
 
-  template<typename, typename, typename, typename, typename>
-  friend class IntersectionIteratorWrapper;
+  template<typename, typename, typename, typename>
+  friend class IntersectionWrapper;
 
   typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 
