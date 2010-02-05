@@ -43,9 +43,9 @@ protected:
   {}
 
   const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
-    assert(_intersection._indexSet == rhs._intersection._indexSet);
+    assert(GridImp::getRealImplementation(_intersection)._indexSet == GridImp::getRealImplementation(rhs._intersection)._indexSet);
     _multiDomainIterator = rhs._multiDomainIterator;
-    _intersection.clear();
+    GridImp::getRealImplementation(_intersection).clear();
     return *this;
   }
 
@@ -60,13 +60,13 @@ private:
   }
 
   void increment() {
-    _intersection.clear();
+    GridImp::getRealImplementation(_intersection).clear();
     ++_multiDomainIterator;
   }
 
   const Intersection& dereference() const {
-    if (!_intersection.isSet()) {
-      _intersection.reset(*_multiDomainIterator);
+    if (!GridImp::getRealImplementation(_intersection).isSet()) {
+      GridImp::getRealImplementation(_intersection).reset(*_multiDomainIterator);
     }
     return _intersection;
   }

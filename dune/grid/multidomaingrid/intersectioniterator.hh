@@ -54,13 +54,13 @@ private:
   }
 
   void increment() {
-    _intersection.clear();
+    GridImp::getRealImplementation(_intersection).clear();
     ++_hostIterator;
   }
 
   const Intersection& dereference() const {
-    if (!_intersection.isSet()) {
-      _intersection.reset(*_hostIterator);
+    if (!GridImp::getRealImplementation(_intersection).isSet()) {
+      GridImp::getRealImplementation(_intersection).reset(*_hostIterator);
     }
     return _intersection;
   }
