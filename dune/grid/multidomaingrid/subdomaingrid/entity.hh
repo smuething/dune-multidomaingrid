@@ -243,6 +243,10 @@ public:
     return EntityPointerWrapper<0,GridImp>(_grid,_multiDomainEntityPointer->father());
   }
 
+  bool hasFather() const {
+    return _multiDomainEntityPointer->hasFather();
+  }
+
   bool isLeaf() const {
     return _multiDomainEntityPointer->isLeaf();
   }

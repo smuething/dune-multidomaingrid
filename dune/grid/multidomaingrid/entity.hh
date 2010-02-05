@@ -207,6 +207,10 @@ public:
     return EntityPointerWrapper<0,GridImp>(_hostEntityPointer->father());
   }
 
+  bool hasFather() const {
+    return _hostEntityPointer->hasFather();
+  }
+
   bool isLeaf() const {
     return _hostEntityPointer->isLeaf();
   }
