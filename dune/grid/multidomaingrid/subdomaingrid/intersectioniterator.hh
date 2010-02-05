@@ -74,7 +74,7 @@ private:
 private:
 
   MultiDomainIntersectionIterator _multiDomainIterator;
-  IntersectionType _intersection;
+  mutable IntersectionType _intersection;
 
 };
 

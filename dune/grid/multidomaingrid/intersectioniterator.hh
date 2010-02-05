@@ -66,7 +66,7 @@ private:
   }
 
   HostIntersectionIterator _hostIterator;
-  Intersection _intersection;
+  mutable Intersection _intersection;
 
 };
 
