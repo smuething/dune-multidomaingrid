@@ -466,14 +466,14 @@ public:
 
 private:
 
-  const MDGrid& _grid;
+  MDGrid& _grid;
   SubDomainType _subDomain;
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
   LeafIndexSetImp _leafIndexSet;
   mutable std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
 
-  SubDomainGrid(const MDGrid& grid, SubDomainType subDomain) :
+  SubDomainGrid(MDGrid& grid, SubDomainType subDomain) :
     _grid(grid),
     _subDomain(subDomain),
     _globalIdSet(*this,grid._hostGrid.globalIdSet()),
