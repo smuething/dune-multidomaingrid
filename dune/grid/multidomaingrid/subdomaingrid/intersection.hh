@@ -49,7 +49,7 @@ protected:
 private:
 
   const typename GridImp::MultiDomainGrid::template ReturnImplementationType<MultiDomainIntersection>::ImplementationType::HostIntersection& hostIntersection() const {
-    return GridImp::MultiDomainGrid::getRealImplementation(_multiDomainIntersection).hostIntersection();
+    return GridImp::MultiDomainGrid::getRealImplementation(*_multiDomainIntersection).hostIntersection();
   }
 
 
@@ -105,7 +105,7 @@ private:
 
   const LocalGeometry& geometryInInside() const {
     if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset((*hostIntersection()).geometryInInside());
+      _geometryInInside.reset(hostIntersection().geometryInInside());
     }
     return _geometryInInside;
   }
@@ -118,7 +118,7 @@ private:
     checkOutside();
     assert(_outsideType == otNeighbor);
     if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset((*hostIntersection()).geometryInOutside());
+      _geometryInOutside.reset(hostIntersection().geometryInOutside());
     }
     return _geometryInOutside;
   }
@@ -129,7 +129,7 @@ private:
 
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
-      _geometry.reset((*hostIntersection()).geometry());
+      _geometry.reset(hostIntersection().geometry());
     }
     return _geometry;
   }
