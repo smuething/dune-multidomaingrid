@@ -77,6 +77,10 @@ private:
     return _multiDomainIntersection->boundaryId();
   }
 
+  std::size_t boundarySegmentIndex() const {
+    return _multiDomainIntersection->boundarySegmentIndex();
+  }
+
   bool neighbor() const {
     checkOutside();
     return _outsideType == otNeighbor;

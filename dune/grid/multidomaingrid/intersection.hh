@@ -55,6 +55,10 @@ private:
     return _hostIntersection->boundaryId();
   }
 
+  std::size_t boundarySegmentIndex() const {
+    return _hostIntersection->boundarySegmentIndex();
+  }
+
   bool neighbor() const {
     return _hostIntersection->neighbor();
   }
