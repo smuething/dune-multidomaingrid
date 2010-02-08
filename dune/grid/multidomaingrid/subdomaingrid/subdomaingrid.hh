@@ -255,7 +255,7 @@ public:
     return "SubDomainGrid";
   }
 
-  std::size_t maxLevel() const {
+  int maxLevel() const {
     return _grid.maxLevel();
   }
 
@@ -342,7 +342,7 @@ public:
     return _localIdSet;
   }
 
-  const typename Traits::LevelIndexSet& levelIndexSet(unsigned int level) const {
+  const typename Traits::LevelIndexSet& levelIndexSet(int level) const {
     if (!_grid.supportLevelIndexSets()) {
       DUNE_THROW(GridError,"level index set support not enabled for this grid");
     }
@@ -408,7 +408,7 @@ public:
 
   void update() const {
     if (_grid.supportLevelIndexSets()) {
-      while (_levelIndexSets.size() <= maxLevel()) {
+      while (_levelIndexSets.size() <= static_cast<std::size_t>(maxLevel())) {
         _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size()))));
       }
     }
