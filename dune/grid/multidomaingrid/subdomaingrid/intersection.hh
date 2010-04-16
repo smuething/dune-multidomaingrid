@@ -41,7 +41,7 @@ protected:
   IntersectionWrapper(const IndexSet& indexSet, const MultiDomainIntersection* multiDomainIntersection) :
     _indexSet(indexSet),
     _multiDomainIntersection(multiDomainIntersection),
-    _outsideTested(false)
+    _intersectionTypeTested(false)
   {}
 
   const IntersectionWrapper& operator=(const IntersectionWrapper& rhs);
@@ -57,23 +57,23 @@ private:
     return *_multiDomainIntersection == *(rhs._multiDomainIntersection);
   }
 
-  void checkOutside() const {
-    if (!_outsideTested) {
+  void checkIntersectionType() const {
+    if (!_intersectionTypeTested) {
       if (_multiDomainIntersection->boundary()) {
-        _outsideType = otBoundary;
+        _intersectionType = GridImp::boundary;
       } else {
         if (_indexSet.containsMultiDomainEntity(*(_multiDomainIntersection->outside()))) {
-          _outsideType = otNeighbor;
+          _intersectionType = GridImp::neighbor;
         } else {
-          _outsideType = otForeignCell;
+          _intersectionType = GridImp::foreign;
         }
       }
     }
   }
 
   bool boundary() const {
-    checkOutside();
-    return _outsideType != otNeighbor;
+    checkIntersectionType();
+    return _intersectionType != GridImp::neighbor;
   }
 
   int boundaryId() const {
@@ -85,8 +85,8 @@ private:
   }
 
   bool neighbor() const {
-    checkOutside();
-    return _outsideType == otNeighbor;
+    checkIntersectionType();
+    return _intersectionType == GridImp::neighbor;
   }
 
   EntityPointer inside() const {
@@ -94,8 +94,8 @@ private:
   }
 
   EntityPointer outside() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
+    checkIntersectionType();
+    assert(_intersectionType == GridImp::neighbor);
     return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIntersection->outside());
   }
 
@@ -115,8 +115,8 @@ private:
   }
 
   const LocalGeometry& geometryInOutside() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
+    checkIntersectionType();
+    assert(_intersectionType == GridImp::neighbor);
     if (!_geometryInOutside.isSet()) {
       _geometryInOutside.reset(hostIntersection().geometryInOutside());
     }
@@ -151,14 +151,14 @@ private:
   }
 
   int indexInOutside() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
+    checkIntersectionType();
+    assert(_intersectionType == GridImp::neighbor);
     return _multiDomainIntersection->indexInOutside();
   }
 
   int numberInNeighbor() const {
-    checkOutside();
-    assert(_outsideType == otNeighbor);
+    checkIntersectionType();
+    assert(_intersectionType == GridImp::neighbor);
     return _multiDomainIntersection->numberInNeighbor();
   }
 
@@ -189,7 +189,7 @@ private:
     _geometryInInside.clear();
     _geometryInOutside.clear();
     _geometry.clear();
-    _outsideTested = false;
+    _intersectionTypeTested = false;
   }
 
   void reset(const MultiDomainIntersection& multiDomainIntersection) {
@@ -199,14 +199,12 @@ private:
     _multiDomainIntersection = &multiDomainIntersection;
   }
 
-  enum OutsideType { otNeighbor, otForeignCell, otBoundary };
-
   const IndexSet& _indexSet;
   const MultiDomainIntersection* _multiDomainIntersection;
   MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
-  mutable bool _outsideTested;
-  mutable OutsideType _outsideType;
+  mutable bool _intersectionTypeTested;
+  mutable typename GridImp::IntersectionType _intersectionType;
 
 };
 

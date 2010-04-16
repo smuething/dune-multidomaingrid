@@ -249,6 +249,8 @@ public:
   typedef typename MDGrid::SubDomainType SubDomainType;
   typedef MDGridType MultiDomainGrid;
 
+  enum IntersectionType { neighbor, foreign, boundary };
+
 public:
 
   std::string name() const {
