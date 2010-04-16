@@ -22,6 +22,9 @@ class IntersectionWrapper {
   template<class, template<class> class>
   friend class Intersection;
 
+  template<typename MDGrid>
+  friend class SubDomainGrid;
+
   typedef MultiDomainIntersectionType MultiDomainIntersection;
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
@@ -176,6 +179,11 @@ private:
 
   GlobalCoords centerUnitOuterNormal() const {
     return _multiDomainIntersection->centerUnitOuterNormal();
+  }
+
+  typename GridImp::IntersectionType intersectionType() const {
+    checkIntersectionType();
+    return _intersectionType;
   }
 
 private:

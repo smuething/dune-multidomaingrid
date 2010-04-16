@@ -466,6 +466,11 @@ public:
       return LevelIntersectionIteratorWrapper<const GridImp>(*this,it.secondCell()->level(),it.secondMultiDomainIntersectionIterator());
   }
 
+  template<typename Intersection>
+  IntersectionType intersectionType(const Intersection& intersection) const {
+    return getRealImplementation(intersection).intersectionType();
+  }
+
 private:
 
   MDGrid& _grid;
