@@ -629,7 +629,7 @@ public:
   const SubDomainGrid& subDomain(SubDomainType subDomain) const {
     boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
-      subGridPointer.reset(new SubDomainGrid(*this,subDomain));
+      subGridPointer.reset(new SubDomainGrid(const_cast<MultiDomainGrid&>(*this),subDomain));
       // subGridPointer->update();
     }
     return *subGridPointer;
