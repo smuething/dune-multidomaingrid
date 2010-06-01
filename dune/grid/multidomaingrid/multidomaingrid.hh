@@ -18,6 +18,8 @@ namespace detail {
 }
 }
 
+#include <dune/grid/common/grid.hh>
+
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>
