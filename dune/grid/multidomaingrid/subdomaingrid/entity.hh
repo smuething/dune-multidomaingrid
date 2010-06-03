@@ -50,6 +50,7 @@ class MakeableEntityWrapper :
 
   typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
 
+
   MakeableEntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,multiDomainEntityPointer))
   {}
@@ -64,10 +65,6 @@ class MakeableEntityWrapper :
 
   const MultiDomainEntityPointer& multiDomainEntityPointer() const {
     return this->getRealImp().multiDomainEntityPointer();
-  }
-
-  const MultiDomainEntityPointer& hostEntityPointer() const {
-    return this->getRealImp().hostEntityPointer();
   }
 
 };
@@ -95,6 +92,7 @@ class EntityWrapper :
 
   typedef typename GridImp::MultiDomainGrid::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::Entity HostEntity;
 
 public:
 
@@ -120,7 +118,7 @@ public:
 
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
-      _geometry.reset(hostEntityPointer()->geometry());
+      _geometry.reset(hostEntity().geometry());
     }
     return _geometry;
   }
@@ -153,8 +151,8 @@ private:
     return _multiDomainEntityPointer;
   }
 
-  const HostEntityPointer& hostEntityPointer() const {
-    return _grid._grid.getRealImplementation(_multiDomainEntityPointer).hostEntityPointer();
+  const HostEntity& hostEntity() const {
+    return _grid._grid.hostEntity(*_multiDomainEntityPointer);
   }
 
 };
@@ -182,6 +180,7 @@ class EntityWrapper<0,dim,GridImp> :
 
   typedef typename GridImp::MDGridType::Traits::template Codim<0>::EntityPointer MultiDomainEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity HostEntity;
 
 public:
 
@@ -208,14 +207,14 @@ public:
 
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
-      _geometry.reset(hostEntityPointer()->geometry());
+      _geometry.reset(hostEntity().geometry());
     }
     return _geometry;
   }
 
   template<int cc>
   int count() const {
-    return hostEntityPointer()->template count<cc>();
+    return hostEntity().template count<cc>();
   }
 
   template<int cc>
@@ -257,7 +256,7 @@ public:
 
   const LocalGeometry& geometryInFather() const {
     if (!_fatherGeometry.isSet()) {
-      _fatherGeometry.reset(hostEntityPointer()->geometryInFather());
+      _fatherGeometry.reset(hostEntity().geometryInFather());
     }
     return _fatherGeometry;
   }
@@ -313,8 +312,8 @@ private:
     return _multiDomainEntityPointer;
   }
 
-  const HostEntityPointer& hostEntityPointer() const {
-    return _grid._grid.getRealImplementation(_multiDomainEntityPointer).hostEntityPointer();
+  const HostEntity& hostEntity() const {
+    return _grid._grid.hostEntity(*_multiDomainEntityPointer);
   }
 
 };
