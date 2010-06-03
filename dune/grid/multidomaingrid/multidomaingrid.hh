@@ -774,6 +774,23 @@ private:
 
 };
 
+enum MultiDomainGridType { multiDomainGrid, subDomainGrid, other };
+
+template<typename T>
+struct GridType {
+  static const MultiDomainGridType v = other;
+};
+
+template<class HostGrid, typename MDGridTraits>
+struct GridType<MultiDomainGrid<HostGrid,MDGridTraits> > {
+  static const MultiDomainGridType v = multiDomainGrid;
+};
+
+template<class MDGrid>
+struct GridType<subdomain::SubDomainGrid<MDGrid> > {
+  static const MultiDomainGridType v = subDomainGrid;
+};
+
 } // namespace mdgrid
 
 } // namespace Dune
