@@ -128,6 +128,14 @@ public:
     _size(0)
   {}
 
+  bool operator==(const ArrayBasedSet& r) const {
+    return _size == r._size && std::equal(_set.begin(),_set.begin()+size,r._set.begin());
+  }
+
+  bool operator!=(const ArrayBasedSet& r) const {
+    return !operator==(r);
+  }
+
 private:
   std::size_t _size;
   std::array<DomainType,maxSize> _set;

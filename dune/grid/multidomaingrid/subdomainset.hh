@@ -291,6 +291,14 @@ public:
     _set(0)
   {}
 
+  bool operator==(const IntegralTypeSubDomainSet& r) const {
+    return _set == r._set;
+  }
+
+  bool operator!=(const IntegralTypeSubDomainSet& r) const {
+    return !operator==(r);
+  }
+
 private:
   SetStorage _set;
 
