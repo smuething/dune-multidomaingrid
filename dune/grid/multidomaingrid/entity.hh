@@ -88,6 +88,13 @@ public:
     _hostEntityPointer(e)
   {}
 
+  // copy constructor. The default constructor does not work correctly here,
+  // as it will initialise the geometry with a pointer to the host geometry
+  // of rhs, causing geometry access to fail if rhs gets destructed.
+  EntityWrapper(const EntityWrapper& rhs) :
+    _hostEntityPointer(rhs._hostEntityPointer)
+  {}
+
   int level() const {
     return _hostEntityPointer->level();
   }
@@ -160,6 +167,13 @@ public:
 
   EntityWrapper(const HostEntityPointer& e) :
     _hostEntityPointer(e)
+  {}
+
+  // copy constructor. The default constructor does not work correctly here,
+  // as it will initialise the geometry with a pointer to the host geometry
+  // of rhs, causing geometry access to fail if rhs gets destructed.
+  EntityWrapper(const EntityWrapper& rhs) :
+    _hostEntityPointer(rhs._hostEntityPointer)
   {}
 
   int level() const {

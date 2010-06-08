@@ -103,6 +103,14 @@ public:
     _multiDomainEntityPointer(e)
   {}
 
+  // copy constructor. The default constructor does not work correctly here,
+  // as it will initialise the geometry with a pointer to the host geometry
+  // of rhs, causing geometry access to fail if rhs gets destructed.
+  EntityWrapper(const EntityWrapper& rhs) :
+    _grid(rhs._grid),
+    _multiDomainEntityPointer(rhs._multiDomainEntityPointer)
+  {}
+
   int level() const {
     return _multiDomainEntityPointer->level();
   }
@@ -195,6 +203,14 @@ public:
   EntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& e) :
     _grid(grid),
     _multiDomainEntityPointer(e)
+  {}
+
+  // copy constructor. The default constructor does not work correctly here,
+  // as it will initialise the geometry with a pointer to the host geometry
+  // of rhs, causing geometry access to fail if rhs gets destructed.
+  EntityWrapper(const EntityWrapper& rhs) :
+    _grid(rhs._grid),
+    _multiDomainEntityPointer(rhs._multiDomainEntityPointer)
   {}
 
   int level() const {
