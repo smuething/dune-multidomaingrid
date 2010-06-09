@@ -40,6 +40,12 @@ protected:
     _hostIntersection(hostIntersection)
   {}
 
+  // copy constructor is required to make sure the wrapper does not pick up a pointer to the wrapped
+  // intersection of a foreign IntersectionIterator
+  IntersectionWrapper(const IntersectionWrapper& rhs) :
+    _hostIntersection(NULL)
+  {}
+
 private:
 
   const HostIntersection& hostIntersection() const {

@@ -47,6 +47,14 @@ protected:
     _intersectionTypeTested(false)
   {}
 
+  // copy constructor is required to make sure the wrapper does not pick up a pointer to the wrapped
+  // intersection of a foreign IntersectionIterator
+  IntersectionWrapper(const IntersectionWrapper& rhs) :
+    _indexSet(rhs._indexSet),
+    _multiDomainIntersection(NULL),
+    _intersectionTypeTested(false)
+  {}
+
   const IntersectionWrapper& operator=(const IntersectionWrapper& rhs);
 
 private:
