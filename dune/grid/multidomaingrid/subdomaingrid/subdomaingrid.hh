@@ -442,12 +442,12 @@ public:
 
   template<typename EntityType>
   static const typename MDGrid::template HostEntity<EntityType>::type& hostEntity(const EntityType& e) {
-    return *(getRealImplementation(e).hostEntityPointer());
+    return getRealImplementation(e).hostEntity();
   }
 
   template<typename EntityType>
   static typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) {
-    return getRealImplementation(e).hostEntityPointer();
+    return typename MDGrid::template HostEntityPointer<EntityType>::type(getRealImplementation(e).hostEntity());
   }
 
   typename Traits::LeafIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
