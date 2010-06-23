@@ -192,6 +192,9 @@ class LeafIntersectionWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
+  template<typename,typename>
+  friend class Dune::Intersection;
+
   template<typename,typename,typename,typename>
   friend class subdomain::IntersectionWrapper;
 
@@ -212,6 +215,11 @@ class LeafIntersectionWrapper :
     Base(hostIntersection)
   {}
 
+  LeafIntersectionWrapper(const LeafIntersectionWrapper& rhs):
+    Base(rhs)
+  {}
+
+
 };
 
 
@@ -227,6 +235,9 @@ class LevelIntersectionWrapper :
 
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
+
+  template<typename,typename>
+  friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>
   friend class subdomain::IntersectionWrapper;
@@ -246,6 +257,10 @@ class LevelIntersectionWrapper :
 
   explicit LevelIntersectionWrapper(const HostIntersection* hostIntersection) :
     Base(hostIntersection)
+  {}
+
+  LevelIntersectionWrapper(const LevelIntersectionWrapper& rhs):
+    Base(rhs)
   {}
 
 };
