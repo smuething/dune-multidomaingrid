@@ -36,14 +36,14 @@ namespace Capabilities {
   template<class HostGrid, typename MDGridTraits>
   struct isParallel<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
-    static const bool v = isParallel<HostGrid>::v;
+    static const bool v = false; //isParallel<HostGrid>::v;
   };
 
 
-  template<class HostGrid, typename MDGridTraits>
-  struct hasHangingNodes<MultiDomainGrid<HostGrid,MDGridTraits> >
+  template<class HostGrid, typename MDGridTraits, int codim>
+  struct canCommunicate<MultiDomainGrid<HostGrid,MDGridTraits>, codim>
   {
-    static const bool v = hasHangingNodes<HostGrid>::v;
+    static const bool v = false; //isParallel<HostGrid>::v;
   };
 
 
@@ -62,16 +62,23 @@ namespace Capabilities {
 
 
   template<class HostGrid, typename MDGridTraits>
-  struct IsUnstructured<MultiDomainGrid<HostGrid,MDGridTraits> >
+  struct hasBackupRestoreFacilities<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
-    static const bool v = IsUnstructured<HostGrid>::v;
+    static const bool v = false;
   };
 
 
   template<typename HostGrid, typename MDGridTraits>
-  struct isAdaptable<MultiDomainGrid<HostGrid,MDGridTraits> >
+  struct threadSafe<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
-    static const bool v = isAdaptable<HostGrid>::v;
+    static const bool v = false;
+  };
+
+
+  template<typename HostGrid, typename MDGridTraits>
+  struct viewThreadSafe<MultiDomainGrid<HostGrid,MDGridTraits> >
+  {
+    static const bool v = true;
   };
 
 } // namespace Capabilities
@@ -96,10 +103,10 @@ namespace Capabilities {
   };
 
 
-  template<class MDGrid>
-  struct hasHangingNodes<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
+  template<class MDGrid, int codim>
+  struct canCommunicate<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid>, codim>
   {
-    static const bool v = hasHangingNodes<MDGrid>::v;
+    static const bool v = canCommunicate<MDGrid,codim>::v;
   };
 
 
@@ -118,16 +125,23 @@ namespace Capabilities {
 
 
   template<class MDGrid>
-  struct IsUnstructured<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
+  struct hasBackupRestoreFacilities<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
   {
-    static const bool v = IsUnstructured<MDGrid>::v;
+    static const bool v = false;
   };
 
 
   template<typename MDGrid>
-  struct isAdaptable<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
+  struct threadSafe<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
   {
-    static const bool v = false;
+    static const bool v = threadSafe<MDGrid>::v;
+  };
+
+
+  template<typename MDGrid>
+  struct viewThreadSafe<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
+  {
+    static const bool v = viewThreadSafe<MDGrid>::v;
   };
 
 
