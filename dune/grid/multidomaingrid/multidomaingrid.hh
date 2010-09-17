@@ -707,6 +707,11 @@ private:
       while (_levelIndexSets.size() <= maxLevel()) {
         _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size()))));
       }
+      // and make sure we don't have too many...
+      if (_levelIndexSets.size() > maxLevel() + 1)
+        {
+          _levelIndexSets.resize(maxLevel() + 1);
+        }
     }
 
     _leafIndexSet.reset(true);
