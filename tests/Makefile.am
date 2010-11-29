@@ -14,7 +14,7 @@ include $(top_srcdir)/am/global-rules
 check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers testadaptation profilerepartitioning
 
 test_wrapper_SOURCES = test-wrapper.cc
-test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
 test_wrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
 test_wrapper_LIBS = $(ALL_PKG_LIBS)
 
