@@ -449,6 +449,12 @@ public:
   const typename Traits::CollectiveCommunication& comm() const {
     return _grid.comm();
   }
+
+  size_t numBoundarySegments() const
+  {
+    return _grid.numBoundarySegments();
+  }
+
   /*@}*/
 
   /** \brief Get the MultiDomainGrid that we are part of */

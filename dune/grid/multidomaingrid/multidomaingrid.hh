@@ -550,6 +550,12 @@ public:
   const typename Traits::CollectiveCommunication& comm() const {
     return _hostGrid.comm();
   }
+
+  size_t numBoundarySegments() const
+  {
+    return _hostGrid.numBoundarySegments();
+  }
+
   /*@}*/
 
   /** @name Subdomain creation- and adaptation methods */
