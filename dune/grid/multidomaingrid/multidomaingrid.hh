@@ -368,7 +368,8 @@ public:
     _localIdSet(*this),
     _state(stateFixed),
     _adaptState(stateFixed),
-    _supportLevelIndexSets(supportLevelIndexSets)
+    _supportLevelIndexSets(supportLevelIndexSets),
+    _maxAssignedSubDomainIndex(0)
   {
     updateIndexSets();
   }
@@ -615,6 +616,7 @@ public:
   void addToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
+    _maxAssignedSubDomainIndex = std::max(_maxAssignedSubDomainIndex,subDomain);
     _tmpLeafIndexSet->addToSubDomain(subDomain,e);
   }
 
@@ -629,9 +631,11 @@ public:
   void assignToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
+    _maxAssignedSubDomainIndex = std::max(_maxAssignedSubDomainIndex,subDomain);
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
 
+  //! Removes the given leaf entity from all subdomains it currently belongs to.
   void removeFromAllSubDomains(const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
@@ -659,6 +663,18 @@ public:
       // subGridPointer->update();
     }
     return *subGridPointer;
+  }
+
+  //! Returns the largest subdomain index that was ever assigned to a cell in this grid.
+  /**
+   * This method returns the largest subdomain index that was passed to addToSubDomain() or
+   * assignToSubDomain() since this MultiDomainGrid was created. Keep in mind that the subdomain
+   * belonging to that index might not contain any entities anymore if all entities have been
+   * removed from it at a later point.
+   */
+  SubDomainIndexType maxAssignedSubDomainIndex() const
+  {
+    return _maxAssignedSubDomainIndex;
   }
 
   //! Indicates whether this MultiDomainGrid instance supports level index sets on its SubDomainGrids.
@@ -716,6 +732,7 @@ private:
   const bool _supportLevelIndexSets;
 
   mutable std::map<SubDomainIndexType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
+  SubDomainIndexType _maxAssignedSubDomainIndex;
 
   AdaptationStateMap _adaptationStateMap;
 
