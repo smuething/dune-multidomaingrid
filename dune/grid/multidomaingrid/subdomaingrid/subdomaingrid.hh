@@ -356,26 +356,73 @@ public:
     return _leafIndexSet;
   }
 
+  //! Use MultiDomainGrid::globalRefine() instead of this method.
+  /**
+   * Like all grid modification methods, globalRefine() may ONLY be called on the underlying
+   * MultiDomainGrid.
+   *
+   * \throws NotImplemented calling globalRefine() will always throw this exception.
+   */
   void globalRefine(int refCount) {
     DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
+  //! Mark the entity e for grid refinement across ALL subdomains.
+  /**
+   * This method marks the passed entity for refinement on the underlying MultiDomainGrid.
+   * When using this method, keep in mind that
+   * a) this will have an effect across all subdomains and also on the MultiDomainGrid.
+   * b) the exact semantics of refinement depend on the host grid.
+   *
+   * \param refCount the refinement mark to set, for exact semantics see the documentation
+   *                 of the host grid.
+   * \param e        the entity to refine / coarsen.
+   */
   bool mark(int refCount, const typename Traits::template Codim<0>::Entity& e) {
     return _grid.mark(refCount,multiDomainEntity(e));
   }
 
+  //! Retrieve the refinement mark of entity e.
+  /**
+   * This method returns the refinement mark set on the entity by a call to mark(). As the
+   * mark might have been set on any subdomain containing e, the caller should not assume that
+   * entities always carry the mark assigned within the current subdomain.
+.
+   * \param e        the entity for which to return the refinement mark.
+   */
   int getMark(const typename Traits::template Codim<0>::Entity& e) {
     return _grid.getMark(multiDomainEntity(e));
   }
 
+  //! Use MultiDomainGrid::preAdapt() instead of this method.
+  /**
+   * Like all grid modification methods, preAdapt() may ONLY be called on the underlying
+   * MultiDomainGrid.
+   *
+   * \throws NotImplemented calling preAdapt() will always throw this exception.
+   */
   bool preAdapt() {
     DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
+  //! Use MultiDomainGrid::adapt() instead of this method.
+  /**
+   * Like all grid modification methods, adapt() may ONLY be called on the underlying
+   * MultiDomainGrid.
+   *
+   * \throws NotImplemented calling adapt() will always throw this exception.
+   */
   bool adapt() {
     DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
 
+  //! Use MultiDomainGrid::postAdapt() instead of this method.
+  /**
+   * Like all grid modification methods, postAdapt() may ONLY be called on the underlying
+   * MultiDomainGrid.
+   *
+   * \throws NotImplemented calling postAdapt() will always throw this exception.
+   */
   void postAdapt() {
     DUNE_THROW(NotImplemented,"grid modification only allowed on the MultiDomainGrid");
   }
