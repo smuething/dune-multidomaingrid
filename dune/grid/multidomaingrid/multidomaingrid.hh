@@ -352,6 +352,8 @@ public:
   //! The type of the iterators over the codim 1 interface between two subdomains on a level view.
   typedef typename Traits::LevelSubDomainInterfaceIterator LevelSubDomainInterfaceIterator;
 
+  /** @name Constructors */
+  /*@{*/
   //! Constructs a new MultiDomainGrid from the given host grid.
   /**
    *
@@ -369,11 +371,10 @@ public:
   {
     updateIndexSets();
   }
+  /*@}*/
 
-  //! The grid identifier.
-  std::string name() const {
-    return "MultiDomainGrid";
-  }
+  /** @name Dune grid interface methods */
+  /*@{*/
 
   //! The current maximum level of the grid.
   std::size_t maxLevel() const {
@@ -419,7 +420,10 @@ public:
   typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
     return LeafIteratorWrapper<codim,PiType,const GridImp>(_hostGrid.template leafend<codim,PiType>());
   }
+  /*@}*/
 
+  /** @name Methods for iterating over subdomain interfaces */
+  /*@{*/
   //! Returns an iterator over the leaf interface of two subdomains.
   /**
    * The resulting iterator will visit all cell intersections that are part of both subdomains.
@@ -445,7 +449,10 @@ public:
   LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level,true);
   }
+  /*@}*/
 
+  /** @name Dune grid interface methods */
+  /*@{*/
   int size(int level, int codim) const {
     return _hostGrid.size(level,codim);
   }
@@ -541,7 +548,10 @@ public:
   const typename Traits::CollectiveCommunication& comm() const {
     return _hostGrid.comm();
   }
+  /*@}*/
 
+  /** @name Subdomain creation- and adaptation methods */
+  /*@{*/
   //! Prepares the grid for (re-)assigning cells to subdomains.
   /**
    * After calling this method, it becomes possible to invoke the various methods
@@ -626,7 +636,10 @@ public:
     assert(e.isLeaf());
     _tmpLeafIndexSet->removeFromAllSubDomains(e);
   }
+  /*@}*/
 
+  /** @name Access to the subdomain grids */
+  /*@{*/
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   const SubDomainGrid& subDomain(SubDomainType subDomain) const {
     boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
@@ -651,7 +664,10 @@ public:
   bool supportLevelIndexSets() const {
     return _supportLevelIndexSets;
   }
+  /*@}*/
 
+  /** @name Entity conversion methods */
+  /*@{*/
   //! Returns a reference to the corresponding host entity.
   /**
    * \warning The returned reference will only be valid as long as the passed-in reference to the
@@ -679,6 +695,7 @@ public:
   const typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
     return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
   }
+ /*@}*/
 
 private:
 

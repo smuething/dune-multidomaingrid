@@ -245,7 +245,11 @@ public:
 
   typedef SubDomainGridFamily<MDGrid> GridFamily;
   typedef typename GridFamily::Traits Traits;
+
+  /** \brief The type used for coordinates */
   typedef typename MDGrid::ctype ctype;
+
+  /** \brief The type used for subdomain numbers */
   typedef typename MDGrid::SubDomainType SubDomainType;
   typedef MDGridType MultiDomainGrid;
 
@@ -253,10 +257,8 @@ public:
 
 public:
 
-  std::string name() const {
-    return "SubDomainGrid";
-  }
-
+  /** @name Dune grid interface methods */
+  /*@{*/
   int maxLevel() const {
     return _grid.maxLevel();
   }
@@ -446,11 +448,14 @@ public:
   const typename Traits::CollectiveCommunication& comm() const {
     return _grid.comm();
   }
+  /*@}*/
 
+  /** \brief Get the MultiDomainGrid that we are part of */
   const MDGrid& multiDomainGrid() const {
     return _grid;
   }
 
+  /** \brief Return our subdomain number */
   SubDomainType domain() const {
     return _subDomain;
   }
@@ -467,6 +472,8 @@ public:
     return (&_grid == &rhs._grid && _subDomain == rhs._subDomain);
   }
 
+  /** @name Entity conversion methods */
+  /*@{*/
   template<int cc>
   typename Traits::template Codim<cc>::EntityPointer subDomainEntityPointer(const typename MDGrid::Traits::template Codim<cc>::Entity& mdEntity) const {
     return EntityPointerWrapper<cc,const SubDomainGrid<MDGrid> >(*this,typename MDGrid::Traits::template Codim<cc>::EntityPointer(mdEntity));
@@ -496,6 +503,7 @@ public:
   static typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) {
     return typename MDGrid::template HostEntityPointer<EntityType>::type(getRealImplementation(e).hostEntity());
   }
+  /*@}*/
 
   typename Traits::LeafIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
     assert(_subDomain == it.domain1() || _subDomain == it.domain2());
