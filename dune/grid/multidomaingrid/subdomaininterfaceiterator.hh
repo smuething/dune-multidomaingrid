@@ -26,7 +26,8 @@ class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfa
   typedef typename HostGridView::IntersectionIterator HostIntersectionIterator;
   typedef typename GridView::IntersectionIterator MultiDomainIntersectionIterator;
   typedef IntersectionType Intersection;
-  typedef typename GridImp::SubDomainType SubDomainType;
+  typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
   typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
@@ -49,8 +50,8 @@ protected:
 
   SubDomainInterfaceIterator(const GridView& gridView,
                              const HostGridView& hostGridView,
-                             SubDomainType domain1,
-                             SubDomainType domain2,
+                             SubDomainIndexType domain1,
+                             SubDomainIndexType domain2,
                              bool end) :
     _gridView(gridView),
     _hostGridView(hostGridView),
@@ -248,11 +249,11 @@ public:
     return -_hostIntersectionIterator->unitOuterNormal(local);
   }
 
-  SubDomainType domain1() const {
+  SubDomainIndexType domain1() const {
     return _domain1;
   }
 
-  SubDomainType domain2() const {
+  SubDomainIndexType domain2() const {
     return _domain2;
   }
 
@@ -261,8 +262,8 @@ private:
   GridView _gridView;
   HostGridView _hostGridView;
 
-  SubDomainType _domain1;
-  SubDomainType _domain2;
+  SubDomainIndexType _domain1;
+  SubDomainIndexType _domain2;
 
   HostIterator _hostIterator;
   HostIterator _hostEnd;
@@ -303,9 +304,10 @@ class LeafSubDomainInterfaceIterator :
                                      LeafSubDomainInterfaceIterator<GridImp> > Base;
 
   typedef LeafSubDomainInterfaceIterator<GridImp> Intersection;
-  typedef typename GridImp::SubDomainType SubDomainType;
+  typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
 
-  LeafSubDomainInterfaceIterator(const GridImp& grid, SubDomainType subDomain1, SubDomainType subDomain2, bool end=false) :
+  LeafSubDomainInterfaceIterator(const GridImp& grid, SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, bool end=false) :
     Base(grid.leafView(),grid._hostGrid.leafView(),subDomain1,subDomain2,end)
   {}
 
@@ -337,9 +339,10 @@ class LevelSubDomainInterfaceIterator :
                                      LevelSubDomainInterfaceIterator<GridImp> > Base;
 
   typedef LevelSubDomainInterfaceIterator<GridImp> Intersection;
-  typedef typename GridImp::SubDomainType SubDomainType;
+  typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
 
-  LevelSubDomainInterfaceIterator(const GridImp& grid, SubDomainType subDomain1, SubDomainType subDomain2, int level, bool end=false) :
+  LevelSubDomainInterfaceIterator(const GridImp& grid, SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level, bool end=false) :
     Base(grid.levelView(level),grid._hostGrid.levelView(level),subDomain1,subDomain2,end)
   {}
 

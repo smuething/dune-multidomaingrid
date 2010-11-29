@@ -331,7 +331,8 @@ private:
 public:
 
   //! The (integer) type used to identify subdomains.
-  typedef typename MDGridTraits::SubDomainType SubDomainType;
+  typedef typename MDGridTraits::SubDomainIndexType SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
 
   //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
@@ -340,7 +341,7 @@ public:
    * \note As subdomain indices always start at 0, this constant also determines the maximum
    * number of possible subdomains.
    */
-  static const SubDomainType maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
+  static const SubDomainIndexType maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
 
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
@@ -434,19 +435,19 @@ public:
    * \param subDomain1 the first subdomain
    * \param subDomain2 the second subdomain
    */
-  LeafSubDomainInterfaceIterator leafSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2) const {
+  LeafSubDomainInterfaceIterator leafSubDomainInterfaceBegin(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2) const {
     return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2);
   }
 
-  LeafSubDomainInterfaceIterator leafSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2) const {
+  LeafSubDomainInterfaceIterator leafSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2) const {
     return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2,true);
   }
 
-  LevelSubDomainInterfaceIterator levelSubDomainInterfaceBegin(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
+  LevelSubDomainInterfaceIterator levelSubDomainInterfaceBegin(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level);
   }
 
-  LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainType subDomain1, SubDomainType subDomain2, int level) const {
+  LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level,true);
   }
   /*@}*/
@@ -611,21 +612,21 @@ public:
   }
 
   //! Adds the given leaf entity to the specified subdomain.
-  void addToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+  void addToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->addToSubDomain(subDomain,e);
   }
 
   //! Removes the given leaf entity from the specified subdomain.
-  void removeFromSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+  void removeFromSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->removeFromSubDomain(subDomain,e);
   }
 
   //! Assigns the given leaf entity to the specified subdomain, clearing any previous subdomain assignments.
-  void assignToSubDomain(SubDomainType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+  void assignToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
@@ -641,7 +642,7 @@ public:
   /** @name Access to the subdomain grids */
   /*@{*/
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
-  const SubDomainGrid& subDomain(SubDomainType subDomain) const {
+  const SubDomainGrid& subDomain(SubDomainIndexType subDomain) const {
     boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(const_cast<MultiDomainGrid&>(*this),subDomain));
@@ -651,7 +652,7 @@ public:
   }
 
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
-  SubDomainGrid& subDomain(SubDomainType subDomain) {
+  SubDomainGrid& subDomain(SubDomainIndexType subDomain) {
     boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(*this,subDomain));
@@ -714,7 +715,7 @@ private:
   State _adaptState;
   const bool _supportLevelIndexSets;
 
-  mutable std::map<SubDomainType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
+  mutable std::map<SubDomainIndexType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
 
   AdaptationStateMap _adaptationStateMap;
 

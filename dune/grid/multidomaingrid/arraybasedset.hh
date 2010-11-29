@@ -16,36 +16,38 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename SubDomainType, std::size_t capacity>
+template<typename SubDomainIndexType, std::size_t capacity>
 class ArrayBasedSet;
 
 
-template<typename SubDomainType, std::size_t capacity>
-bool setContains(const ArrayBasedSet<SubDomainType,capacity>& a,
-                 const ArrayBasedSet<SubDomainType,capacity>& b);
+template<typename SubDomainIndexType, std::size_t capacity>
+bool setContains(const ArrayBasedSet<SubDomainIndexType,capacity>& a,
+                 const ArrayBasedSet<SubDomainIndexType,capacity>& b);
 
 
-template<typename SubDomainType, std::size_t capacity>
-void setAdd(ArrayBasedSet<SubDomainType,capacity>& a,
-            const ArrayBasedSet<SubDomainType,capacity>& b);
+template<typename SubDomainIndexType, std::size_t capacity>
+void setAdd(ArrayBasedSet<SubDomainIndexType,capacity>& a,
+            const ArrayBasedSet<SubDomainIndexType,capacity>& b);
 
 
-template<typename SubDomainType, std::size_t capacity>
+template<typename SubDomainIndexT, std::size_t capacity>
 class ArrayBasedSet {
 
-  friend bool setContains<>(const ArrayBasedSet<SubDomainType,capacity>& a,
-                        const ArrayBasedSet<SubDomainType,capacity>& b);
+  friend bool setContains<>(const ArrayBasedSet<SubDomainIndexT,capacity>& a,
+                        const ArrayBasedSet<SubDomainIndexT,capacity>& b);
 
-  friend void setAdd<>(ArrayBasedSet<SubDomainType,capacity>& a,
-                   const ArrayBasedSet<SubDomainType,capacity>& b);
+  friend void setAdd<>(ArrayBasedSet<SubDomainIndexT,capacity>& a,
+                   const ArrayBasedSet<SubDomainIndexT,capacity>& b);
 
 public:
+  typedef SubDomainIndexT SubDomainIndexType;
+  typedef SubDomainIndexType DomainType DUNE_DEPRECATED;
+
   static const std::size_t maxSize = capacity;
-  static const SubDomainType emptyTag = boost::integer_traits<SubDomainType>::const_max;
-  typedef SubDomainType DomainType;
-  typedef typename std::array<DomainType,maxSize>::iterator ArrayIterator;
-  typedef typename std::array<DomainType,maxSize>::const_iterator Iterator;
-  typedef ArrayBasedSet<SubDomainType,capacity> This;
+  static const SubDomainIndexType emptyTag = boost::integer_traits<SubDomainIndexType>::const_max;
+  typedef typename std::array<SubDomainIndexType,maxSize>::iterator ArrayIterator;
+  typedef typename std::array<SubDomainIndexType,maxSize>::const_iterator Iterator;
+  typedef ArrayBasedSet<SubDomainIndexType,capacity> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
@@ -57,7 +59,7 @@ public:
     return _set.begin() + _size;
   }
 
-  bool contains(DomainType domain) const {
+  bool contains(SubDomainIndexType domain) const {
     return std::binary_search(_set.begin(),_set.begin() + _size,domain);
   }
 
@@ -93,7 +95,7 @@ public:
     _size = 0;
   }
 
-  void add(DomainType domain) {
+  void add(SubDomainIndexType domain) {
     if (!std::binary_search(_set.begin(),_set.begin()+_size,domain)) {
       assert(_size < maxSize);
       _set[_size++] = domain;
@@ -101,14 +103,14 @@ public:
     }
   }
 
-  void remove(DomainType domain) {
+  void remove(SubDomainIndexType domain) {
     ArrayIterator it = std::lower_bound(_set.begin(),_set.begin()+_size,domain);
     assert(*it == domain);
     *it = emptyTag;
     std::sort(_set.begin(),_set.end() + (_size--));
   }
 
-  void set(DomainType domain) {
+  void set(SubDomainIndexType domain) {
     _size = 1;
     _set[0] = domain;
   }
@@ -118,7 +120,7 @@ public:
     setAdd(*this,set);
   }
 
-  int domainOffset(DomainType domain) const {
+  int domainOffset(SubDomainIndexType domain) const {
     Iterator it = std::lower_bound(_set.begin(),_set.begin()+_size,domain);
     assert(*it == domain);
     return it - _set.begin();
@@ -138,24 +140,24 @@ public:
 
 private:
   std::size_t _size;
-  std::array<DomainType,maxSize> _set;
+  std::array<SubDomainIndexType,maxSize> _set;
 
 };
 
 
-template<typename SubDomainType, std::size_t capacity>
-inline bool setContains(const ArrayBasedSet<SubDomainType,capacity>& a,
-                        const ArrayBasedSet<SubDomainType,capacity>& b) {
+template<typename SubDomainIndexType, std::size_t capacity>
+inline bool setContains(const ArrayBasedSet<SubDomainIndexType,capacity>& a,
+                        const ArrayBasedSet<SubDomainIndexType,capacity>& b) {
   return std::includes(a._set.begin(),a._set.begin() + a._size,b._set.begin(),b._set.begin() + b._size);
 }
 
-template<typename SubDomainType, std::size_t capacity>
-inline void setAdd(ArrayBasedSet<SubDomainType,capacity>& a,
-                   const ArrayBasedSet<SubDomainType,capacity>& b) {
-  std::array<SubDomainType,2*capacity> tmp;
-  typename std::array<SubDomainType,2*capacity>::iterator it = std::set_union(a._set.begin(), a._set.begin() + a._size,
-                                                                              b._set.begin(), b._set.begin() + b._size,
-                                                                              tmp.begin());
+template<typename SubDomainIndexType, std::size_t capacity>
+inline void setAdd(ArrayBasedSet<SubDomainIndexType,capacity>& a,
+                   const ArrayBasedSet<SubDomainIndexType,capacity>& b) {
+  std::array<SubDomainIndexType,2*capacity> tmp;
+  typename std::array<SubDomainIndexType,2*capacity>::iterator it = std::set_union(a._set.begin(), a._set.begin() + a._size,
+                                                                                   b._set.begin(), b._set.begin() + b._size,
+                                                                                   tmp.begin());
   a._size = it - tmp.begin();
   assert(a._size <= capacity);
   std::copy(tmp.begin(),++it,a._set.begin());

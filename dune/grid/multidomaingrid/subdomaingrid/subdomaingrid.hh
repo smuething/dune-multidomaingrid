@@ -250,7 +250,8 @@ public:
   typedef typename MDGrid::ctype ctype;
 
   /** \brief The type used for subdomain numbers */
-  typedef typename MDGrid::SubDomainType SubDomainType;
+  typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
   typedef MDGridType MultiDomainGrid;
 
   enum IntersectionType { neighbor, foreign, boundary };
@@ -456,7 +457,7 @@ public:
   }
 
   /** \brief Return our subdomain number */
-  SubDomainType domain() const {
+  SubDomainIndexType domain() const {
     return _subDomain;
   }
 
@@ -529,13 +530,13 @@ public:
 private:
 
   MDGrid& _grid;
-  SubDomainType _subDomain;
+  SubDomainIndexType _subDomain;
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
   LeafIndexSetImp _leafIndexSet;
   mutable std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
 
-  SubDomainGrid(MDGrid& grid, SubDomainType subDomain) :
+  SubDomainGrid(MDGrid& grid, SubDomainIndexType subDomain) :
     _grid(grid),
     _subDomain(subDomain),
     _globalIdSet(*this,grid._hostGrid.globalIdSet()),

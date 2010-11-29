@@ -16,35 +16,38 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename SubDomainType>
+template<typename SubDomainIndexType>
 class SingleValueSet;
 
 
-template<typename SubDomainType>
-bool setContains(const SingleValueSet<SubDomainType>& a,
-                 const SingleValueSet<SubDomainType>& b);
+template<typename SubDomainIndexType>
+bool setContains(const SingleValueSet<SubDomainIndexType>& a,
+                 const SingleValueSet<SubDomainIndexType>& b);
 
 
-template<typename SubDomainType>
-void setAdd(SingleValueSet<SubDomainType>& a,
-            const SingleValueSet<SubDomainType>& b);
+template<typename SubDomainIndexType>
+void setAdd(SingleValueSet<SubDomainIndexType>& a,
+            const SingleValueSet<SubDomainIndexType>& b);
 
 
-template<typename SubDomainType>
+template<typename SubDomainIndexT>
 class SingleValueSet {
 
-  friend bool setContains<>(const SingleValueSet<SubDomainType>& a,
-                        const SingleValueSet<SubDomainType>& b);
+  friend bool setContains<>(const SingleValueSet<SubDomainIndexT>& a,
+                        const SingleValueSet<SubDomainIndexT>& b);
 
-  friend void setAdd<>(SingleValueSet<SubDomainType>& a,
-                   const SingleValueSet<SubDomainType>& b);
+  friend void setAdd<>(SingleValueSet<SubDomainIndexT>& a,
+                   const SingleValueSet<SubDomainIndexT>& b);
 
 public:
+
+  typedef SubDomainIndexT SubDomainIndexType;
+  typedef SubDomainIndexType DomainType DUNE_DEPRECATED;
+
   static const std::size_t maxSize = 1;
-  static const SubDomainType emptyTag = boost::integer_traits<SubDomainType>::const_max;
-  typedef SubDomainType DomainType;
-  typedef const SubDomainType* Iterator;
-  typedef SingleValueSet<SubDomainType> This;
+  static const SubDomainIndexType emptyTag = boost::integer_traits<SubDomainIndexType>::const_max;
+  typedef const SubDomainIndexType* Iterator;
+  typedef SingleValueSet<SubDomainIndexType> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
@@ -56,7 +59,7 @@ public:
     return &_set + (_set != emptyTag ? 1 : 0);
   }
 
-  bool contains(DomainType domain) const {
+  bool contains(SubDomainIndexType domain) const {
     return _set == domain;
   }
 
@@ -85,17 +88,17 @@ public:
     _set = emptyTag;
   }
 
-  void add(DomainType domain) {
+  void add(SubDomainIndexType domain) {
     assert(_set == emptyTag || _set == domain);
     _set = domain;
   }
 
-  void remove(DomainType domain) {
+  void remove(SubDomainIndexType domain) {
     assert(_set == domain);
     _set = emptyTag;
   }
 
-  void set(DomainType domain) {
+  void set(SubDomainIndexType domain) {
     _set = domain;
   }
 
@@ -104,7 +107,7 @@ public:
     setAdd(*this,set);
   }
 
-  int domainOffset(DomainType domain) const {
+  int domainOffset(SubDomainIndexType domain) const {
     assert(_set == domain);
     return 0;
   }
@@ -114,21 +117,21 @@ public:
   {}
 
 private:
-  SubDomainType _set;
+  SubDomainIndexType _set;
 
 };
 
 
-template<typename SubDomainType>
-inline bool setContains(const SingleValueSet<SubDomainType>& a,
-                        const SingleValueSet<SubDomainType>& b) {
+template<typename SubDomainIndexType>
+inline bool setContains(const SingleValueSet<SubDomainIndexType>& a,
+                        const SingleValueSet<SubDomainIndexType>& b) {
   return a._set == b._set;
 }
 
-template<typename SubDomainType>
-inline void setAdd(SingleValueSet<SubDomainType>& a,
-                   const SingleValueSet<SubDomainType>& b) {
-  assert(a._set == SingleValueSet<SubDomainType>::emptyTag || a._set == b._set);
+template<typename SubDomainIndexType>
+inline void setAdd(SingleValueSet<SubDomainIndexType>& a,
+                   const SingleValueSet<SubDomainIndexType>& b) {
+  assert(a._set == SingleValueSet<SubDomainIndexType>::emptyTag || a._set == b._set);
   a._set = b._set;
 }
 

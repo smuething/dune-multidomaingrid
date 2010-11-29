@@ -49,12 +49,13 @@ struct CellAndVertexCodims {
 template<int dim, std::size_t subDomainsPerCell, std::size_t subDomainCount, template<int dim, int codim> class supportedCodims = AllCodims>
 struct ArrayBasedTraits {
 
-  typedef int SubDomainType;
-  static const SubDomainType empty = -1;
+  typedef int SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  static const SubDomainIndexType empty = -1;
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
-  static const SubDomainType maxSubDomainIndex = subDomainCount;
+  static const SubDomainIndexType maxSubDomainIndex = subDomainCount;
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -65,9 +66,9 @@ struct ArrayBasedTraits {
   template<int codim>
   struct CodimBase {
     static const std::size_t maxSubDomainsPerEntity = (2<<(codim)) * maxSubDomainsPerCell;
-    typedef Dune::mdgrid::ArrayBasedSet<SubDomainType,maxSubDomainsPerEntity> SubDomainSet;
-    typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
-    typedef std::array<int,maxSubDomainIndex> SizeContainer;
+    typedef Dune::mdgrid::ArrayBasedSet<SubDomainIndexType,maxSubDomainsPerEntity> SubDomainSet;
+    typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer; // TODO: really int??
+    typedef std::array<int,maxSubDomainIndex> SizeContainer; // TODO: really int??
   };
 
   template<int codim>
@@ -80,12 +81,13 @@ struct ArrayBasedTraits {
 template<int dim, std::size_t maxSubDomains, template<int dim, int codim> class supportedCodims = AllCodims >
 struct FewSubDomainsTraits {
 
-  typedef unsigned int SubDomainType;
-  static const SubDomainType empty = -1;
+  typedef unsigned int SubDomainIndexType;
+  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  static const SubDomainIndexType empty = -1; // this is not used, but has to be present to make the compiler happy
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
-  static const SubDomainType maxSubDomainIndex = maxSubDomains - 1;
+  static const SubDomainIndexType maxSubDomainIndex = maxSubDomains - 1;
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -96,7 +98,7 @@ struct FewSubDomainsTraits {
   template<int codim>
   struct CodimBase {
     static const std::size_t maxSubDomainsPerEntity = maxSubDomains;
-    typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainType,maxSubDomainsPerEntity> SubDomainSet;
+    typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainIndexType,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
     typedef std::array<int,maxSubDomainIndex> SizeContainer;
   };

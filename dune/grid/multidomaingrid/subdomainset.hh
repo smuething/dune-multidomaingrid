@@ -19,16 +19,16 @@ namespace Dune {
 namespace mdgrid {
 
 // forward declarations
-template<typename SubDomainType, std::size_t capacity>
+template<typename SubDomainIndexType, std::size_t capacity>
 class IntegralTypeSubDomainSet;
 
-template<typename SubDomainType, std::size_t capacity>
-bool setContains(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
-                 const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+template<typename SubDomainIndexType, std::size_t capacity>
+bool setContains(const IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& a,
+                 const IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& b);
 
-template<typename SubDomainType, std::size_t capacity>
-void setAdd(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
-            const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+template<typename SubDomainIndexType, std::size_t capacity>
+void setAdd(IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& a,
+            const IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& b);
 
 //! @cond DEV_DOC
 
@@ -140,10 +140,10 @@ namespace sds_detail {
   }
 
   //! \internal
-  template<typename DomainType, typename SetStorage>
-  class Iterator : public ForwardIteratorFacade<Iterator<DomainType,SetStorage>,
-						DomainType,
-						DomainType,
+  template<typename SubDomainIndexType, typename SetStorage>
+  class Iterator : public ForwardIteratorFacade<Iterator<SubDomainIndexType,SetStorage>,
+						SubDomainIndexType,
+						SubDomainIndexType,
 						std::ptrdiff_t> {
 
     template<std::size_t capacity>
@@ -151,10 +151,10 @@ namespace sds_detail {
 
   public:
 
-    typedef Iterator<DomainType,SetStorage> ThisType;
+    typedef Iterator<SubDomainIndexType,SetStorage> ThisType;
     static const SetStorage base = 1;
 
-    DomainType dereference() const {
+    SubDomainIndexType dereference() const {
       assert(_state != 0);
       return _value;
     }
@@ -192,7 +192,7 @@ namespace sds_detail {
     {}
 
     SetStorage _state;
-    DomainType _value;
+    SubDomainIndexType _value;
 
   };
 
@@ -200,23 +200,24 @@ namespace sds_detail {
 
 //! @endcond
 
-template<typename SubDomainType, std::size_t capacity>
+template<typename SubDomainIndexT, std::size_t capacity>
 class IntegralTypeSubDomainSet {
 
-  friend bool setContains<>(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
-                          const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+  friend bool setContains<>(const IntegralTypeSubDomainSet<SubDomainIndexT,capacity>& a,
+                          const IntegralTypeSubDomainSet<SubDomainIndexT,capacity>& b);
 
-  friend void setAdd<>(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
-                     const IntegralTypeSubDomainSet<SubDomainType,capacity>& b);
+  friend void setAdd<>(IntegralTypeSubDomainSet<SubDomainIndexT,capacity>& a,
+                     const IntegralTypeSubDomainSet<SubDomainIndexT,capacity>& b);
 
   typedef typename sds_detail::SetStorageChooser<capacity>::type SetStorage;
   static const SetStorage base = 1;
 
 public:
   static const std::size_t maxSize = capacity;
-  typedef SubDomainType DomainType;
-  typedef sds_detail::Iterator<DomainType,SetStorage> Iterator;
-  typedef IntegralTypeSubDomainSet<SubDomainType,capacity> This;
+  typedef SubDomainIndexT SubDomainIndexType;
+  typedef SubDomainIndexType DomainType DUNE_DEPRECATED;
+  typedef sds_detail::Iterator<SubDomainIndexType,SetStorage> Iterator;
+  typedef IntegralTypeSubDomainSet<SubDomainIndexType,capacity> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
@@ -228,7 +229,7 @@ public:
     return Iterator();
   }
 
-  bool contains(DomainType domain) const {
+  bool contains(SubDomainIndexType domain) const {
     assert(domain < maxSize);
     return (base << domain) & _set;
   }
@@ -262,17 +263,17 @@ public:
     _set = 0;
   }
 
-  void add(DomainType domain) {
+  void add(SubDomainIndexType domain) {
     assert(domain < maxSize);
     _set |= base << domain;
   }
 
-  void remove(DomainType domain) {
+  void remove(SubDomainIndexType domain) {
     assert(domain < maxSize);
     _set &= ~(base << domain);
   }
 
-  void set(DomainType domain) {
+  void set(SubDomainIndexType domain) {
     assert(domain < maxSize);
     _set = base << domain;
   }
@@ -282,7 +283,7 @@ public:
     setAdd(*this,rhs);
   }
 
-  int domainOffset(DomainType domain) const {
+  int domainOffset(SubDomainIndexType domain) const {
     assert(domain >= 0 && domain < maxSize);
     return domain;
   }
@@ -316,15 +317,15 @@ inline void setAdd(A& a, const B& b) {
 }
 
 
-template<typename SubDomainType, std::size_t capacity>
-inline bool setContains(const IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
-                        const IntegralTypeSubDomainSet<SubDomainType,capacity>& b) {
+template<typename SubDomainIndexType, std::size_t capacity>
+inline bool setContains(const IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& a,
+                        const IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& b) {
   return (a._set & b._set) == b._set;
 }
 
-template<typename SubDomainType, std::size_t capacity>
-inline void setAdd(IntegralTypeSubDomainSet<SubDomainType,capacity>& a,
-                   const IntegralTypeSubDomainSet<SubDomainType,capacity>& b) {
+template<typename SubDomainIndexType, std::size_t capacity>
+inline void setAdd(IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& a,
+                   const IntegralTypeSubDomainSet<SubDomainIndexType,capacity>& b) {
   a._set |= b._set;
 }
 

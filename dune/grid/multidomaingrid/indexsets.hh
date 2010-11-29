@@ -207,10 +207,11 @@ public:
 
   typedef typename remove_const<GridImp>::type::MDGridTraits MDGridTraits;
   typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
-  typedef typename MDGridTraits::SubDomainType SubDomainType;
+  typedef typename MDGridTraits::SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename MDGridTraits::SubDomainIndexType SubDomainIndexType;
+
   typedef typename HostIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
-  typedef SubDomainType DomainType;
   static const std::size_t maxSubDomains = SubDomainSet::maxSize;
 
 private:
@@ -355,14 +356,14 @@ public:
 
   //! Returns the index of the entity in a specific subdomain.
   template<class EntityType>
-  IndexType index(DomainType subDomain, const EntityType& e) const {
+  IndexType index(SubDomainIndexType subDomain, const EntityType& e) const {
     return index<EntityType::codimension>(subDomain,e);
   }
 
   //! Returns the index of the entity with codimension cc in a specific subdomain.
   //! \tparam the codimension of the entity.
   template<int cc>
-  IndexType index(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
+  IndexType index(SubDomainIndexType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) const {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     const MapEntry<cc>& me = indexMap<cc>().at(gt).at(hostIndex);
@@ -377,7 +378,7 @@ public:
 private:
 
   template<int cc>
-  IndexType indexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<cc>::Entity& he) const {
+  IndexType indexForSubDomain(SubDomainIndexType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<cc>::Entity& he) const {
     const GeometryType gt = he.type();
     const IndexType hostIndex = _hostGridView.indexSet().index(he);
     const MapEntry<cc>& me = indexMap<cc>().find(gt)->second[hostIndex];
@@ -403,12 +404,12 @@ private:
       }
     }
 
-    DomainType _subDomain;
+    SubDomainIndexType _subDomain;
     GeometryType _gt;
     IndexType _hostIndex;
     const ThisType& _indexSet;
 
-    getSubIndexForSubDomain(DomainType subDomain, GeometryType gt, IndexType hostIndex, const ThisType& indexSet) :
+    getSubIndexForSubDomain(SubDomainIndexType subDomain, GeometryType gt, IndexType hostIndex, const ThisType& indexSet) :
       _subDomain(subDomain),
       _gt(gt),
       _hostIndex(hostIndex),
@@ -417,14 +418,14 @@ private:
 
   };
 
-  IndexType subIndexForSubDomain(DomainType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<0>::Entity& he, int i, int codim) const {
+  IndexType subIndexForSubDomain(SubDomainIndexType subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<0>::Entity& he, int i, int codim) const {
     return getSubIndexForSubDomain(subDomain,
                                    GenericReferenceElements<ctype,dimension>::general(he.type()).type(i,codim),
                                    _hostGridView.indexSet().subIndex(he,i,codim),
                                    *this).dispatch(codim);
   }
 
-  const std::vector<GeometryType>& geomTypesForSubDomain(DomainType subDomain, int codim) const {
+  const std::vector<GeometryType>& geomTypesForSubDomain(SubDomainIndexType subDomain, int codim) const {
     return geomTypes(codim);
   }
 
@@ -435,11 +436,11 @@ private:
       return _indexSet.sizeMap<codim>().find(_gt)->second[_subDomain];
     }
 
-    DomainType _subDomain;
+    SubDomainIndexType _subDomain;
     GeometryType _gt;
     const ThisType& _indexSet;
 
-    getGeometryTypeSizeForSubDomain(DomainType subDomain, GeometryType gt, const ThisType& indexSet) :
+    getGeometryTypeSizeForSubDomain(SubDomainIndexType subDomain, GeometryType gt, const ThisType& indexSet) :
       _subDomain(subDomain),
       _gt(gt),
       _indexSet(indexSet)
@@ -447,7 +448,7 @@ private:
 
   };
 
-  IndexType sizeForSubDomain(DomainType subDomain, GeometryType type) const {
+  IndexType sizeForSubDomain(SubDomainIndexType subDomain, GeometryType type) const {
     return getGeometryTypeSizeForSubDomain(subDomain,type,*this).dispatch(dimension-type.dim());
   }
 
@@ -458,22 +459,22 @@ private:
       return _indexSet.codimSizes<codim>()[_subDomain];
     }
 
-    DomainType _subDomain;
+    SubDomainIndexType _subDomain;
     const ThisType& _indexSet;
 
-    getCodimSizeForSubDomain(DomainType subDomain, const ThisType& indexSet) :
+    getCodimSizeForSubDomain(SubDomainIndexType subDomain, const ThisType& indexSet) :
       _subDomain(subDomain),
       _indexSet(indexSet)
     {}
 
   };
 
-  IndexType sizeForSubDomain(DomainType subDomain, int codim) const {
+  IndexType sizeForSubDomain(SubDomainIndexType subDomain, int codim) const {
     return getCodimSizeForSubDomain(subDomain,*this).dispatch(codim);
   }
 
   template<typename EntityType>
-  bool containsForSubDomain(DomainType subDomain, const EntityType& he) const {
+  bool containsForSubDomain(SubDomainIndexType subDomain, const EntityType& he) const {
     const GeometryType gt = he.type();
     const IndexType hostIndex = _hostGridView.indexSet().index(he);
     const MapEntry<EntityType::codimension>& me = indexMap<EntityType::codimension>().find(gt)->second[hostIndex];
@@ -482,25 +483,25 @@ private:
 
 public:
 
-  IndexType subIndex(DomainType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity& e, int i, int codim) const {
+  IndexType subIndex(SubDomainIndexType subDomain, const typename remove_const<GridImp>::type::Traits::template Codim<0>::Entity& e, int i, int codim) const {
     return subIndexForSubDomain(subDomain,_grid.hostEntity(e),i,codim);
   }
 
-  const std::vector<GeometryType>& geomTypes(DomainType subDomain, int codim) const {
+  const std::vector<GeometryType>& geomTypes(SubDomainIndexType subDomain, int codim) const {
     return geomTypes(codim);
   }
 
-  IndexType size(DomainType subDomain, GeometryType type) const {
+  IndexType size(SubDomainIndexType subDomain, GeometryType type) const {
     return sizeForSubDomain(subDomain,type);
   }
 
-  IndexType size(DomainType subDomain, int codim) const {
+  IndexType size(SubDomainIndexType subDomain, int codim) const {
     return sizeForSubDomain(subDomain,codim);
   }
 
   //! Returns true if the entity is contained in a specific subdomain.
   template<typename EntityType>
-  bool contains(DomainType subDomain, const EntityType& e) const {
+  bool contains(SubDomainIndexType subDomain, const EntityType& e) const {
     const GeometryType gt = e.type();
     const IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     const MapEntry<EntityType::codimension>& me = indexMap<EntityType::codimension>().find(gt)->second[hostIndex];
@@ -518,13 +519,13 @@ private:
     util::swap(_containers,rhs._containers);
   }
 
-  void addToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+  void addToSubDomain(SubDomainIndexType subDomain, const Codim0Entity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     indexMap<0>().at(gt)[hostIndex].domains.add(subDomain);
   }
 
-  void removeFromSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+  void removeFromSubDomain(SubDomainIndexType subDomain, const Codim0Entity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     indexMap<0>()[gt][hostIndex].domains.remove(subDomain);
@@ -536,7 +537,7 @@ private:
     indexMap<0>()[gt][hostIndex].domains.clear();
   }
 
-  void assignToSubDomain(SubDomainType subDomain, const Codim0Entity& e) {
+  void assignToSubDomain(SubDomainIndexType subDomain, const Codim0Entity& e) {
     GeometryType gt = e.type();
     IndexType hostIndex = _hostGridView.indexSet().index(_grid.hostEntity(e));
     indexMap<0>()[gt][hostIndex].domains.set(subDomain);
