@@ -400,6 +400,11 @@ public:
     return _grid.comm();
   }
 
+  size_t numBoundarySegments() const
+  {
+    return _grid.numBoundarySegments();
+  }
+
   const MDGrid& multiDomainGrid() const {
     return _grid;
   }
