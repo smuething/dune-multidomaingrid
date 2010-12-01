@@ -237,12 +237,20 @@ public:
     return -_hostIntersectionIterator->unitOuterNormal(local);
   }
 
-  SubDomainIndexType domain1() const {
-    return _controller.domain1();
+  SubDomainIndexType subDomain1() const {
+    return _controller.subDomain1();
   }
 
-  SubDomainIndexType domain2() const {
-    return _controller.domain2();
+  SubDomainIndexType subDomain2() const {
+    return _controller.subDomain2();
+  }
+
+  SubDomainIndexType domain1() const DUNE_DEPRECATED {
+    return this->subDomain1();
+  }
+
+  SubDomainIndexType domain2() const DUNE_DEPRECATED {
+    return this->subDomain2();
   }
 
 private:
