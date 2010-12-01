@@ -193,7 +193,7 @@ class IndexSetWrapper :
   template<typename, typename>
   friend class subdomain::IndexSetWrapper;
 
-  template<typename, typename, typename, typename, typename>
+  template<typename, typename, typename, typename, typename, typename>
   friend class SubDomainInterfaceIterator;
 
   typedef IndexSetWrapper<GridImp,HostGridViewType> ThisType;

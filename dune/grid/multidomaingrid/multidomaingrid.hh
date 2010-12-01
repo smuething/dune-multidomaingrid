@@ -268,7 +268,7 @@ class MultiDomainGrid :
   template <typename>
   friend class LevelSubDomainInterfaceIterator;
 
-  template<typename,typename,typename,typename,typename>
+  template<typename,typename,typename,typename,typename,typename>
   friend class SubDomainInterfaceIterator;
 
   template<typename,typename,typename,typename,typename>

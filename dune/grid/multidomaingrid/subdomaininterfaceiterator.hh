@@ -11,13 +11,15 @@ template<typename GridImp,
          typename WrapperImp,
          typename GridView,
          typename HostGridView,
-         typename IntersectionType>
+         typename IntersectionType,
+         typename IterationController>
 class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfaceIterator<
                                                                   GridImp,
                                                                   WrapperImp,
                                                                   GridView,
                                                                   HostGridView,
-                                                                  IntersectionType
+                                                                  IntersectionType,
+                                                                  IterationController
                                                                   >,
                                                                 IntersectionType>
 {
@@ -50,13 +52,11 @@ protected:
 
   SubDomainInterfaceIterator(const GridView& gridView,
                              const HostGridView& hostGridView,
-                             SubDomainIndexType domain1,
-                             SubDomainIndexType domain2,
+                             IterationController controller,
                              bool end) :
     _gridView(gridView),
     _hostGridView(hostGridView),
-    _domain1(domain1),
-    _domain2(domain2),
+    _controller(controller),
     _hostIterator(end ? hostGridView.template end<0>() : hostGridView.template begin<0>()),
     _hostEnd(hostGridView.template end<0>()),
     _hostIntersectionIterator(hostGridView.ibegin(*hostGridView.template begin<0>())),
@@ -64,9 +64,7 @@ protected:
     _inverseHostIntersection(hostGridView.ibegin(*hostGridView.template begin<0>())),
     _inverseHostIntersectionValid(false)
   {
-    if (incrementToNextValidEntity()) {
-      incrementToNextValidPosition();
-    }
+    _controller.incrementToStartPosition(*this);
   }
 
 public:
@@ -75,48 +73,26 @@ public:
   // IteratorFacade framework!
 
   bool equals(const WrapperImp& rhs) const {
-    assert(_domain1 == rhs._domain1 && _domain2 == rhs._domain2);
-    return _hostIterator == rhs._hostIterator && (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator); //TODO: domains?
+    return (_controller.domain1() == rhs._controller.domain1() &&
+            _controller.domain2() == rhs._controller.domain2() &&
+            _hostIterator == rhs._hostIterator &&
+            (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator)
+            );
   }
 
   bool equals(const SubDomainInterfaceIterator& rhs) const {
-    assert(_domain1 == rhs._domain1 && _domain2 == rhs._domain2);
-    return _hostIterator == rhs._hostIterator && (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator); //TODO: domains?
+    return (_controller.domain1() == rhs._controller.domain1() &&
+            _controller.domain2() == rhs._controller.domain2() &&
+            _hostIterator == rhs._hostIterator &&
+            (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator)
+            );
   }
 
 
 private:
 
-  bool incrementToNextValidEntity() {
-    while (_hostIterator != _hostEnd) {
-      if (_gridView.indexSet().containsForSubDomain(_domain1,*_hostIterator)) {
-        _hostIntersectionIterator = _hostGridView.ibegin(*_hostIterator);
-        _hostIntersectionEnd = _hostGridView.iend(*_hostIterator);
-        return true;
-      }
-      ++_hostIterator;
-    }
-    return false;
-  }
-
-  void incrementToNextValidPosition() {
-    for (;;) {
-      while(_hostIntersectionIterator != _hostIntersectionEnd) {
-        if (_hostIntersectionIterator->neighbor() && _gridView.indexSet().containsForSubDomain(_domain2,*_hostIntersectionIterator->outside())) {
-          return;
-        }
-        ++_hostIntersectionIterator;
-      }
-      ++_hostIterator;
-      if (!incrementToNextValidEntity()) {
-        return;
-      }
-    }
-  }
-
   void increment() {
-    ++_hostIntersectionIterator;
-    incrementToNextValidPosition();
+    _controller.increment(*this);
     _inverseHostIntersectionValid = false;
     _geometry.clear();
     _geometryInInside.clear();
@@ -250,11 +226,11 @@ public:
   }
 
   SubDomainIndexType domain1() const {
-    return _domain1;
+    return _controller.domain1();
   }
 
   SubDomainIndexType domain2() const {
-    return _domain2;
+    return _controller.domain2();
   }
 
 private:
@@ -262,8 +238,7 @@ private:
   GridView _gridView;
   HostGridView _hostGridView;
 
-  SubDomainIndexType _domain1;
-  SubDomainIndexType _domain2;
+  IterationController _controller;
 
   HostIterator _hostIterator;
   HostIterator _hostEnd;
