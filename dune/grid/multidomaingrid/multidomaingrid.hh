@@ -69,6 +69,8 @@ struct MultiDomainGridFamily {
             class GlobalIdSetImp, class GIDType, class LocalIdSetImp, class LIDType, class CCType,
             template<class> class LeafSubDomainInterfaceIteratorImp,
             template<class> class LevelSubDomainInterfaceIteratorImp,
+            template<class> class LeafAllSubDomainInterfacesIteratorImp,
+            template<class> class LevelAllSubDomainInterfacesIteratorImp,
             template<class,PartitionIteratorType> class LevelGridViewTraits = DefaultLevelGridViewTraits,
             template<class,PartitionIteratorType> class LeafGridViewTraits = DefaultLeafGridViewTraits
             >
@@ -161,6 +163,9 @@ struct MultiDomainGridFamily {
 
     typedef LeafSubDomainInterfaceIteratorImp<const GridImp> LeafSubDomainInterfaceIterator;
     typedef LevelSubDomainInterfaceIteratorImp<const GridImp> LevelSubDomainInterfaceIterator;
+
+    typedef LeafAllSubDomainInterfacesIteratorImp<const GridImp> LeafAllSubDomainInterfacesIterator;
+    typedef LevelAllSubDomainInterfacesIteratorImp<const GridImp> LevelAllSubDomainInterfacesIterator;
   };
 
   typedef MultiDomainGridTraits<
@@ -185,7 +190,9 @@ struct MultiDomainGridFamily {
     typename HostGrid::Traits::LocalIdSet::IdType,
     typename HostGrid::CollectiveCommunication,
     LeafSubDomainInterfaceIterator,
-    LevelSubDomainInterfaceIterator
+    LevelSubDomainInterfaceIterator,
+    LeafAllSubDomainInterfacesIterator,
+    LevelAllSubDomainInterfacesIterator
     > Traits;
 
 };
@@ -267,6 +274,12 @@ class MultiDomainGrid :
 
   template <typename>
   friend class LevelSubDomainInterfaceIterator;
+
+  template <typename>
+  friend class LeafAllSubDomainInterfacesIterator;
+
+  template <typename>
+  friend class LevelAllSubDomainInterfacesIterator;
 
   template<typename,typename,typename,typename,typename,typename>
   friend class SubDomainInterfaceIterator;
@@ -352,6 +365,12 @@ public:
 
   //! The type of the iterators over the codim 1 interface between two subdomains on a level view.
   typedef typename Traits::LevelSubDomainInterfaceIterator LevelSubDomainInterfaceIterator;
+
+  //! The type of the iterators over the codim 1 interfaces between all subdomains on the leaf view.
+  typedef typename Traits::LeafAllSubDomainInterfacesIterator LeafAllSubDomainInterfacesIterator;
+
+  //! The type of the iterators over the codim 1 interfaces between all subdomains on a level view.
+  typedef typename Traits::LevelAllSubDomainInterfacesIterator LevelAllSubDomainInterfacesIterator;
 
   /** @name Constructors */
   /*@{*/
@@ -450,6 +469,22 @@ public:
 
   LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level,true);
+  }
+
+  LeafAllSubDomainInterfacesIterator leafAllSubDomainInterfacesBegin() const {
+    return LeafAllSubDomainInterfacesIterator(*this);
+  }
+
+  LeafAllSubDomainInterfacesIterator leafAllSubDomainInterfacesEnd() const {
+    return LeafAllSubDomainInterfacesIterator(*this,true);
+  }
+
+  LevelAllSubDomainInterfacesIterator levelAllSubDomainInterfacesBegin(int level) const {
+    return LevelAllSubDomainInterfacesIterator(*this,level);
+  }
+
+  LevelAllSubDomainInterfacesIterator levelAllSubDomainInterfacesEnd(int level) const {
+    return LevelAllSubDomainInterfacesIterator(*this,level,true);
   }
   /*@}*/
 
