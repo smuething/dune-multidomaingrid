@@ -79,18 +79,24 @@ public:
   // IteratorFacade framework!
 
   bool equals(const WrapperImp& rhs) const {
-    return (_controller.domain1() == rhs._controller.domain1() &&
-            _controller.domain2() == rhs._controller.domain2() &&
-            _hostIterator == rhs._hostIterator &&
-            (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator)
+    return (_hostIterator == rhs._hostIterator &&
+            (_hostIterator == _hostEnd ||
+             (_hostIntersectionIterator == rhs._hostIntersectionIterator &&
+             _controller.subDomain1() == rhs._controller.subDomain1() &&
+             _controller.subDomain2() == rhs._controller.subDomain2()
+              )
+             )
             );
   }
 
   bool equals(const SubDomainInterfaceIterator& rhs) const {
-    return (_controller.domain1() == rhs._controller.domain1() &&
-            _controller.domain2() == rhs._controller.domain2() &&
-            _hostIterator == rhs._hostIterator &&
-            (_hostIterator == _hostEnd || _hostIntersectionIterator == rhs._hostIntersectionIterator)
+    return (_hostIterator == rhs._hostIterator &&
+            (_hostIterator == _hostEnd ||
+             (_hostIntersectionIterator == rhs._hostIntersectionIterator &&
+             _controller.subDomain1() == rhs._controller.subDomain1() &&
+             _controller.subDomain2() == rhs._controller.subDomain2()
+              )
+             )
             );
   }
 
