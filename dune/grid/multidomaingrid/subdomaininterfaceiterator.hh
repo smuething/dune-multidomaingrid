@@ -354,7 +354,7 @@ class LeafSubDomainInterfaceIterator :
                                       >
 {
 
-  template<typename, typename, typename, typename, typename>
+  template<typename, typename, typename, typename, typename, typename>
   friend class SubDomainInterfaceIterator;
 
   template<int, int, typename>
@@ -395,7 +395,7 @@ class LevelSubDomainInterfaceIterator :
                                       >
 {
 
-  template<typename, typename, typename, typename, typename>
+  template<typename, typename, typename, typename, typename, typename>
   friend class SubDomainInterfaceIterator;
 
   template<int, int, typename>
