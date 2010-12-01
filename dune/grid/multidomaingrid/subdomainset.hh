@@ -239,6 +239,11 @@ public:
     return setContains(*this,set);
   }
 
+  void difference(const IntegralTypeSubDomainSet& minuend, const IntegralTypeSubDomainSet& subtrahend)
+  {
+    _set = minuend._set & ~subtrahend._set;
+  }
+
   bool simple() const {
     return (!empty()) && ((_set & (_set - 1)) == 0);
   }

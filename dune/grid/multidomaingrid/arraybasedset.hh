@@ -68,6 +68,14 @@ public:
     return setContains(*this,set);
   }
 
+  void difference(const ArrayBasedSet& minuend, const ArrayBasedSet& subtrahend)
+  {
+    Iterator res = std::set_difference(minuend.begin(),minuend.end(),
+                                       subtrahend.begin(),subtrahend.end(),
+                                       _set.begin());
+    _size = res - _set.begin();
+  }
+
   bool simple() const {
     return _size == 1;
   }
