@@ -7,4 +7,6 @@ testpartitioning
 testsubdomainset
 testlargedomainnumbers
 testadaptation
+testhierarchy
+iterateallinterfaces
 profilerepartitioning
