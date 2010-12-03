@@ -136,18 +136,6 @@ private:
     return _hostIntersectionIterator;
   }
 
-public:
-
-  MultiDomainIntersectionIterator secondMultiDomainIntersectionIterator() const {
-    return _gridView.grid().template multiDomainIntersectionIterator<GridView,HostGridView>(secondHostIntersectionIterator());
-  }
-
-  MultiDomainIntersectionIterator firstMultiDomainIntersectionIterator() const {
-    return _gridView.grid().template multiDomainIntersectionIterator<GridView,HostGridView>(firstHostIntersectionIterator());
-  }
-
-private:
-
   const Intersection& dereference() const {
     return reinterpret_cast<const Intersection&>(*this);
   }
@@ -155,13 +143,6 @@ private:
 
 public:
 
-  const Intersection& operator*() const {
-    return dereference();
-  }
-
-  const Intersection* operator->() const {
-    return &(dereference());
-  }
 
   //! Returns an EntityPointer to the corresponding cell in the first subdomain.
   EntityPointer firstCell() const {
@@ -171,11 +152,6 @@ public:
   //! Returns an EntityPointer to the corresponding cell in the second subdomain.
   EntityPointer secondCell() const {
     return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->outside());
-  }
-
-  //! Returns true if this intersection is conforming.
-  bool conforming() const {
-    return _hostIntersectionIterator->conforming();
   }
 
   //! Returns the local geometry in the corresponding cell of the first subdomain.
@@ -192,19 +168,6 @@ public:
       _geometryInOutside.reset(_hostIntersectionIterator->geometryInOutside());
     }
     return _geometryInOutside;
-  }
-
-  //! Returns the global geometry of the intersection.
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(_hostIntersectionIterator->geometry());
-    }
-    return _geometry;
-  }
-
-  //! Returns the GeometryType of this intersection.
-  GeometryType type() const {
-    return _hostIntersectionIterator->type();
   }
 
   //! Returns the subindex of the corresponding face in the cell belonging to the
@@ -243,20 +206,110 @@ public:
     return -_hostIntersectionIterator->unitOuterNormal(local);
   }
 
+  //! Returns a standard Dune IntersectionIterator for the current intersection, but with inside and outside flipped.
+  MultiDomainIntersectionIterator secondMultiDomainIntersectionIterator() const {
+    return _gridView.grid().template multiDomainIntersectionIterator<GridView,HostGridView>(secondHostIntersectionIterator());
+  }
+
+  //! Returns a standard Dune IntersectionIterator for the current intersection.
+  MultiDomainIntersectionIterator firstMultiDomainIntersectionIterator() const {
+    return _gridView.grid().template multiDomainIntersectionIterator<GridView,HostGridView>(firstHostIntersectionIterator());
+  }
+
+  //! Returns the index of the subdomain the first (inside) cell belongs to.
   SubDomainIndexType subDomain1() const {
     return _controller.subDomain1();
   }
 
+  //! Returns the index of the subdomain the second (outside) cell belongs to.
   SubDomainIndexType subDomain2() const {
     return _controller.subDomain2();
   }
 
+  //! Use subDomain1() instead.
   SubDomainIndexType domain1() const DUNE_DEPRECATED {
     return this->subDomain1();
   }
 
+  //! Use subDomain2() instead.
   SubDomainIndexType domain2() const DUNE_DEPRECATED {
     return this->subDomain2();
+  }
+
+  const Intersection& operator*() const {
+    return dereference();
+  }
+
+  const Intersection* operator->() const {
+    return &(dereference());
+  }
+
+  //! Returns an EntityPointer to the corresponding cell in the first subdomain.
+  EntityPointer inside() const {
+    return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->inside());
+  }
+
+  //! Returns an EntityPointer to the corresponding cell in the second subdomain.
+  EntityPointer outside() const {
+    return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->outside());
+  }
+
+  //! Returns true if this intersection is conforming.
+  bool conforming() const {
+    return _hostIntersectionIterator->conforming();
+  }
+
+  //! Returns the local geometry in the corresponding cell of the first subdomain.
+  const LocalGeometry& geometryInside() const {
+    if (!_geometryInInside.isSet()) {
+      _geometryInInside.reset(_hostIntersectionIterator->geometryInInside());
+    }
+    return _geometryInInside;
+  }
+
+  //! Returns the local geometry in the corresponding cell of the second subdomain.
+  const LocalGeometry& geometryInOutside() const {
+    if (!_geometryInOutside.isSet()) {
+      _geometryInOutside.reset(_hostIntersectionIterator->geometryInOutside());
+    }
+    return _geometryInOutside;
+  }
+
+  //! Returns the global geometry of the intersection.
+  const Geometry& geometry() const {
+    if (!_geometry.isSet()) {
+      _geometry.reset(_hostIntersectionIterator->geometry());
+    }
+    return _geometry;
+  }
+
+  //! Returns the GeometryType of this intersection.
+  GeometryType type() const {
+    return _hostIntersectionIterator->type();
+  }
+
+  //! Returns the subindex of the corresponding face in the cell belonging to the
+  //! first subdomain.
+  int indexInInside() const {
+    return _hostIntersectionIterator->indexInInside();
+  }
+
+  //! Returns the subindex of the corresponding face in the cell belonging to the
+  //! second subdomain.
+  int indexInOutside() const {
+    return _hostIntersectionIterator->indexInOutside();
+  }
+
+  GlobalCoords outerNormal(const LocalCoords& local) const {
+    return _hostIntersectionIterator->outerNormal(local);
+  }
+
+  GlobalCoords integrationOuterNormal(const LocalCoords& local) const {
+    return _hostIntersectionIterator->integrationOuterNormal(local);
+  }
+
+  GlobalCoords unitOuterNormal(const LocalCoords& local) const {
+    return _hostIntersectionIterator->unitOuterNormal(local);
   }
 
 private:
