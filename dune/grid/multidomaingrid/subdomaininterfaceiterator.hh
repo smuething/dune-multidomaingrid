@@ -143,6 +143,8 @@ private:
 
 public:
 
+  /** @name SubDomainIterator-specific interface methods */
+  /*@{*/
 
   //! Returns an EntityPointer to the corresponding cell in the first subdomain.
   EntityPointer firstCell() const {
@@ -236,6 +238,11 @@ public:
     return this->subDomain2();
   }
 
+  /*@}*/
+
+  /** @name Stardard Dune Intersection interface methods */
+  /*@{*/
+
   const Intersection& operator*() const {
     return dereference();
   }
@@ -311,6 +318,8 @@ public:
   GlobalCoords unitOuterNormal(const LocalCoords& local) const {
     return _hostIntersectionIterator->unitOuterNormal(local);
   }
+
+  /*@}*/
 
 private:
 
