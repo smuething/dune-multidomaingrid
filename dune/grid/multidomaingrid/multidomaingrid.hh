@@ -459,30 +459,83 @@ public:
     return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2);
   }
 
+  //! Returns the corresponding end iterator for leafSubDomainInterfaceBegin().
   LeafSubDomainInterfaceIterator leafSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2) const {
     return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2,true);
   }
 
+  //! Returns an iterator over the interface of two subdomains at the given level.
+  /**
+   * The resulting iterator will visit all cell intersections that are part of both subdomains.
+   *
+   * \attention The iterator assumes the two subdomains to be non-overlapping! If there is an overlap,
+   * some intersections will be iterated over twice!
+   *
+   * \param subDomain1 the first subdomain
+   * \param subDomain2 the second subdomain
+   * \param level      the grid level over which to iterate
+   */
   LevelSubDomainInterfaceIterator levelSubDomainInterfaceBegin(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level);
   }
 
+  //! Returns the corresponding end iterator for levelSubDomainInterfaceBegin().
+  /**
+   * \param level the grid level to be iterated over.
+   */
   LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level,true);
   }
 
+  //! Returns an iterator over all subdomain interfaces on the leaf view.
+  /**
+   * This method returns an iterator that will visit all pairwise surface interfaces
+   * between subdomains on the leaf view. In particular, given to adjacent cells
+   * \f$e_1\f$ and \f$e_2\f$ and two subdomains \f$s_1\f$ and \f$s_2\f$, this iterator
+   * will visit the intersection between \f$e_1\f$ and \f$e_2\f$ iff all of the following hold:
+   * \f{eqnarray*} e_1 \in s_1,\ e_1 \not\in s_2,\\ e_2 \not\in s_1,\ e_1 \in s_2.\f}
+   * In essence, the two subdomains have to be locally disjoint on \f$e_1\f$ and \f$e_2\f$.
+   *
+   * The iterator will only traverse the host grid once for visiting all subdomain interfaces.
+   * Incrementing the iterator might thus result in an iterator pointing to the same grid
+   * intersection, but to a different pair of subdomains. The subdomains pointed to by ther
+   * iterator can be retrieved by calling LeafAllSubDomainInterfacesIterator::subDomain1()
+   * and LeafAllSubDomainInterfacesIterator::subDomain2(), respectively.
+   */
   LeafAllSubDomainInterfacesIterator leafAllSubDomainInterfacesBegin() const {
     return LeafAllSubDomainInterfacesIterator(*this);
   }
 
+  //! Returns the corresponding end iterator for leafAllSubDomainInterfacesBegin().
   LeafAllSubDomainInterfacesIterator leafAllSubDomainInterfacesEnd() const {
     return LeafAllSubDomainInterfacesIterator(*this,true);
   }
 
+  //! Returns an iterator over all subdomain interfaces on the requested level view.
+  /**
+   * This method returns an iterator that will visit all pairwise surface interfaces
+   * between subdomains on the requested level view. In particular, given to adjacent cells
+   * \f$e_1\f$ and \f$e_2\f$ and two subdomains \f$s_1\f$ and \f$s_2\f$, this iterator
+   * will visit the intersection between \f$e_1\f$ and \f$e_2\f$ iff all of the following hold:
+   * \f{eqnarray*} e_1 \in s_1,\ e_1 \not\in s_2,\\ e_2 \not\in s_1,\ e_1 \in s_2.\f}
+   * In essence, the two subdomains have to be locally disjoint on \f$e_1\f$ and \f$e_2\f$.
+   *
+   * The iterator will only traverse the host grid once for visiting all subdomain interfaces.
+   * Incrementing the iterator might thus result in an iterator pointing to the same grid
+   * intersection, but to a different pair of subdomains. The subdomains pointed to by ther
+   * iterator can be retrieved by calling LevelAllSubDomainInterfacesIterator::subDomain1()
+   * and LevelAllSubDomainInterfacesIterator::subDomain2(), respectively.
+   *
+   * \param level the grid level to be iterated over.
+   */
   LevelAllSubDomainInterfacesIterator levelAllSubDomainInterfacesBegin(int level) const {
     return LevelAllSubDomainInterfacesIterator(*this,level);
   }
 
+  //! Returns the corresponding end iterator for levelAllSubDomainInterfacesBegin().
+  /**
+   * \param level the grid level to be iterated over.
+   */
   LevelAllSubDomainInterfacesIterator levelAllSubDomainInterfacesEnd(int level) const {
     return LevelAllSubDomainInterfacesIterator(*this,level,true);
   }
