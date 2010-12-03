@@ -36,8 +36,8 @@ namespace detail {
 #include <dune/grid/multidomaingrid/indexsets.hh>
 #include <dune/grid/multidomaingrid/mdgridtraits.hh>
 
-#include <dune/grid/multidomaingrid/subdomaininterfaceiterator.hh>
-
+#include <dune/grid/multidomaingrid/subdomaintosubdomaininterfaceiterator.hh>
+#include <dune/grid/multidomaingrid/allsubdomaininterfacesiterator.hh>
 
 namespace Dune {
 
