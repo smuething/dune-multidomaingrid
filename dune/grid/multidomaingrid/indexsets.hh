@@ -193,8 +193,8 @@ class IndexSetWrapper :
   template<typename, typename>
   friend class subdomain::IndexSetWrapper;
 
-  template<typename, typename, typename, typename, typename, typename>
-  friend class SubDomainInterfaceIterator;
+  template<typename, typename, typename, typename>
+  friend class SubDomainInterface;
 
   template<typename>
   friend class SubDomainToSubDomainController;

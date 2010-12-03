@@ -18,10 +18,15 @@ class SubDomainToSubDomainController
 {
 
   template<typename GridImp,
-           typename WrapperImp,
            typename GridView,
            typename HostGridView,
-           typename IntersectionType,
+           typename IntersectionController
+           >
+  friend class SubDomainInterface;
+
+  template<typename GridImp,
+           typename GridView,
+           typename HostGridView,
            typename IntersectionController
            >
   friend class SubDomainInterfaceIterator;
@@ -98,15 +103,13 @@ class SubDomainToSubDomainController
 template<typename GridImp>
 class LeafSubDomainInterfaceIterator :
     public SubDomainInterfaceIterator<GridImp,
-                                      LeafSubDomainInterfaceIterator<GridImp>,
                                       typename GridImp::LeafGridView,
                                       typename detail::HostGridAccessor<GridImp>::Type::LeafGridView,
-                                      LeafSubDomainInterfaceIterator<GridImp>,
                                       SubDomainToSubDomainController<typename GridImp::SubDomainIndexType>
                                       >
 {
 
-  template<typename, typename, typename, typename, typename, typename>
+  template<typename, typename, typename, typename>
   friend class SubDomainInterfaceIterator;
 
   template<int, int, typename>
@@ -118,16 +121,12 @@ class LeafSubDomainInterfaceIterator :
   typedef SubDomainToSubDomainController<typename GridImp::SubDomainIndexType> Controller;
 
   typedef SubDomainInterfaceIterator<GridImp,
-                                     LeafSubDomainInterfaceIterator<GridImp>,
                                      typename GridImp::LeafGridView,
                                      typename GridImp::HostGridType::LeafGridView,
-                                     LeafSubDomainInterfaceIterator<GridImp>,
                                      Controller
                                      > Base;
 
-  typedef LeafSubDomainInterfaceIterator<GridImp> Intersection;
-  typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename Base::Intersection::SubDomainIndexType SubDomainIndexType;
 
   LeafSubDomainInterfaceIterator(const GridImp& grid, SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, bool end=false) :
     Base(grid.leafView(),grid._hostGrid.leafView(),Controller(subDomain1,subDomain2),end)
@@ -139,15 +138,13 @@ class LeafSubDomainInterfaceIterator :
 template<typename GridImp>
 class LevelSubDomainInterfaceIterator :
     public SubDomainInterfaceIterator<GridImp,
-                                      LevelSubDomainInterfaceIterator<GridImp>,
                                       typename GridImp::LevelGridView,
                                       typename detail::HostGridAccessor<GridImp>::Type::LevelGridView,
-                                      LevelSubDomainInterfaceIterator<GridImp>,
                                       SubDomainToSubDomainController<typename GridImp::SubDomainIndexType>
                                       >
 {
 
-  template<typename, typename, typename, typename, typename, typename>
+  template<typename, typename, typename, typename>
   friend class SubDomainInterfaceIterator;
 
   template<int, int, typename>
@@ -159,16 +156,12 @@ class LevelSubDomainInterfaceIterator :
   typedef SubDomainToSubDomainController<typename GridImp::SubDomainIndexType> Controller;
 
   typedef SubDomainInterfaceIterator<GridImp,
-                                     LevelSubDomainInterfaceIterator<GridImp>,
                                      typename GridImp::LevelGridView,
                                      typename GridImp::HostGridType::LevelGridView,
-                                     LevelSubDomainInterfaceIterator<GridImp>,
                                      Controller
                                      > Base;
 
-  typedef LevelSubDomainInterfaceIterator<GridImp> Intersection;
-  typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename Base::Intersection::SubDomainIndexType SubDomainIndexType;
 
   LevelSubDomainInterfaceIterator(const GridImp& grid, SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level, bool end=false) :
     Base(grid.levelView(level),grid._hostGrid.levelView(level),Controller(subDomain1,subDomain2),end)

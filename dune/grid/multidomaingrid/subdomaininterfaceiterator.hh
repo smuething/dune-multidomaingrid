@@ -7,33 +7,54 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename GridImp,
+         typename GridView,
+         typename HostGridView,
+         typename IterationController>
+class SubDomainInterfaceIterator;
+
 template<typename SubDomainIndexType>
 class SubDomainToSubDomainController;
 
 template<typename SubDomainSet>
 class AllInterfacesController;
 
+
+//! An intersection that forms part of the interface between two subdomains.
 template<typename GridImp,
-         typename WrapperImp,
          typename GridView,
          typename HostGridView,
-         typename IntersectionType,
          typename IterationController>
-class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfaceIterator<
-                                                                  GridImp,
-                                                                  WrapperImp,
-                                                                  GridView,
-                                                                  HostGridView,
-                                                                  IntersectionType,
-                                                                  IterationController
-                                                                  >,
-                                                                IntersectionType>
+class SubDomainInterface
 {
+
+public:
+
+  typedef typename GridImp::ctype ctype;
+  static const int dimension = GridImp::dimension;
+  static const int dimensionworld = GridImp::dimensionworld;
+
+private:
 
   typedef typename HostGridView::template Codim<0>::Iterator HostIterator;
   typedef typename HostGridView::IntersectionIterator HostIntersectionIterator;
   typedef typename GridView::IntersectionIterator MultiDomainIntersectionIterator;
-  typedef IntersectionType Intersection;
+  typedef typename GridImp::SubDomainGrid::Traits::template Codim<0>::Entity SubDomainEntity;
+
+  typedef FieldVector<ctype,dimensionworld> GlobalCoords;
+  typedef FieldVector<ctype,dimension - 1> LocalCoords;
+
+  template<typename>
+  friend class SubDomainToSubDomainController;
+
+  template<typename>
+  friend class AllInterfacesController;
+
+  template<typename, typename, typename, typename>
+  friend class SubDomainInterfaceIterator;
+
+public:
+
   typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
   typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
 
@@ -42,30 +63,12 @@ class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfa
   typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
   typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
 
-  typedef typename GridImp::SubDomainGrid::Traits::template Codim<0>::Entity SubDomainEntity;
+private:
 
-  typedef typename GridImp::ctype ctype;
-  static const int dimension = GridImp::dimension;
-  static const int dimensionworld = GridImp::dimensionworld;
-
-  typedef FieldVector<ctype,dimensionworld> GlobalCoords;
-  typedef FieldVector<ctype,dimension - 1> LocalCoords;
-
-  template<typename, typename, typename, typename>
-  friend class ForwardIteratorFacade;
-
-  template<typename>
-  friend class SubDomainToSubDomainController;
-
-  template<typename>
-  friend class AllInterfacesController;
-
-protected:
-
-  SubDomainInterfaceIterator(const GridView& gridView,
-                             const HostGridView& hostGridView,
-                             IterationController controller,
-                             bool end) :
+  SubDomainInterface(const GridView& gridView,
+                     const HostGridView& hostGridView,
+                     IterationController controller,
+                     bool end) :
     _gridView(gridView),
     _hostGridView(hostGridView),
     _controller(controller),
@@ -79,23 +82,46 @@ protected:
     _controller.incrementToStartPosition(*this);
   }
 
-public:
-
-  // The following two methods have to be public because of non-member comparison operators in the
-  // IteratorFacade framework!
-
-  bool equals(const WrapperImp& rhs) const {
-    return (_hostIterator == rhs._hostIterator &&
-            (_hostIterator == _hostEnd ||
-             (_hostIntersectionIterator == rhs._hostIntersectionIterator &&
-             _controller.subDomain1() == rhs._controller.subDomain1() &&
-             _controller.subDomain2() == rhs._controller.subDomain2()
-              )
-             )
-            );
+  SubDomainInterface(const SubDomainInterface& rhs)
+    : _gridView(rhs._gridView)
+    , _hostGridView(rhs._hostGridView)
+    , _controller(rhs._controller)
+    , _hostIterator(rhs._hostIterator)
+    , _hostEnd(rhs._hostEnd)
+    , _hostIntersectionIterator(rhs._hostIntersectionIterator)
+    , _hostIntersectionEnd(rhs._hostIntersectionEnd)
+    , _inverseHostIntersection(rhs._inverseHostIntersection)
+    , _inverseHostIntersectionValid(rhs._inverseHostIntersectionValid)
+  {
   }
 
-  bool equals(const SubDomainInterfaceIterator& rhs) const {
+  SubDomainInterface& operator=(const SubDomainInterface& rhs)
+  {
+    _gridView = rhs._gridView;
+    _hostGridView = rhs._hostGridView;
+    _controller = rhs._controller;
+    _hostIterator = rhs._hostIterator;
+    _hostEnd = rhs.hostEnd;
+    _hostIntersectionIterator = rhs._hostIntersectionIterator;
+    _hostIntersectionEnd = rhs._hostIntersectionEnd;
+    _inverseHostIntersection = rhs._inverseHostIntersection;
+    _inverseHostIntersectionValid = rhs._inverseHostIntersectionValid;
+    _geometry.clear();
+    _geometryInInside.clear();
+    _geometryInOutside.clear();
+  }
+
+  void clear()
+  {
+    _inverseHostIntersectionValid = false;
+    _geometry.clear();
+    _geometryInInside.clear();
+    _geometryInOutside.clear();
+  }
+
+public:
+
+  bool operator==(const SubDomainInterface& rhs) const {
     return (_hostIterator == rhs._hostIterator &&
             (_hostIterator == _hostEnd ||
              (_hostIntersectionIterator == rhs._hostIntersectionIterator &&
@@ -108,14 +134,6 @@ public:
 
 
 private:
-
-  void increment() {
-    _controller.increment(*this);
-    _inverseHostIntersectionValid = false;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
-  }
 
   void findInverseHostIntersection() const {
     assert(_hostIntersectionIterator->neighbor());
@@ -136,14 +154,9 @@ private:
     return _hostIntersectionIterator;
   }
 
-  const Intersection& dereference() const {
-    return reinterpret_cast<const Intersection&>(*this);
-  }
-
-
 public:
 
-  /** @name SubDomainIterator-specific interface methods */
+  /** @name SubDomainInterface-specific interface methods */
   /*@{*/
 
   //! Returns an EntityPointer to the corresponding cell in the first subdomain.
@@ -243,14 +256,6 @@ public:
   /** @name Stardard Dune Intersection interface methods */
   /*@{*/
 
-  const Intersection& operator*() const {
-    return dereference();
-  }
-
-  const Intersection* operator->() const {
-    return &(dereference());
-  }
-
   //! Returns an EntityPointer to the corresponding cell in the first subdomain.
   EntityPointer inside() const {
     return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->inside());
@@ -341,6 +346,94 @@ private:
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
 };
+
+
+template<typename GridImp,
+         typename GridView,
+         typename HostGridView,
+         typename IterationController>
+class SubDomainInterfaceIterator : public ForwardIteratorFacade<SubDomainInterfaceIterator<
+                                                                  GridImp,
+                                                                  GridView,
+                                                                  HostGridView,
+                                                                  IterationController
+                                                                  >,
+                                                                SubDomainInterface<
+                                                                  GridImp,
+                                                                  GridView,
+                                                                  HostGridView,
+                                                                  IterationController>
+                                                                >
+{
+
+public:
+
+  typedef SubDomainInterface<
+    GridImp,
+    GridView,
+    HostGridView,
+    IterationController> Intersection;
+
+  static const int dimension = GridImp::dimension;
+  static const int dimensionworld = GridImp::dimensionworld;
+
+  template<typename, typename, typename, typename>
+  friend class ForwardIteratorFacade;
+
+protected:
+
+  SubDomainInterfaceIterator(const GridView& gridView,
+                             const HostGridView& hostGridView,
+                             IterationController controller,
+                             bool end)
+    : _intersection(gridView,hostGridView,controller,end)
+  {
+    this->controller().incrementToStartPosition(_intersection);
+  }
+
+public:
+
+  // The following method has to be public because of non-member comparison operators in the
+  // IteratorFacade framework!
+
+  bool equals(const SubDomainInterfaceIterator& rhs) const {
+    return _intersection == rhs._intersection;
+  }
+
+
+private:
+
+  void increment() {
+    this->controller().increment(_intersection);
+    _intersection.clear();
+  }
+
+
+  const Intersection& dereference() const {
+    return _intersection;
+  }
+
+  IterationController& controller()
+  {
+    return _intersection._controller;
+  }
+
+public:
+
+  const Intersection& operator*() const {
+    return dereference();
+  }
+
+  const Intersection* operator->() const {
+    return &(dereference());
+  }
+
+private:
+
+  Intersection _intersection;
+
+};
+
 
 } // namespace mdgrid
 
