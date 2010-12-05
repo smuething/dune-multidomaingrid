@@ -917,6 +917,52 @@ private:
     return EntityPointerWrapper<codim,GridImp>(e);
   }
 
+
+  template<typename Impl>
+  struct DataHandleWrapper
+    : public Dune::CommDataHandleIF<DataHandleWrapper<Impl>,
+                                    typename Impl::DataType
+                                    >
+  {
+
+    bool contains(int dim, int codim) const
+    {
+      return _impl.contains(dim,codim); // TODO: check if codim supported
+    }
+
+    bool fixedsize(int dim, int codim) const
+    {
+      return _impl.fixedsize(dim,codim);
+    }
+
+    template<typename Entity>
+    std::size_t size(const Entity& e) const
+    {
+      return _impl.size(*_grid.wrapHostEntity(e));
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void gather(MessageBufferImp& buf, const Entity& e) const
+    {
+      _impl.gather(buf,*_grid.wrapHostEntity(e));
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
+    {
+      _impl.scatter(buf,*_grid.wrapHostEntity(e),n);
+    }
+
+    DataHandleWrapper(Impl& impl, const MultiDomainGrid<HostGrid,MDGridTraitsType>& grid)
+      : _impl(impl)
+      , _grid(grid)
+    {}
+
+    Impl& _impl;
+    const MultiDomainGrid<HostGrid,MDGridTraitsType>& _grid;
+
+  };
+
 };
 
 enum MultiDomainGridType { multiDomainGrid, subDomainGrid, other };
