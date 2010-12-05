@@ -9,4 +9,5 @@ testlargedomainnumbers
 testadaptation
 testhierarchy
 iterateallinterfaces
+testparallel
 profilerepartitioning
