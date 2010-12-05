@@ -51,6 +51,37 @@ public:
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
+  struct DataHandle
+  {
+    typedef SubDomainIndexType DataType;
+
+    static bool fixedsize(int dim, int codim)
+    {
+      return true;
+    }
+
+    static std::size_t size(const SingleValueSet& sds)
+    {
+      return 1;
+    }
+
+    template<typename MessageBufferImp>
+    static void gather(MessageBufferImp& buf, const SingleValueSet& sds)
+    {
+      buf.write(sds._set);
+    }
+
+    template<typename MessageBufferImp>
+    static void scatter(MessageBufferImp& buf, SingleValueSet& sds, std::size_t n)
+    {
+      SubDomainIndexType i;
+      buf.read(i);
+      assert(sds._set == emptyTag || sds._set == i);
+      sds._set = i;
+    }
+
+  };
+
   Iterator begin() const {
     return &_set;
   }

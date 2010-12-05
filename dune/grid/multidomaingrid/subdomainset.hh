@@ -200,6 +200,7 @@ namespace sds_detail {
 
 //! @endcond
 
+
 template<typename SubDomainIndexT, std::size_t capacity>
 class IntegralTypeSubDomainSet {
 
@@ -218,6 +219,36 @@ public:
   typedef SubDomainIndexType DomainType DUNE_DEPRECATED;
   typedef sds_detail::Iterator<SubDomainIndexType,SetStorage> Iterator;
   typedef IntegralTypeSubDomainSet<SubDomainIndexType,capacity> This;
+
+  struct DataHandle
+  {
+    typedef SetStorage DataType;
+
+    static bool fixedsize(int dim, int codim)
+    {
+      return true;
+    }
+
+    static std::size_t size(const IntegralTypeSubDomainSet& sds)
+    {
+      return 1;
+    }
+
+    template<typename MessageBufferImp>
+    static void gather(MessageBufferImp& buf, const IntegralTypeSubDomainSet& sds)
+    {
+      buf.write(sds._set);
+    }
+
+    template<typename MessageBufferImp>
+    static void scatter(MessageBufferImp& buf, IntegralTypeSubDomainSet& sds, std::size_t n)
+    {
+      IntegralTypeSubDomainSet h;
+      buf.read(h._set);
+      sds.addAll(h);
+    }
+
+  };
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
