@@ -565,6 +565,58 @@ private:
   SubDomainGrid(const SubDomainGrid& rv);
   SubDomainGrid& operator=(const SubDomainGrid& rv);
 
+
+  template<typename Impl>
+  struct DataHandleWrapper
+    : public Dune::CommDataHandleIF<DataHandleWrapper<Impl>,
+                                    typename Impl::DataType
+                                    >
+  {
+
+    bool contains(int dim, int codim) const
+    {
+      return _impl.contains(dim,codim); // TODO: check if codim supported
+    }
+
+    bool fixedsize(int dim, int codim) const
+    {
+      //_impl.fixedsize(dim,codim); // TODO: warning if true?
+      return false;
+    }
+
+    template<typename Entity>
+    std::size_t size(const Entity& e) const
+    {
+      if (_grid.containsHostEntity(e))
+        return _impl.size(*_grid.subDomainEntityPointer(_grid._grid.wrapHostEntity(e)));
+      else
+        return 0;
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void gather(MessageBufferImp& buf, const Entity& e) const
+    {
+      if (_grid.containsHostEntity(e))
+        _impl.gather(buf,*_grid.subDomainEntityPointer(_grid._grid.wrapHostEntity(e)));
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
+    {
+      if (_grid.containsHostEntity(e))
+        _impl.scatter(buf,*_grid.subDomainEntityPointer(_grid._grid.wrapHostEntity(e)),n);
+    }
+
+    DataHandleWrapper(Impl& impl, const SubDomainGrid<MDGrid>& grid)
+      : _impl(impl)
+      , _grid(grid)
+    {}
+
+    Impl& _impl;
+    SubDomainGrid<MDGrid>& _grid;
+
+  };
+
 };
 
 } // namespace subdomain
