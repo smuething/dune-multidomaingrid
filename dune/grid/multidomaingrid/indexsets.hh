@@ -101,28 +101,56 @@ struct invokeIf<false,Impl, resulttype> {
 };
 
 //! \internal Template meta program for dispatching a method to the correctly parameterised template method base on a run-time parameter
-template<typename Impl, typename resulttype, typename MDGridTraits, int codim>
-struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1> {
+template<typename Impl, typename resulttype, typename MDGridTraits, int codim, bool protect = true>
+struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1,protect> {
 
   typedef resulttype result_type;
 
   result_type dispatch(int cc) {
     if (cc == codim)
       return invokeIf<MDGridTraits::template Codim<codim>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template invoke<codim>();
-    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1>&>(*this).dispatch(cc);
+    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1,protect>&>(*this).dispatch(cc);
   }
 
 };
 
 //! \internal Recursion limit for dispatchToCodim
 template<typename Impl, typename resulttype, typename MDGridTraits>
-struct dispatchToCodim<Impl,resulttype,MDGridTraits,0> {
+struct dispatchToCodim<Impl,resulttype,MDGridTraits,0,true> {
 
   typedef resulttype result_type;
 
   result_type dispatch(int cc) {
     if (cc == 0)
       return invokeIf<MDGridTraits::template Codim<0>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template invoke<0>();
+    DUNE_THROW(GridError,"invalid codimension specified");
+  }
+
+};
+
+//! \internal Template meta program for dispatching a method to the correctly parameterised template method base on a run-time parameter
+template<typename Impl, typename resulttype, typename MDGridTraits, int codim>
+struct dispatchToCodim<Impl,resulttype,MDGridTraits,codim,false> : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1,false> {
+
+  typedef resulttype result_type;
+
+  result_type dispatch(int cc) {
+    if (cc == codim)
+      return static_cast<Impl&>(*this).template invoke<codim>();
+    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1,false>&>(*this).dispatch(cc);
+  }
+
+};
+
+//! \internal Recursion limit for dispatchToCodim
+template<typename Impl, typename resulttype, typename MDGridTraits>
+struct dispatchToCodim<Impl,resulttype,MDGridTraits,0,false> {
+
+  typedef resulttype result_type;
+
+  result_type dispatch(int cc) {
+    if (cc == 0)
+      return static_cast<Impl&>(*this).template invoke<0>();
     DUNE_THROW(GridError,"invalid codimension specified");
   }
 
@@ -297,8 +325,8 @@ private:
   typedef std::vector<boost::shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
 
   //! Convenience subclass of dispatchToCodim for automatically passing in the MDGridTraits and the dimension
-  template<typename Impl,typename result_type>
-  struct dispatchToCodim : public detail::dispatchToCodim<Impl,result_type,MDGridTraits,dimension> {};
+  template<typename Impl,typename result_type, bool protect = true>
+  struct dispatchToCodim : public detail::dispatchToCodim<Impl,result_type,MDGridTraits,dimension,protect> {};
 
 public:
 
