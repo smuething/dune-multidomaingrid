@@ -79,12 +79,17 @@ class EntityWrapper :
   friend class MultiDomainGrid;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::Entity HostEntity;
 
 public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
   EntityWrapper(const HostEntityPointer& e) :
+    _hostEntityPointer(e)
+  {}
+
+  EntityWrapper(const HostEntity& e) :
     _hostEntityPointer(e)
   {}
 

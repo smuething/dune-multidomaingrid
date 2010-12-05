@@ -24,9 +24,14 @@ public:
   typedef EntityPointerWrapper<codim,GridImp> Base;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::Entity HostEntity;
 
   EntityPointerWrapper(const HostEntityPointer& hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
+  {}
+
+  EntityPointerWrapper(const HostEntity& hostEntity) :
+    _entityWrapper(hostEntity)
   {}
 
   EntityPointerWrapper(const EntityWrapper<codim,dim,GridImp>& entity) :
