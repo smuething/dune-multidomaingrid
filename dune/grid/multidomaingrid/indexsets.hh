@@ -411,6 +411,32 @@ public:
 
 private:
 
+  //! Returns a mutable reference to the SubDomainSet of the given entity.
+  template<typename EntityType>
+  typename MapEntry<EntityType::codimension>::SubDomainSet& subDomains(const EntityType& e) {
+    return subDomainsForHostEntity(_grid.hostEntity(e));
+  }
+
+  //! Returns a mutable reference to the SubDomainSet of the given entity with codimension cc.
+  //! \tparam cc the codimension of the entity.
+  template<int cc>
+  typename MapEntry<cc>::SubDomainSet& subDomains(const typename remove_const<GridImp>::type::Traits::template Codim<cc>::Entity& e) {
+    return subDomainsForHostEntity<cc>(_grid.hostEntity(e));
+  }
+
+  //! Returns a mutable reference to the SubDomainSet of the given host entity.
+  template<typename HostEntity>
+  typename MapEntry<HostEntity::codimension>::SubDomainSet& subDomainsForHostEntity(const HostEntity& e) {
+    return subDomainsForHostEntity<HostEntity::codimension>(e);
+  }
+
+  //! Returns a mutable reference to the SubDomainSet of the given entity with codimension cc.
+  //! \tparam cc the codimension of the entity.
+  template<int cc>
+  typename MapEntry<cc>::SubDomainSet& subDomainsForHostEntity(const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<cc>::Entity& he) {
+    return indexMap<cc>().find(he.type())->second[_hostGridView.indexSet().index(he)].domains;
+  }
+
   //! Returns a constant reference to the SubDomainSet of the given host entity.
   template<typename HostEntity>
   const typename MapEntry<HostEntity::codimension>::SubDomainSet& subDomainsForHostEntity(const HostEntity& e) const {
