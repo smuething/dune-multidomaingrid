@@ -497,12 +497,18 @@ private:
 
   template<typename EntityType>
   bool containsMultiDomainEntity(const EntityType& e) const {
-    return levelIndexSet(e.level()).containsMultiDomainEntity(e);
+    if (_grid.supportLevelIndexSets())
+      return levelIndexSet(e.level()).containsMultiDomainEntity(e);
+    else
+      return leafIndexSet().containsMultiDomainEntity(e);
   }
 
   template<typename EntityType>
   bool containsHostEntity(const EntityType& e) const {
-    return levelIndexSet(e.level()).containsHostEntity(e);
+    if (_grid.supportLevelIndexSets())
+      return levelIndexSet(e.level()).containsHostEntity(e);
+    else
+      return leafIndexSet().containsHostEntity(e);
   }
 
   SubDomainGrid(const SubDomainGrid& rv);
