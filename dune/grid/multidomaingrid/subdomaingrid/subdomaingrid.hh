@@ -619,7 +619,7 @@ private:
     {}
 
     Impl& _impl;
-    SubDomainGrid<MDGrid>& _grid;
+    const SubDomainGrid<MDGrid>& _grid;
 
   };
 
