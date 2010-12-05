@@ -639,6 +639,25 @@ public:
     return _hostGrid.comm();
   }
 
+  template<typename DataHandleImp, typename DataTypeImp>
+  void communicate (CommDataHandleIF<DataHandleImp,DataTypeImp> &data,
+                    InterfaceType iftype,
+                    CommunicationDirection dir,
+                    int level) const
+  {
+    DataHandleWrapper<CommDataHandleIF<DataHandleImp,DataTypeImp> > datahandle(data,*this);
+    _hostGrid.communicate(datahandle,iftype,dir,level);
+  }
+
+  template<typename DataHandleImp, typename DataTypeImp>
+  void communicate (CommDataHandleIF<DataHandleImp,DataTypeImp> &data,
+                    InterfaceType iftype,
+                    CommunicationDirection dir) const
+  {
+    DataHandleWrapper<CommDataHandleIF<DataHandleImp,DataTypeImp> > datahandle(data,*this);
+    _hostGrid.communicate(datahandle,iftype,dir);
+  }
+
   size_t numBoundarySegments() const
   {
     return _hostGrid.numBoundarySegments();
