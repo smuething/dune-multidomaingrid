@@ -36,14 +36,14 @@ namespace Capabilities {
   template<class HostGrid, typename MDGridTraits>
   struct isParallel<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
-    static const bool v = false; //isParallel<HostGrid>::v;
+    static const bool v = isParallel<HostGrid>::v;
   };
 
 
   template<class HostGrid, typename MDGridTraits, int codim>
   struct canCommunicate<MultiDomainGrid<HostGrid,MDGridTraits>, codim>
   {
-    static const bool v = false; //isParallel<HostGrid>::v;
+    static const bool v = canCommunicate<HostGrid,codim>::v;
   };
 
 
