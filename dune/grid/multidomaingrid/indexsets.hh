@@ -908,6 +908,27 @@ private:
 
   };
 
+  struct SelectionDataHandle
+    : public SubDomainSetDataHandleBase<SelectionDataHandle>
+  {
+
+    bool contains(int dim, int codim) const
+    {
+      return codim == 0;
+    }
+
+    SelectionDataHandle(ThisType& indexSet)
+      : SubDomainSetDataHandleBase<SelectionDataHandle>(indexSet)
+    {}
+
+  };
+
+  void communicateSubDomainSelection()
+  {
+    SelectionDataHandle dh(*this);
+    _hostGridView.template communicate<SelectionDataHandle>(dh,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
+  }
+
 };
 
 } // namespace mdgrid
