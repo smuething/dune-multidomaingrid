@@ -868,6 +868,46 @@ private:
     return getSupportsCodim().dispatch(codim);
   }
 
+  template<typename Impl>
+  struct SubDomainSetDataHandleBase
+    : public Dune::CommDataHandleIF<Impl,
+                                    typename MapEntry<0>::SubDomainSet::DataHandle::DataType
+                                    >
+  {
+    typedef typename MapEntry<0>::SubDomainSet SubDomainSet;
+    typedef typename SubDomainSet::DataHandle DataHandle;
+
+    bool fixedsize(int dim, int codim) const
+    {
+      return DataHandle::fixedsize(dim,codim);
+    }
+
+    template<typename Entity>
+    std::size_t size(const Entity& e) const
+    {
+      return MapEntry<Entity::codimension>::SubDomainSet::DataHandle::size(_indexSet.subDomainsForHostEntity(e));
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void gather(MessageBufferImp& buf, const Entity& e) const
+    {
+      MapEntry<Entity::codimension>::SubDomainSet::DataHandle::gather(buf,_indexSet.subDomainsForHostEntity(e));
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
+    {
+      MapEntry<Entity::codimension>::SubDomainSet::DataHandle::scatter(buf,_indexSet.subDomainsForHostEntity(e),n);
+    }
+
+    SubDomainSetDataHandleBase(ThisType& indexSet)
+      : _indexSet(indexSet)
+    {}
+
+    ThisType& _indexSet;
+
+  };
+
 };
 
 } // namespace mdgrid
