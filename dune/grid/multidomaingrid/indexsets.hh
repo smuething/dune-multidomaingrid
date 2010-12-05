@@ -853,6 +853,21 @@ private:
     {}
   };
 
+  //! functor template for retrieving a subindex.
+  struct getSupportsCodim : public dispatchToCodim<getSupportsCodim,bool,false> {
+
+    template<int codim>
+    bool invoke() const {
+      return MDGridTraits::template Codim<codim>::supported && Dune::Capabilities::hasEntity<HostGrid,codim>::v;
+    }
+
+  };
+
+  bool supportsCodim(int codim) const
+  {
+    return getSupportsCodim().dispatch(codim);
+  }
+
 };
 
 } // namespace mdgrid
