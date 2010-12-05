@@ -923,10 +923,32 @@ private:
 
   };
 
+  struct BorderPropagationDataHandle
+    : public SubDomainSetDataHandleBase<BorderPropagationDataHandle>
+  {
+
+    bool contains(int dim, int codim) const
+    {
+      return codim > 0 && this->_indexSet.supportsCodim(codim);
+    }
+
+    BorderPropagationDataHandle(ThisType& indexSet)
+      : SubDomainSetDataHandleBase<BorderPropagationDataHandle>(indexSet)
+    {}
+
+  };
+
+
   void communicateSubDomainSelection()
   {
     SelectionDataHandle dh(*this);
     _hostGridView.template communicate<SelectionDataHandle>(dh,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
+  }
+
+  void propagateBorderEntitySubDomains()
+  {
+    BorderPropagationDataHandle dh(*this);
+    _hostGridView.communicate(dh,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
   }
 
 };
