@@ -906,6 +906,17 @@ private:
     return typename GridView::IntersectionIterator::ImplementationType(iit);
   }
 
+  template<typename Entity>
+  typename Traits::template Codim<Entity::codimension>::EntityPointer wrapHostEntity(const Entity& e) const {
+    return wrapHostEntity<Entity::codimension>(e);
+  }
+
+  template<int codim>
+  typename Traits::template Codim<codim>::EntityPointer wrapHostEntity(const typename HostGrid::template Codim<codim>::Entity& e)
+  {
+    return EntityPointerWrapper<codim,GridImp>(e);
+  }
+
 };
 
 enum MultiDomainGridType { multiDomainGrid, subDomainGrid, other };
