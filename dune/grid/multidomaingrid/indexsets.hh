@@ -756,6 +756,9 @@ private:
     for (typename LevelIndexSets::iterator it = levelIndexSets.begin(); it != levelIndexSets.end(); ++it) {
       (*it)->reset(full);
     }
+
+    this->communicateSubDomainSelection();
+
     HostEntityIterator end = _hostGridView.template end<0>();
     typename Containers<0>::IndexMap& im = indexMap<0>();
     typename Containers<0>::SizeMap& sm = sizeMap<0>();
@@ -772,6 +775,9 @@ private:
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
       applyToCodims(markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
+
+    propagateBorderEntitySubDomains();
+
     applyToCodims(updateSubIndices(*this));
     applyToCodims(updatePerCodimSizes());
     for(typename LevelIndexSets::iterator it = levelIndexSets.begin(); it != levelIndexSets.end(); ++it) {
@@ -785,6 +791,9 @@ private:
     HostEntityIterator end = _hostGridView.template end<0>();
     typename Containers<0>::IndexMap& im = indexMap<0>();
     typename Containers<0>::SizeMap& sm = sizeMap<0>();
+
+    communicateSubDomainSelection();
+
     for (HostEntityIterator it  = _hostGridView.template begin<0>(); it != end; ++it) {
       const HostEntity& he = *it;
       const GeometryType hgt = he.type();
@@ -793,6 +802,9 @@ private:
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
       applyToCodims(markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
     }
+
+    propagateBorderEntitySubDomains();
+
     applyToCodims(updateSubIndices(*this));
     applyToCodims(updatePerCodimSizes());
   }
