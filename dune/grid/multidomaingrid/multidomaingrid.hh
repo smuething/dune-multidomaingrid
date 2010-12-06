@@ -931,9 +931,9 @@ private:
   }
 
   template<int codim>
-  typename Traits::template Codim<codim>::EntityPointer wrapHostEntity(const typename HostGrid::template Codim<codim>::Entity& e)
+  typename Traits::template Codim<codim>::EntityPointer wrapHostEntity(const typename HostGrid::template Codim<codim>::Entity& e) const
   {
-    return EntityPointerWrapper<codim,GridImp>(e);
+    return EntityPointerWrapper<codim,const GridImp>(e);
   }
 
 
