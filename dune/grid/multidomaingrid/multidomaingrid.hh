@@ -729,6 +729,7 @@ public:
   void addToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
+    assert(e.partitionType() == Dune::InteriorEntity);
     _maxAssignedSubDomainIndex = std::max(_maxAssignedSubDomainIndex,subDomain);
     _tmpLeafIndexSet->addToSubDomain(subDomain,e);
   }
@@ -737,6 +738,7 @@ public:
   void removeFromSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
+    assert(e.partitionType() == Dune::InteriorEntity);
     _tmpLeafIndexSet->removeFromSubDomain(subDomain,e);
   }
 
@@ -744,6 +746,7 @@ public:
   void assignToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
+    assert(e.partitionType() == Dune::InteriorEntity);
     _maxAssignedSubDomainIndex = std::max(_maxAssignedSubDomainIndex,subDomain);
     _tmpLeafIndexSet->assignToSubDomain(subDomain,e);
   }
@@ -752,6 +755,7 @@ public:
   void removeFromAllSubDomains(const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
+    assert(e.partitionType() == Dune::InteriorEntity);
     _tmpLeafIndexSet->removeFromAllSubDomains(e);
   }
   /*@}*/
