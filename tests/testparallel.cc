@@ -13,11 +13,74 @@
 #include <iterator>
 #include <boost/iterator/counting_iterator.hpp>
 
+template<typename GV, typename DataVector>
+class RankTransfer
+  : public Dune::CommDataHandleIF<RankTransfer<GV,DataVector>,
+                                  int
+                                  >
+{
+
+public:
+
+  bool contains(int dim, int codim) const
+  {
+    return codim == _codim;
+  }
+
+  bool fixedsize(int dim, int codim) const
+  {
+    return true;
+  }
+
+  template<typename Entity>
+  std::size_t size(const Entity& e) const
+  {
+    return 1;
+  }
+
+  template<typename MessageBufferImp, typename Entity>
+  void gather(MessageBufferImp& buf, const Entity& e) const
+  {
+    buf.write(Dune::MPIHelper::getCollectiveCommunication().rank());
+  }
+
+  template<typename MessageBufferImp, typename Entity>
+  void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
+  {
+    int i;
+    buf.read(i);
+    _data[_gv.indexSet().index(e)] |= 1 << i;
+  }
+
+  RankTransfer(const GV& gv, DataVector& data, int codim)
+    : _gv(gv)
+    , _data(data)
+    , _codim(codim)
+  {}
+
+private:
+  GV _gv;
+  DataVector& _data;
+  const int _codim;
+
+};
+
 int main(int argc, char** argv)
 {
   try {
     const int dim = 2;
     Dune::MPIHelper& mpihelper = Dune::MPIHelper::instance(argc,argv);
+
+    /* helper code for attaching debugger
+    if (mpihelper.rank() == 0)
+      {
+        volatile int i = 0;
+        std::cout << getpid() << std::endl;
+        while (i == 0)
+          sleep(5);
+      }
+    */
+
     const Dune::FieldVector<double,dim> h(1.0);
     const Dune::FieldVector<int,dim> s(atoi(argv[1]));
     const Dune::FieldVector<bool,dim> p(false);
@@ -26,8 +89,8 @@ int main(int argc, char** argv)
     //typedef HostGrid::LeafGridView GV;
     //GV gv = grid.leafView();
 
-    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,16> > MDGrid;
-    typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
+    typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
+    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
 
     MDGrid grid(hostgrid,true);
     typedef MDGrid::LeafGridView MDGV;
@@ -79,12 +142,30 @@ int main(int argc, char** argv)
           std::cout << " " << *sdit;
         std::cout << std::endl;
       }
+
     for (SubDomainIndexType s = 0; s < 8; ++s)
       {
         typedef MDGrid::SubDomainGrid SDGrid;
         typedef SDGrid::LeafGridView SDGV;
         const SDGrid& sdgrid = grid.subDomain(s);
         SDGV sdgv = sdgrid.leafView();
+
+        typedef std::vector<std::size_t> DataVector;
+        DataVector celldata(sdgv.size(0));
+        std::fill(celldata.begin(),celldata.end(),1 << mpihelper.rank());
+
+        typedef RankTransfer<SDGV,DataVector> DataHandle;
+        DataHandle celldatahandle(sdgv,celldata,0);
+
+        sdgrid.communicate(celldatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
+
+        DataVector nodedata(sdgv.size(dim));
+        std::fill(nodedata.begin(),nodedata.end(),1 << mpihelper.rank());
+
+        DataHandle nodedatahandle(sdgv,nodedata,dim);
+
+        sdgrid.communicate(nodedatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
+
         std::stringstream sstr;
         sstr << "subdomain_" << (char)('a' + s);
         Dune::VTKWriter<SDGV> vtkwriter(sdgv);
@@ -93,9 +174,12 @@ int main(int argc, char** argv)
                   boost::counting_iterator<int>(sdgv.indexSet().size(0)),
                   std::back_inserter(cellIndices));
         std::cout << cellIndices.size() << " " << sdgv.indexSet().size(0) << std::endl;
-        vtkwriter.addCellData(cellIndices,"cell indices");
+        vtkwriter.addCellData(cellIndices,"cell index");
+        vtkwriter.addCellData(celldata,"cell rank");
+        vtkwriter.addVertexData(nodedata,"node rank");
         vtkwriter.write(sstr.str());
       }
+
   }
   catch (std::exception & e) {
     std::cout << "STL ERROR: " << e.what() << std::endl;
