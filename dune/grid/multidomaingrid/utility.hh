@@ -36,7 +36,7 @@ struct GeometryTypeHash {
 
   std::size_t operator()(GeometryType gt) const {
     std::size_t hash = gt.dim() * 509;
-    return gt.dim() < 2 ? hash : hash + static_cast<std::size_t>(gt.basicType());
+    return gt.dim() < 2 ? hash : hash + static_cast<std::size_t>(gt.id());
   }
 
 };
