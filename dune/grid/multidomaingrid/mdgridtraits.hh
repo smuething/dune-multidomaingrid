@@ -98,7 +98,7 @@ struct FewSubDomainsTraits {
     static const std::size_t maxSubDomainsPerEntity = maxSubDomains;
     typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainType,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
-    typedef std::array<int,maxSubDomainIndex> SizeContainer;
+    typedef std::array<int,maxSubDomainIndex+1> SizeContainer;
   };
 
   template<int codim>
