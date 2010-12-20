@@ -78,7 +78,7 @@ namespace Capabilities {
   template<typename HostGrid, typename MDGridTraits>
   struct viewThreadSafe<MultiDomainGrid<HostGrid,MDGridTraits> >
   {
-    static const bool v = true;
+    static const bool v = viewThreadSafe<HostGrid>::v;
   };
 
 } // namespace Capabilities
