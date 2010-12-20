@@ -28,8 +28,7 @@ class IntersectionIteratorWrapper {
   typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
   typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
 
-  typedef typename
-GridImp::ctype ctype;
+  typedef typename GridImp::ctype ctype;
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;
 
