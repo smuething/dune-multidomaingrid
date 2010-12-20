@@ -81,6 +81,14 @@ namespace Capabilities {
     static const bool v = viewThreadSafe<HostGrid>::v;
   };
 
+
+  template<typename HostGrid, typename MDGridTraits>
+  struct hasSingleGeometryType<MultiDomainGrid<HostGrid,MDGridTraits> >
+  {
+    static const bool v = hasSingleGeometryType<HostGrid>::v;
+    static const unsigned int topologyId = hasSingleGeometryType<HostGrid>::topologyId;
+  };
+
 } // namespace Capabilities
 
 
@@ -144,6 +152,13 @@ namespace Capabilities {
     static const bool v = viewThreadSafe<MDGrid>::v;
   };
 
+
+  template<typename MDGrid>
+  struct hasSingleGeometryType<Dune::mdgrid::subdomain::SubDomainGrid<MDGrid> >
+  {
+    static const bool v = hasSingleGeometryType<MDGrid>::v;
+    static const unsigned int topologyId = hasSingleGeometryType<MDGrid>::topologyId;
+  };
 
 } // namespace Capabilities
 
