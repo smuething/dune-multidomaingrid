@@ -43,6 +43,17 @@ protected:
     _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(NULL))
   {}
 
+  IntersectionIteratorWrapper(const IntersectionIteratorWrapper& rhs)
+    : _hostIterator(rhs._hostIterator)
+    , _intersection(GridImp::getRealImplementation(rhs._intersection))
+  {}
+
+  IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs)
+  {
+    _hostIterator = rhs._hostIterator;
+    GridImp::getRealImplementation(_intersection) = GridImp::getRealImplementation(rhs._intersection);
+  }
+
 private:
 
   const HostIntersectionIterator& hostIntersectionIterator() const {

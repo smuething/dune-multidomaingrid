@@ -42,6 +42,11 @@ protected:
     _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(indexSet,NULL))
   {}
 
+  IntersectionIteratorWrapper(const IntersectionIteratorWrapper& rhs)
+    : _multiDomainIterator(rhs._multiDomainIterator)
+    , _intersection(GridImp::getRealImplementation(rhs._intersection))
+  {}
+
   const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
     assert(GridImp::getRealImplementation(_intersection)._indexSet == GridImp::getRealImplementation(rhs._intersection)._indexSet);
     _multiDomainIterator = rhs._multiDomainIterator;
