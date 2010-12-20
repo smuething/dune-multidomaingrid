@@ -116,6 +116,8 @@ struct MultiDomainGridFamily {
       /** \brief The type of the entity pointer for entities of this codim.*/
       typedef Dune::EntityPointer<const GridImp,EntityPointerImp<cd,const GridImp> > EntityPointer;
 
+      typedef EntityPointer EntitySeed;
+
       /**
        * \brief Traits associated with a specific grid partition type.
        * \tparam pitype The type of the grid partition.
