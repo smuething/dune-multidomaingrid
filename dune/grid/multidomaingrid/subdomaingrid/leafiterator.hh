@@ -18,9 +18,8 @@ class LeafIteratorWrapper :
   template<typename MDGrid>
   friend class SubDomainGrid;
 
-  template<int, PartitionIteratorType, class,
-	   template<int,PartitionIteratorType,class> class>
-  friend class LeafIterator;
+  template< int cd, class Grid, class IteratorImp >
+  friend class EntityIterator;
 
   template<typename,typename>
   friend class EntityPointer;

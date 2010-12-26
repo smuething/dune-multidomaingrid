@@ -16,9 +16,8 @@ class LeafIteratorWrapper :
   template<typename, typename>
   friend class MultiDomainGrid;
 
-  template<int, PartitionIteratorType, class,
-	   template<int,PartitionIteratorType,class> class>
-  friend class LeafIterator;
+  template< int cd, class Grid, class IteratorImp >
+  friend class EntityIterator;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LeafIterator HostLeafIterator;
 
