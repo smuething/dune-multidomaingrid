@@ -12,8 +12,8 @@ class HierarchicIteratorWrapper :
     public EntityPointerWrapper<0,GridImp>
 {
 
-  template<class, template<class> class>
-  friend class HierarchicIterator;
+  template< int cd, class Grid, class IteratorImp >
+  friend class EntityIterator;
 
   template<int, int, typename>
   friend class MakeableEntityWrapper;
