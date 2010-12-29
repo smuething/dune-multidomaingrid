@@ -15,9 +15,8 @@ class LevelIteratorWrapper :
   template<typename>
   friend class SubDomainGrid;
 
-  template<int, PartitionIteratorType, class,
-	   template<int,PartitionIteratorType,class> class>
-  friend class LevelIterator;
+  template< int cd, class Grid, class IteratorImp >
+  friend class EntityIterator;
 
   template<typename,typename>
   friend class EntityPointer;
