@@ -44,3 +44,6 @@ testparallel_SOURCES = testparallel.cc
 testparallel_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
 testparallel_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testparallel_LIBS = $(ALL_PKG_LIBS)
+
+check_PROGRAMS += multidomain-leveliterator-bug
+multidomain_leveliterator_bug_SOURCES = multidomain-leveliterator-bug.cc
