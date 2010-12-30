@@ -48,6 +48,7 @@ class LevelIteratorWrapper :
   const LevelIteratorWrapper& operator=(const LevelIteratorWrapper& rhs) {
     assert(_indexSet == rhs._indexSet);
     _multiDomainIterator = rhs._multiDomainIterator;
+    this->_entityWrapper.reset(_multiDomainIterator);
     _end = rhs._end;
     return *this;
   }

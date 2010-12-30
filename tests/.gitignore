@@ -11,3 +11,4 @@ testhierarchy
 iterateallinterfaces
 testparallel
 profilerepartitioning
+multidomain-leveliterator-bug
