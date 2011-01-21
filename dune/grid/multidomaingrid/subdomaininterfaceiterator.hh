@@ -312,6 +312,22 @@ public:
     return _hostIntersectionIterator->indexInOutside();
   }
 
+  //! Returns the index of the subdomain the first (inside) cell belongs to.
+  /**
+   * \note This method is equivalent to subDomain1().
+   */
+  SubDomainIndexType subDomainInInside() const {
+    return this->subDomain1();
+  }
+
+  //! Returns the index of the subdomain the second (outside) cell belongs to.
+  /**
+   * \note This method is equivalent to subDomain2().
+   */
+  SubDomainIndexType subDomainInOutside() const {
+    return this->subDomain2();
+  }
+
   GlobalCoords outerNormal(const LocalCoords& local) const {
     return _hostIntersectionIterator->outerNormal(local);
   }
