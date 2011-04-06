@@ -293,6 +293,12 @@ class MultiDomainGrid :
   template<typename,typename,typename,typename>
   friend class subdomain::IntersectionWrapper;
 
+  typedef GridDefaultImplementation<HostGrid::dimension,
+                                    HostGrid::dimensionworld,
+                                    typename HostGrid::ctype,
+                                    MultiDomainGridFamily<HostGrid,MDGridTraitsType>
+                                    > BaseT;
+
   typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
   typedef HostGrid HostGridType;
 
@@ -831,6 +837,11 @@ public:
   template<typename EntityType>
   const typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
     return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
+  }
+
+  template<typename IntersectionType>
+  static const typename BaseT::template ReturnImplementationType<IntersectionType>::ImplementationType multiDomainIntersection(const IntersectionType& is) {
+    return getRealImplementation(is).multiDomainIntersection();
   }
  /*@}*/
 
