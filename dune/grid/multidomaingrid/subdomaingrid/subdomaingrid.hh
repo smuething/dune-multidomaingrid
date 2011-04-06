@@ -228,6 +228,12 @@ class SubDomainGrid :
   template<typename GridImp>
   friend class LevelIntersectionWrapper;
 
+  typedef GridDefaultImplementation<MDGrid::dimension,
+                                    MDGrid::dimensionworld,
+                                    typename MDGrid::ctype,
+                                    SubDomainGridFamily<MDGrid>
+                                    > BaseT;
+
   typedef SubDomainGrid<MDGrid> GridImp;
   typedef MDGrid MDGridType;
 
@@ -529,6 +535,12 @@ public:
   static typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) {
     return typename MDGrid::template HostEntityPointer<EntityType>::type(getRealImplementation(e).hostEntity());
   }
+
+  template<typename IntersectionType>
+  static const typename BaseT::template ReturnImplementationType<IntersectionType>::ImplementationType multiDomainIntersection(const IntersectionType& is) {
+    return getRealImplementation(is).multiDomainIntersection();
+  }
+
   /*@}*/
 
   typename Traits::LeafIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {

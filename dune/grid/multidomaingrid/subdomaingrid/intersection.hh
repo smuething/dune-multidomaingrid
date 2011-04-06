@@ -194,6 +194,11 @@ private:
     return _intersectionType;
   }
 
+  const MultiDomainIntersection& multiDomainIntersection() const
+  {
+    return _multiDomainIntersection;
+  }
+
 private:
 
   bool isSet() const {
