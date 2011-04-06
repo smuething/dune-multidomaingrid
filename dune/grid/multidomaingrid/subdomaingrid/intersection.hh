@@ -73,6 +73,7 @@ private:
       if (_multiDomainIntersection->boundary()) {
         _intersectionType = GridImp::boundary;
       } else {
+        // FIXME: handle processor boundaries correctly!
         if (_indexSet.containsMultiDomainEntity(*(_multiDomainIntersection->outside()))) {
           _intersectionType = GridImp::neighbor;
         } else {
