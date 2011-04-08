@@ -537,7 +537,13 @@ public:
   }
 
   template<typename IntersectionType>
-  static const typename BaseT::template ReturnImplementationType<IntersectionType>::ImplementationType multiDomainIntersection(const IntersectionType& is) {
+  struct MultiDomainIntersection
+  {
+    typedef typename BaseT::template ReturnImplementationType<IntersectionType>::ImplementationType::MultiDomainIntersection Type;
+  };
+
+  template<typename IntersectionType>
+  static const typename MultiDomainIntersection<IntersectionType>::Type& multiDomainIntersection(const IntersectionType& is) {
     return getRealImplementation(is).multiDomainIntersection();
   }
 
