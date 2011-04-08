@@ -47,3 +47,6 @@ testparallel_LIBS = $(ALL_PKG_LIBS)
 
 check_PROGRAMS += multidomain-leveliterator-bug
 multidomain_leveliterator_bug_SOURCES = multidomain-leveliterator-bug.cc
+
+check_PROGRAMS += testintersectionconversion
+testintersectionconversion_SOURCES = testintersectionconversion.cc
