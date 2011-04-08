@@ -196,7 +196,7 @@ private:
 
   const MultiDomainIntersection& multiDomainIntersection() const
   {
-    return _multiDomainIntersection;
+    return *_multiDomainIntersection;
   }
 
 private:
