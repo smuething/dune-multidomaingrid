@@ -840,8 +840,8 @@ public:
   }
 
   template<typename IntersectionType>
-  static const typename BaseT::template ReturnImplementationType<IntersectionType>::ImplementationType multiDomainIntersection(const IntersectionType& is) {
-    return getRealImplementation(is).multiDomainIntersection();
+  static const typename SubDomainGrid::template MultiDomainIntersection<IntersectionType>::Type& multiDomainIntersection(const IntersectionType& is) {
+    return SubDomainGrid::multiDomainIntersection(is);
   }
  /*@}*/
 

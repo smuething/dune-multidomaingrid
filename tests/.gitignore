@@ -12,3 +12,4 @@ iterateallinterfaces
 testparallel
 profilerepartitioning
 multidomain-leveliterator-bug
+testintersectionconversion
