@@ -2,6 +2,7 @@
 
 #include <dune/common/mpihelper.hh>
 #include <dune/grid/yaspgrid.hh>
+#include <dune/grid/uggrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <iostream>
@@ -65,44 +66,24 @@ private:
 
 };
 
-int main(int argc, char** argv)
+template<typename HostGrid>
+void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper)
 {
-  try {
-    const int dim = 2;
-    Dune::MPIHelper& mpihelper = Dune::MPIHelper::instance(argc,argv);
+  const int dim = HostGrid::dimension;
+  typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
+  //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
 
-    /* helper code for attaching debugger
-    if (mpihelper.rank() == 0)
-      {
-        volatile int i = 0;
-        std::cout << getpid() << std::endl;
-        while (i == 0)
-          sleep(5);
-      }
-    */
+  MDGrid grid(hostgrid,true);
+  typedef typename MDGrid::LeafGridView MDGV;
+  typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
+  MDGV mdgv = grid.leafView();
 
-    const Dune::FieldVector<double,dim> h(1.0);
-    const Dune::FieldVector<int,dim> s(atoi(argv[1]));
-    const Dune::FieldVector<bool,dim> p(false);
-    typedef Dune::YaspGrid<dim> HostGrid;
-    HostGrid hostgrid(Dune::MPIHelper::getCommunicator(),h,s,p,atoi(argv[2]));
-    //typedef HostGrid::LeafGridView GV;
-    //GV gv = grid.leafView();
+  grid.startSubDomainMarking();
 
-    typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
-    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
-
-    MDGrid grid(hostgrid,true);
-    typedef MDGrid::LeafGridView MDGV;
-    typedef MDGrid::SubDomainIndexType SubDomainIndexType;
-    MDGV mdgv = grid.leafView();
-
-    grid.startSubDomainMarking();
-
-    for (auto it = mdgv.begin<0>(); it != mdgv.end<0>(); ++it)
-      {
-        if (it->partitionType() != Dune::InteriorEntity)
-          continue;
+  for (auto it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
+    {
+      if (it->partitionType() != Dune::InteriorEntity)
+        continue;
       SubDomainIndexType subdomain = 0;
       if (it->geometry().center()[0] > 0.5)
         subdomain += 1;
@@ -119,66 +100,95 @@ int main(int argc, char** argv)
         grid.addToSubDomain(7,*it);
     }
 
-    grid.preUpdateSubDomains();
-    grid.updateSubDomains();
-    grid.postUpdateSubDomains();
+  grid.preUpdateSubDomains();
+  grid.updateSubDomains();
+  grid.postUpdateSubDomains();
 
-    for (auto it = mdgv.begin<0>(); it != mdgv.end<0>(); ++it)
+  for (auto it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
+    {
+      std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(*it) << "  " << it->geometry().center()
+                << " subdomains:";
+      auto end = mdgv.indexSet().subDomains(*it).end();
+      for (auto sdit = mdgv.indexSet().subDomains(*it).begin(); sdit != end; ++sdit)
+        std::cout << " " << *sdit;
+      std::cout << std::endl;
+    }
+
+  std::cout << std::endl;
+  for (auto it = mdgv.template begin<dim>(); it != mdgv.template end<dim>(); ++it)
+    {
+      std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(*it) << "  " << it->geometry().center()
+                << " subdomains:";
+      auto end = mdgv.indexSet().subDomains(*it).end();
+      for (auto sdit = mdgv.indexSet().subDomains(*it).begin(); sdit != end; ++sdit)
+        std::cout << " " << *sdit;
+      std::cout << std::endl;
+    }
+
+  for (SubDomainIndexType s = 0; s < 8; ++s)
+    {
+      typedef typename MDGrid::SubDomainGrid SDGrid;
+      typedef typename SDGrid::LeafGridView SDGV;
+      const SDGrid& sdgrid = grid.subDomain(s);
+      SDGV sdgv = sdgrid.leafView();
+
+      typedef std::vector<std::size_t> DataVector;
+      DataVector celldata(sdgv.size(0));
+      std::fill(celldata.begin(),celldata.end(),1 << mpihelper.rank());
+
+      typedef RankTransfer<SDGV,DataVector> DataHandle;
+      DataHandle celldatahandle(sdgv,celldata,0);
+
+      sdgrid.communicate(celldatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
+
+      DataVector nodedata(sdgv.size(dim));
+      std::fill(nodedata.begin(),nodedata.end(),1 << mpihelper.rank());
+
+      DataHandle nodedatahandle(sdgv,nodedata,dim);
+
+      sdgrid.communicate(nodedatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
+
+      std::stringstream sstr;
+      sstr << prefix << "_subdomain_" << (char)('a' + s);
+      Dune::VTKWriter<SDGV> vtkwriter(sdgv);
+      std::vector<int> cellIndices;
+      std::copy(boost::counting_iterator<int>(0),
+                boost::counting_iterator<int>(sdgv.indexSet().size(0)),
+                std::back_inserter(cellIndices));
+      std::cout << cellIndices.size() << " " << sdgv.indexSet().size(0) << std::endl;
+      vtkwriter.addCellData(cellIndices,"cell index");
+      vtkwriter.addCellData(celldata,"cell rank");
+      vtkwriter.addVertexData(nodedata,"node rank");
+      vtkwriter.write(sstr.str());
+    }
+}
+
+
+int main(int argc, char** argv)
+{
+  try {
+    const int dim = 2;
+    Dune::MPIHelper& mpihelper = Dune::MPIHelper::instance(argc,argv);
+
+    /* helper code for attaching debugger
+    if (mpihelper.rank() == 0)
       {
-        std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(*it) << "  " << it->geometry().center()
-                  << " subdomains:";
-        auto end = mdgv.indexSet().subDomains(*it).end();
-        for (auto sdit = mdgv.indexSet().subDomains(*it).begin(); sdit != end; ++sdit)
-          std::cout << " " << *sdit;
-        std::cout << std::endl;
+        volatile int i = 0;
+        std::cout << getpid() << std::endl;
+        while (i == 0)
+          sleep(5);
       }
-    std::cout << std::endl;
-    for (auto it = mdgv.begin<dim>(); it != mdgv.end<dim>(); ++it)
-      {
-        std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(*it) << "  " << it->geometry().center()
-                  << " subdomains:";
-        auto end = mdgv.indexSet().subDomains(*it).end();
-        for (auto sdit = mdgv.indexSet().subDomains(*it).begin(); sdit != end; ++sdit)
-          std::cout << " " << *sdit;
-        std::cout << std::endl;
-      }
+    */
 
-    for (SubDomainIndexType s = 0; s < 8; ++s)
-      {
-        typedef MDGrid::SubDomainGrid SDGrid;
-        typedef SDGrid::LeafGridView SDGV;
-        const SDGrid& sdgrid = grid.subDomain(s);
-        SDGV sdgv = sdgrid.leafView();
+    {
+      const Dune::FieldVector<double,dim> h(1.0);
+      const Dune::FieldVector<int,dim> s(atoi(argv[1]));
+      const Dune::FieldVector<bool,dim> p(false);
+      typedef Dune::YaspGrid<dim> HostGrid;
+      HostGrid hostgrid(Dune::MPIHelper::getCommunicator(),h,s,p,atoi(argv[2]));
 
-        typedef std::vector<std::size_t> DataVector;
-        DataVector celldata(sdgv.size(0));
-        std::fill(celldata.begin(),celldata.end(),1 << mpihelper.rank());
-
-        typedef RankTransfer<SDGV,DataVector> DataHandle;
-        DataHandle celldatahandle(sdgv,celldata,0);
-
-        sdgrid.communicate(celldatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
-
-        DataVector nodedata(sdgv.size(dim));
-        std::fill(nodedata.begin(),nodedata.end(),1 << mpihelper.rank());
-
-        DataHandle nodedatahandle(sdgv,nodedata,dim);
-
-        sdgrid.communicate(nodedatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
-
-        std::stringstream sstr;
-        sstr << "subdomain_" << (char)('a' + s);
-        Dune::VTKWriter<SDGV> vtkwriter(sdgv);
-        std::vector<int> cellIndices;
-        std::copy(boost::counting_iterator<int>(0),
-                  boost::counting_iterator<int>(sdgv.indexSet().size(0)),
-                  std::back_inserter(cellIndices));
-        std::cout << cellIndices.size() << " " << sdgv.indexSet().size(0) << std::endl;
-        vtkwriter.addCellData(cellIndices,"cell index");
-        vtkwriter.addCellData(celldata,"cell rank");
-        vtkwriter.addVertexData(nodedata,"node rank");
-        vtkwriter.write(sstr.str());
-      }
+      testGrid(hostgrid,"YaspGrid_2",mpihelper);
+    }
 
   }
   catch (std::exception & e) {
