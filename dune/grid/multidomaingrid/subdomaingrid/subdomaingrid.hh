@@ -263,7 +263,7 @@ public:
   typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
   typedef MDGridType MultiDomainGrid;
 
-  enum IntersectionType { neighbor, foreign, boundary };
+  enum IntersectionType { neighbor, foreign, boundary, processor };
 
 public:
 
