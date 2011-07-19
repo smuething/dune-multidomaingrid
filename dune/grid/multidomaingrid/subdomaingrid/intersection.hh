@@ -72,20 +72,28 @@ private:
     if (!_intersectionTypeTested) {
       if (_multiDomainIntersection->boundary()) {
         _intersectionType = GridImp::boundary;
-      } else {
-        // FIXME: handle processor boundaries correctly!
-        if (_indexSet.containsMultiDomainEntity(*(_multiDomainIntersection->outside()))) {
-          _intersectionType = GridImp::neighbor;
-        } else {
-          _intersectionType = GridImp::foreign;
-        }
+        return;
       }
+      if (!_multiDomainIntersection->neighbor()) {
+        _intersectionType = GridImp::processor;
+        return;
+      }
+      if (_indexSet.containsMultiDomainEntity(*(_multiDomainIntersection->outside()))) {
+        _intersectionType = GridImp::neighbor;
+        return;
+      } else {
+        _intersectionType = GridImp::foreign;
+        return;
+      }
+      assert(false && "Should never get here - invalid intersection type!");
     }
   }
 
   bool boundary() const {
     checkIntersectionType();
-    return _intersectionType != GridImp::neighbor;
+    return
+      _intersectionType == GridImp::neighbor ||
+      _intersectionType == GridImp::foreign;
   }
 
   int boundaryId() const {
