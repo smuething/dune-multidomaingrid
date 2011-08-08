@@ -92,7 +92,7 @@ private:
   bool boundary() const {
     checkIntersectionType();
     return
-      _intersectionType == GridImp::neighbor ||
+      _multiDomainIntersection->boundary() ||
       _intersectionType == GridImp::foreign;
   }
 
