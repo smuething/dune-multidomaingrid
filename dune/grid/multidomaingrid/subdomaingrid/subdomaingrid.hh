@@ -8,6 +8,7 @@
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/geometry.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/localgeometry.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/entity.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/entitypointer.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/leafiterator.hh>
@@ -38,6 +39,7 @@ struct SubDomainGridFamily {
 
   template <int dim, int dimw, class GridImp,
             template<int,int,class> class GeometryImp,
+            template<int,int,class> class LocalGeometryImp,
             template<int,int,class> class EntityImp,
             template<int,class> class EntityPointerImp,
             template<int,PartitionIteratorType,class> class LevelIteratorImp,
@@ -80,7 +82,7 @@ struct SubDomainGridFamily {
       /** \brief The type of the geometry associated with the entity.*/
       typedef Dune::Geometry<dim-cd, dimw, const GridImp, GeometryImp> Geometry;
       /** \brief The type of the local geometry associated with the entity.*/
-      typedef Dune::Geometry<dim-cd, dim, const GridImp, GeometryImp> LocalGeometry;
+      typedef Dune::Geometry<dim-cd, dim, const GridImp, LocalGeometryImp> LocalGeometry;
       /** \brief The type of the entity. */
       // we could - if needed - introduce another struct for dimglobal of Geometry
       typedef Dune::Entity<cd, dim, const GridImp, EntityImp> Entity;
@@ -152,6 +154,7 @@ struct SubDomainGridFamily {
     MDGrid::dimensionworld,
     SubDomainGrid<MDGrid>,
     GeometryWrapper,
+    LocalGeometryWrapper,
     EntityWrapper,
     EntityPointerWrapper,
     LevelIteratorWrapper,
@@ -206,6 +209,12 @@ class SubDomainGrid :
 
   template<int mydim, int coorddim, typename GridImp>
   friend class MakeableGeometryWrapper;
+
+  template<int mydim, int coorddim, typename GridImp>
+  friend class LocalGeometryWrapper;
+
+  template<int mydim, int coorddim, typename GridImp>
+  friend class MakeableLocalGeometryWrapper;
 
   template<typename GridImp, typename WrappedIndexSet>
   friend class IndexSetWrapper;

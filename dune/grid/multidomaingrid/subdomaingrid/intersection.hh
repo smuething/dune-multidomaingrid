@@ -231,7 +231,7 @@ private:
 
   const IndexSet& _indexSet;
   const MultiDomainIntersection* _multiDomainIntersection;
-  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
+  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
   mutable bool _intersectionTypeTested;
   mutable typename GridImp::IntersectionType _intersectionType;
