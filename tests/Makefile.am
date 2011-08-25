@@ -49,4 +49,9 @@ check_PROGRAMS += multidomain-leveliterator-bug
 multidomain_leveliterator_bug_SOURCES = multidomain-leveliterator-bug.cc
 
 check_PROGRAMS += testintersectionconversion
-testintersectionconversion_SOURCES = testintersectionconversion.cc
+
+check_PROGRAMS += testintersectiongeometrytypes
+testintersectiongeometrytypes_SOURCES = testintersectiongeometrytypes.cc
+testintersectiongeometrytypes_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
+testintersectiongeometrytypes_LDFLAGS = $(AM_LDFLAGS) $(ALL_PKG_LDFLAGS)
+testintersectiongeometrytypes_LIBS = $(AM_LIBS) $(ALL_PKG_LIBS)
