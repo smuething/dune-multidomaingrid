@@ -302,7 +302,7 @@ private:
   const GridImp& _grid;
   MultiDomainEntityPointer _multiDomainEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
-  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
+  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
 
   const EntityWrapper& operator=(const EntityWrapper& rhs) {
     assert(_grid == rhs._grid);

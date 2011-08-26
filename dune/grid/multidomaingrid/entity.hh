@@ -265,7 +265,7 @@ private:
 
   HostEntityPointer _hostEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
-  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
+  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
 
   void reset(const HostEntityPointer& hostEntityPointer) {
     if (_hostEntityPointer != hostEntityPointer) {
