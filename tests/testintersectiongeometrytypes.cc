@@ -10,6 +10,7 @@
 template<typename HostGrid>
 void run_test(HostGrid& hostgrid)
 {
+  hostgrid.globalRefine(1);
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
   MDGrid mdgrid(hostgrid,true);
 
@@ -37,6 +38,12 @@ void run_test(HostGrid& hostgrid)
        it != endit;
        ++it)
     {
+      it->geometry();
+      it->geometryInFather();
+      const typename MDGrid::LeafGridView::template Codim<0>::Entity& e = sdgrid.multiDomainEntity(*it);
+      e.geometry();
+      e.geometryInFather();
+
       const typename SDGrid::LeafGridView::IntersectionIterator endiit = sdgv.iend(*it);
       for (typename SDGrid::LeafGridView::IntersectionIterator iit = sdgv.ibegin(*it);
            iit != endiit;
