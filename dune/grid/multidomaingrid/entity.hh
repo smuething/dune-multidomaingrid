@@ -46,7 +46,7 @@ class MakeableEntityWrapper :
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
   template<typename HostIteratorOrEntityPointer>
-  MakeableEntityWrapper(const HostIteratorOrEntityPointer& hostEntityPointer) :
+  explicit MakeableEntityWrapper(const HostIteratorOrEntityPointer& hostEntityPointer) :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(hostEntityPointer))
   {}
 
@@ -92,7 +92,7 @@ public:
     _hostEntityPointer(e)
   {}
 
-  EntityWrapper(const HostEntity& e) :
+  explicit EntityWrapper(const HostEntity& e) :
     _hostEntityPointer(e)
   {}
 
@@ -175,7 +175,7 @@ public:
 
 
   template<typename HostIteratorOrEntityPointer>
-  EntityWrapper(const HostIteratorOrEntityPointer& e) :
+  explicit EntityWrapper(const HostIteratorOrEntityPointer& e) :
     _hostEntityPointer(e)
   {}
 

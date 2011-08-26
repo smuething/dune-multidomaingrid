@@ -32,27 +32,27 @@ public:
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::Entity HostEntity;
 
-  EntityPointerWrapper(const HostEntityPointer& hostEntityPointer) :
+  explicit EntityPointerWrapper(const HostEntityPointer& hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
   {}
 
-  EntityPointerWrapper(const HostLeafIterator& hostEntityPointer) :
+  explicit EntityPointerWrapper(const HostLeafIterator& hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
   {}
 
-  EntityPointerWrapper(typename SelectType<!is_same<HostLeafIterator,HostLevelIterator>::value,const HostLevelIterator&,Invalid>::Type hostEntityPointer) :
+  explicit EntityPointerWrapper(typename SelectType<!is_same<HostLeafIterator,HostLevelIterator>::value,const HostLevelIterator&,Invalid>::Type hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
   {}
 
-  EntityPointerWrapper(typename SelectType<codim==0,const HostHierarchicIterator&,Invalid>::Type hostEntityPointer) :
+  explicit EntityPointerWrapper(typename SelectType<codim==0,const HostHierarchicIterator&,Invalid>::Type hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
   {}
 
-  EntityPointerWrapper(const HostEntity& hostEntity) :
+  explicit EntityPointerWrapper(const HostEntity& hostEntity) :
     _entityWrapper(hostEntity)
   {}
 
-  EntityPointerWrapper(const EntityWrapper<codim,dim,GridImp>& entity) :
+  explicit EntityPointerWrapper(const EntityWrapper<codim,dim,GridImp>& entity) :
     _entityWrapper(entity._hostEntityPointer)
   {}
 
