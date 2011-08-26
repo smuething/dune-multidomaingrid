@@ -13,6 +13,8 @@ class EntityPointerWrapper
 
   static const int dim = GridImp::dimension;
 
+  struct Invalid {};
+
 public:
 
   typedef EntityPointerWrapper EntityPointerImp;
@@ -23,8 +25,25 @@ public:
   typedef EntityPointerWrapper<codim,GridImp> Base;
 
   typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
+  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::LeafIterator MultiDomainLeafIterator;
+  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::LevelIterator MultiDomainLevelIterator;
+  typedef typename GridImp::MDGridType::Traits::HierarchicIterator MultiDomainHierarchicIterator;
 
   EntityPointerWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
+    _entityWrapper(grid,multiDomainEntityPointer)
+  {}
+
+  EntityPointerWrapper(const GridImp& grid, const MultiDomainLeafIterator& multiDomainEntityPointer) :
+    _entityWrapper(grid,multiDomainEntityPointer)
+  {}
+
+  EntityPointerWrapper(const GridImp& grid,
+                       const MultiDomainLevelIterator& multiDomainEntityPointer) :
+    _entityWrapper(grid,multiDomainEntityPointer)
+  {}
+
+  EntityPointerWrapper(const GridImp& grid,
+                       typename SelectType<codim==0,const MultiDomainHierarchicIterator&,Invalid>::Type multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 

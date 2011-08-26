@@ -50,12 +50,13 @@ class MakeableEntityWrapper :
 
   typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
 
-
-  MakeableEntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
+  template<typename MultiDomainIteratorOrEntityPointer>
+  MakeableEntityWrapper(const GridImp& grid, const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,multiDomainEntityPointer))
   {}
 
-  void reset(const MultiDomainEntityPointer& multiDomainEntityPointer) {
+  template<typename MultiDomainIteratorOrEntityPointer>
+  void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
     this->getRealImp().reset(multiDomainEntityPointer);
   }
 
@@ -98,7 +99,8 @@ public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
-  EntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& e) :
+  template<typename MultiDomainIteratorOrEntityPointer>
+  EntityWrapper(const GridImp& grid, const MultiDomainIteratorOrEntityPointer& e) :
     _grid(grid),
     _multiDomainEntityPointer(e)
   {}
@@ -143,7 +145,8 @@ private:
     return *this;
   }
 
-  void reset(const MultiDomainEntityPointer& multiDomainEntityPointer) {
+  template<typename MultiDomainIteratorOrEntityPointer>
+  void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
     if (_multiDomainEntityPointer != multiDomainEntityPointer) {
       _geometry.clear();
       _multiDomainEntityPointer = multiDomainEntityPointer;
@@ -200,7 +203,8 @@ public:
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
 
 
-  EntityWrapper(const GridImp& grid, const MultiDomainEntityPointer& e) :
+  template<typename MultiDomainIteratorOrEntityPointer>
+  EntityWrapper(const GridImp& grid, const MultiDomainIteratorOrEntityPointer& e) :
     _grid(grid),
     _multiDomainEntityPointer(e)
   {}
@@ -310,7 +314,8 @@ private:
     return *this;
   }
 
-  void reset(const MultiDomainEntityPointer& multiDomainEntityPointer) {
+  template<typename MultiDomainIteratorOrEntityPointer>
+  void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
     if (_multiDomainEntityPointer != multiDomainEntityPointer) {
       _geometry.clear();
       _fatherGeometry.clear();

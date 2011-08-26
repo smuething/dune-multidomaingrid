@@ -45,11 +45,13 @@ class MakeableEntityWrapper :
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
-  MakeableEntityWrapper(const HostEntityPointer& hostEntityPointer) :
+  template<typename HostIteratorOrEntityPointer>
+  MakeableEntityWrapper(const HostIteratorOrEntityPointer& hostEntityPointer) :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(hostEntityPointer))
   {}
 
-  void reset(const HostEntityPointer& hostEntityPointer) {
+  template<typename HostIteratorOrEntityPointer>
+  void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
     this->getRealImp().reset(hostEntityPointer);
   }
 
@@ -85,7 +87,8 @@ public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
-  EntityWrapper(const HostEntityPointer& e) :
+  template<typename HostIteratorOrEntityPointer>
+  explicit EntityWrapper(const HostIteratorOrEntityPointer& e) :
     _hostEntityPointer(e)
   {}
 
@@ -125,7 +128,8 @@ public:
   HostEntityPointer _hostEntityPointer;
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
-  void reset(const HostEntityPointer& hostEntityPointer) {
+  template<typename HostIteratorOrEntityPointer>
+  void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
     if (_hostEntityPointer != hostEntityPointer) {
       _geometry.clear();
       _hostEntityPointer = hostEntityPointer;
@@ -170,7 +174,8 @@ public:
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
 
 
-  EntityWrapper(const HostEntityPointer& e) :
+  template<typename HostIteratorOrEntityPointer>
+  EntityWrapper(const HostIteratorOrEntityPointer& e) :
     _hostEntityPointer(e)
   {}
 
@@ -267,7 +272,8 @@ private:
   MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
   MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
 
-  void reset(const HostEntityPointer& hostEntityPointer) {
+  template<typename HostIteratorOrEntityPointer>
+  void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
     if (_hostEntityPointer != hostEntityPointer) {
       _geometry.clear();
       _fatherGeometry.clear();
