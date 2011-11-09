@@ -334,6 +334,8 @@ private:
 
   typedef std::map<typename Traits::LocalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> AdaptationStateMap;
 
+  typedef std::map<typename Traits::GlobalIdSet::IdType,typename MDGridTraits::template Codim<0>::SubDomainSet> LoadBalanceStateMap;
+
   // typedefs for extracting the host entity types from our own entities
 
   template<typename Entity>
@@ -676,6 +678,46 @@ public:
     _hostGrid.communicate(datahandle,iftype,dir);
   }
 
+  template<typename DataHandle>
+  bool loadBalance(DataHandle& dataHandle)
+  {
+    typedef typename MultiDomainGrid::LeafGridView GV;
+    GV gv = this->leafView();
+    typedef typename GV::template Codim<0>::Iterator Iterator;
+    typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
+    typedef typename GV::template Codim<0>::Entity Entity;
+    typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
+    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
+      const Entity& e = *it;
+      const SubDomainSet& subDomains = gv.indexSet().subDomains(e);
+      _loadBalanceStateMap[globalIdSet().id(e)] = subDomains;
+    }
+
+    LoadBalancingDataHandle<DataHandle> dataHandleWrapper(*this,dataHandle);
+    if (!_hostGrid.loadBalance(dataHandleWrapper))
+      return false;
+
+    this->startSubDomainMarking();
+
+    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
+      _leafIndexSet.addToSubDomains(_loadBalanceStateMap[globalIdSet().id(*it)],*it);
+    }
+
+    this->preUpdateSubDomains();
+    this->updateSubDomains();
+    this->postUpdateSubDomains();
+
+    _loadBalanceStateMap.clear();
+
+    return true;
+  }
+
+  bool loadBalance()
+  {
+    EmptyDataHandle emptyDataHandle;
+    return loadBalance(emptyDataHandle);
+  }
+
   size_t numBoundarySegments() const
   {
     return _hostGrid.numBoundarySegments();
@@ -875,6 +917,7 @@ private:
   SubDomainIndexType _maxAssignedSubDomainIndex;
 
   AdaptationStateMap _adaptationStateMap;
+  LoadBalanceStateMap _loadBalanceStateMap;
 
   void updateIndexSets() {
     // make sure we have enough LevelIndexSets
@@ -1006,6 +1049,125 @@ private:
 
     Impl& _impl;
     const MultiDomainGrid<HostGrid,MDGridTraitsType>& _grid;
+
+  };
+
+
+  template<typename WrappedDataHandle>
+  struct LoadBalancingDataHandle
+    : public Dune::CommDataHandleIF<LoadBalancingDataHandle<WrappedDataHandle>,
+                                    typename WrappedDataHandle::DataType
+                                    >
+  {
+
+    union Data
+    {
+      SubDomainType data;
+      typename WrappedDataHandle::DataType buffer;
+    };
+
+    dune_static_assert(sizeof(WrappedDataHandle::DataType) >= sizeof(SubDomainType),
+                       "During load balancing, the data type has to be large enough to contain SubDomainType");
+
+    bool contains(int dim, int codim) const
+    {
+      return (codim == 0)
+        || _wrappedDataHandle.contains(dim,codim);
+    }
+
+    bool fixedsize(int dim, int codim) const
+    {
+      return false;
+    }
+
+    template<typename Entity>
+    std::size_t size(const Entity& e) const
+    {
+      if (_grid.leafView().indexSet().contains(e) && e.partitionType() == Dune::InteriorEntity)
+        return _grid.leafView().indexSet().subDomains(e).size() + 1 + _wrappedDataHandle.size(e);
+      else
+        return _wrappedDataHandle.size(e);
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void gather(MessageBufferImp& buf, const Entity& e) const
+    {
+      assert(Entity::codimension == 0);
+      if (e.partitionType() == Dune::InteriorEntity && _grid.leafView().indexSet().contains(e))
+        {
+          typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
+          const SubDomainSet& subDomains = _grid.leafView().indexSet().subDomains(e);
+          Data size = { subDomains.size() };
+          buf.write(size.buffer);
+          for (typename SubDomainSet::const_iterator it = subDomains.begin(); it != subDomains.end(); ++it)
+            {
+              Data subDomain = { *it };
+              buf.write(subDomain.buffer);
+            }
+        }
+      _wrappedDataHandle.gather(buf,e);
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
+    {
+      if (e.partitionType() != Dune::InteriorEntity && _grid.leafView().indexSet().contains(e))
+        {
+          Data subDomains = { 0 };
+          buf.read(subDomains.buffer);
+          for (int i = 0; i < subDomains.data; ++i)
+            {
+              Data subDomain = { 0 };
+              buf.read(subDomain.buffer);
+              _grid._loadBalanceStateMap[_grid.globalIdSet().id(e)].add(subDomain.data);
+            }
+          _wrappedDataHandle.scatter(buf,e,n - (subDomains.data + 1));
+        }
+      else
+        _wrappedDataHandle.scatter(buf,e,n);
+    }
+
+    LoadBalancingDataHandle(const MultiDomainGrid& grid, WrappedDataHandle& wrappedDataHandle)
+      : _grid(grid)
+      , _wrappedDataHandle(wrappedDataHandle)
+    {}
+
+    const MultiDomainGrid& _grid;
+    WrappedDataHandle& _wrappedDataHandle;
+
+  };
+
+  struct EmptyDataHandle
+    : public Dune::CommDataHandleIF<EmptyDataHandle,
+                                    SubDomainType
+                                    >
+  {
+
+    bool contains(int dim, int codim) const
+    {
+      return false;
+    }
+
+    bool fixedsize(int dim, int codim) const
+    {
+      return true;
+    }
+
+    template<typename Entity>
+    std::size_t size(const Entity& e) const
+    {
+      return 0;
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void gather(MessageBufferImp& buf, const Entity& e) const
+    {
+    }
+
+    template<typename MessageBufferImp, typename Entity>
+    void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
+    {
+    }
 
   };
 
