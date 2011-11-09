@@ -25,20 +25,21 @@ public:
   typedef EntityPointerWrapper<codim,GridImp> Base;
 
   typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
-  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::LeafIterator MultiDomainLeafIterator;
-  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::LevelIterator MultiDomainLevelIterator;
   typedef typename GridImp::MDGridType::Traits::HierarchicIterator MultiDomainHierarchicIterator;
 
   EntityPointerWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
-  EntityPointerWrapper(const GridImp& grid, const MultiDomainLeafIterator& multiDomainEntityPointer) :
+  template<PartitionType pitype>
+  EntityPointerWrapper(const GridImp& grid,
+                       const typename GridImp::MDGridType::Traits::template Codim<codim>::template Partition<pitype>::LeafIterator& multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
+  template<PartitionType pitype>
   EntityPointerWrapper(const GridImp& grid,
-                       const MultiDomainLevelIterator& multiDomainEntityPointer) :
+                       const typename GridImp::MDGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator& multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 

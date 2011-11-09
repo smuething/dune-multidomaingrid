@@ -15,6 +15,7 @@ class EntityPointerWrapper
   friend class subdomain::EntityWrapper;
 
   struct Invalid {};
+  struct InvalidHierarchic {};
 
 public:
 
@@ -44,7 +45,7 @@ public:
     _entityWrapper(hostEntityPointer)
   {}
 
-  explicit EntityPointerWrapper(typename SelectType<codim==0,const HostHierarchicIterator&,Invalid>::Type hostEntityPointer) :
+  explicit EntityPointerWrapper(typename SelectType<codim==0,const HostHierarchicIterator&,InvalidHierarchic>::Type hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
   {}
 
