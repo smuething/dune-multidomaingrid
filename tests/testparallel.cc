@@ -2,7 +2,8 @@
 
 #include <dune/common/mpihelper.hh>
 #include <dune/grid/yaspgrid.hh>
-#include <dune/grid/uggrid.hh>
+#include <dune/grid/alugrid.hh>
+#include <dune/grid/io/file/gmshreader.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <iostream>
@@ -72,6 +73,8 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
   const int dim = HostGrid::dimension;
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
   //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
+
+  hostgrid.leafIndexSet().index(*hostgrid.leafView().template begin<0>());
 
   MDGrid grid(hostgrid,true);
   typedef typename MDGrid::LeafGridView MDGV;
@@ -148,8 +151,17 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
 
       sdgrid.communicate(nodedatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
 
+      bool dummy = false;
+      typedef typename SDGV::template Codim<0>::Iterator Iterator;
+      for (Iterator it = sdgv.template begin<0>(); it != sdgv.template end<0>(); ++it)
+        {
+          typedef typename SDGV::IntersectionIterator IIterator;
+          for (IIterator iit = sdgv.ibegin(*it); iit != sdgv.iend(*it); ++iit)
+            dummy |= iit->boundary() || iit->neighbor();
+        }
+
       std::stringstream sstr;
-      sstr << prefix << "_subdomain_" << (char)('a' + s);
+      sstr << prefix << (dummy ? "_subdomain_" : "_subdomain_") << (char)('a' + s);
       Dune::VTKWriter<SDGV> vtkwriter(sdgv);
       std::vector<int> cellIndices;
       std::copy(boost::counting_iterator<int>(0),
@@ -189,7 +201,21 @@ int main(int argc, char** argv)
 
       testGrid(hostgrid,"YaspGrid_2",mpihelper);
     }
+    /*
+    {
+      typedef Dune::ALUSimplexGrid<2,2> HostGrid;
 
+      std::vector<int> boundaryid;
+      std::vector<int> elementid;
+      std::shared_ptr<HostGrid> gridptr
+        (Dune::GmshReader<HostGrid>::read("square.msh",boundaryid, elementid,
+                                          true, false));
+
+      gridptr->loadBalance();
+
+      testGrid(*gridptr,"AluSimplexGrid_2_2",mpihelper);
+    }
+    */
   }
   catch (std::exception & e) {
     std::cout << "STL ERROR: " << e.what() << std::endl;
