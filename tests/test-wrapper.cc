@@ -1,5 +1,3 @@
-// $Id$
-
 #include <config.h>
 
 #include <iostream>
@@ -16,27 +14,7 @@
 int rank;
 
 template <int dim>
-void check_yasp(bool p0=false) {
-  typedef Dune::FieldVector<int,dim> iTupel;
-  typedef Dune::FieldVector<double,dim> fTupel;
-  typedef Dune::FieldVector<bool,dim> bTupel;
-
-  std::cout << std::endl << "YaspGrid<" << dim << ">";
-  if (p0) std::cout << " periodic\n";
-  std::cout << std::endl << std::endl;
-
-  fTupel Len; Len = 1.0;
-  iTupel s; s = 3;
-  bTupel p; p = false;
-  p[0] = p0;
-  int overlap = 1;
-
-  //#if HAVE_MPI
-  //Dune::YaspGrid<dim> grid(MPI_COMM_WORLD,Len,s,p,overlap);
-  //#else
-
-  //typedef Dune::YaspGrid<dim> HostGrid;
-  //Dune::YaspGrid<dim> wgrid(Len,s,p,overlap);
+void check_grid() {
 
   int n[] = { 5,5,5 };
   double h[] = { 1.0, 2.0, 3.0 };
@@ -46,7 +24,6 @@ void check_yasp(bool p0=false) {
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
 
   MDGrid grid(wgrid);
-  //#endif
 
   grid.globalRefine(2);
 
@@ -81,7 +58,7 @@ void check_yasp(bool p0=false) {
 
   // check communication interface
   checkCommunication(grid,-1,Dune::dvverb);
-  for(int l=0; l<=grid.maxLevel(); ++l)
+  for(unsigned int l=0; l<=grid.maxLevel(); ++l)
     checkCommunication(grid,l,Dune::dvverb);
 
   // check the method geometryInFather()
@@ -101,21 +78,12 @@ void check_yasp(bool p0=false) {
 
 int main (int argc , char **argv) {
   try {
-#if HAVE_MPI
-    // initialize MPI
-    MPI_Init(&argc,&argv);
 
-    // get own rank
-    MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-#endif
+    Dune::MPIHelper::instance(argc,argv);
 
-    check_yasp<1>();
-    //check_yasp<1>(true);
-    check_yasp<2>();
-    //check_yasp<2>(true);
-    check_yasp<3>();
-    //check_yasp<3>(true);
-    //check_yasp<4>();
+    check_grid<1>();
+    check_grid<2>();
+    check_grid<3>();
 
   } catch (Dune::Exception &e) {
     std::cerr << e << std::endl;
@@ -124,11 +92,6 @@ int main (int argc , char **argv) {
     std::cerr << "Generic exception!" << std::endl;
     return 2;
   }
-
-#if HAVE_MPI
-  // Terminate MPI
-  MPI_Finalize();
-#endif
 
   return 0;
 };
