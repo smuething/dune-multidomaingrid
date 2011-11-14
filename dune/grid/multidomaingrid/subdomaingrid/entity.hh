@@ -57,15 +57,15 @@ class MakeableEntityWrapper :
 
   template<typename MultiDomainIteratorOrEntityPointer>
   void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
-    this->getRealImp().reset(multiDomainEntityPointer);
+    GridImp::getRealImplementation(*this).reset(multiDomainEntityPointer);
   }
 
   void compactify() {
-    this->getRealImp().compactify();
+    GridImp::getRealImplementation(*this).compactify();
   }
 
   const MultiDomainEntityPointer& multiDomainEntityPointer() const {
-    return this->getRealImp().multiDomainEntityPointer();
+    return GridImp::getRealImplementation(*this).multiDomainEntityPointer();
   }
 
 };

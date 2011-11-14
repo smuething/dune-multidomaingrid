@@ -52,15 +52,15 @@ class MakeableEntityWrapper :
 
   template<typename HostIteratorOrEntityPointer>
   void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
-    this->getRealImp().reset(hostEntityPointer);
+    GridImp::getRealImplementation(*this).reset(hostEntityPointer);
   }
 
   void compactify() {
-    this->getRealImp().compactify();
+    GridImp::getRealImplementation(*this).compactify();
   }
 
   const HostEntityPointer& hostEntityPointer() const {
-    return this->getRealImp().hostEntityPointer();
+    return GridImp::getRealImplementation(*this).hostEntityPointer();
   }
 
 };

@@ -32,15 +32,15 @@ class MakeableLocalGeometryWrapper :
   {}
 
   void reset(const HostLocalGeometry& geometry) const {
-    this->getRealImp().reset(geometry);
+    GridImp::getRealImplementation(*this).reset(geometry);
   }
 
   void clear() const {
-    this->getRealImp().clear();
+    GridImp::getRealImplementation(*this).clear();
   }
 
   bool isSet() const {
-    return this->getRealImp().isSet();
+    return GridImp::getRealImplementation(*this).isSet();
   }
 
 };
