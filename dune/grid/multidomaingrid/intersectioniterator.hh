@@ -51,6 +51,7 @@ protected:
   {
     _hostIterator = rhs._hostIterator;
     GridImp::getRealImplementation(_intersection) = GridImp::getRealImplementation(rhs._intersection);
+    return *this;
   }
 
 private:
