@@ -1,3 +1,4 @@
+#include "config.h"
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include <iostream>
