@@ -117,25 +117,25 @@ namespace sds_detail {
 
   //! \internal asdf
   template<>
-  std::size_t Log2<uint8_t>::doCalculation(uint8_t value) {
+  inline std::size_t Log2<uint8_t>::doCalculation(uint8_t value) {
     return __builtin_ffs(value)-1;
   }
 
   //! \internal
   template<>
-  std::size_t Log2<uint16_t>::doCalculation(uint16_t value) {
+  inline std::size_t Log2<uint16_t>::doCalculation(uint16_t value) {
     return __builtin_ffs(value)-1;
   }
 
   //! \internal
   template<>
-  std::size_t Log2<uint32_t>::doCalculation(uint32_t value) {
+  inline std::size_t Log2<uint32_t>::doCalculation(uint32_t value) {
     return __builtin_ffsl(value)-1;
   }
 
   //! \internal
   template<>
-  std::size_t Log2<uint64_t>::doCalculation(uint64_t value) {
+  inline std::size_t Log2<uint64_t>::doCalculation(uint64_t value) {
     return __builtin_ffsll(value)-1;
   }
 
