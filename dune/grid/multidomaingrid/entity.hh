@@ -116,28 +116,20 @@ public:
     return _hostEntityPointer->template count<cc>();
   }
 
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(_hostEntityPointer->geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(_hostEntityPointer->geometry());
   }
 
   private:
 
   HostEntityPointer _hostEntityPointer;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
   template<typename HostIteratorOrEntityPointer>
   void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
-    if (_hostEntityPointer != hostEntityPointer) {
-      _geometry.clear();
-      _hostEntityPointer = hostEntityPointer;
-    }
+    _hostEntityPointer = hostEntityPointer;
   }
 
   void compactify() {
-    _geometry.clear();
     _hostEntityPointer.compactify();
   }
 
@@ -194,11 +186,8 @@ public:
     return _hostEntityPointer->partitionType();
   }
 
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(_hostEntityPointer->geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(_hostEntityPointer->geometry());
   }
 
   template<int cc>
@@ -243,11 +232,8 @@ public:
     return _hostEntityPointer->isRegular();
   }
 
-  const LocalGeometry& geometryInFather() const {
-    if (!_fatherGeometry.isSet()) {
-      _fatherGeometry.reset(_hostEntityPointer->geometryInFather());
-    }
-    return _fatherGeometry;
+  LocalGeometry geometryInFather() const {
+    return LocalGeometry(_hostEntityPointer->geometryInFather());
   }
 
   HierarchicIterator hbegin(int maxLevel) const {
@@ -269,21 +255,13 @@ public:
 private:
 
   HostEntityPointer _hostEntityPointer;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
-  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
 
   template<typename HostIteratorOrEntityPointer>
   void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
-    if (_hostEntityPointer != hostEntityPointer) {
-      _geometry.clear();
-      _fatherGeometry.clear();
-      _hostEntityPointer = hostEntityPointer;
-    }
+    _hostEntityPointer = hostEntityPointer;
   }
 
   void compactify() {
-    _geometry.clear();
-    _fatherGeometry.clear();
     _hostEntityPointer.compactify();
   }
 

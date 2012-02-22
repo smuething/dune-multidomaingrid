@@ -8,54 +8,17 @@ namespace Dune {
 namespace mdgrid {
 
 template<int mydim, int coorddim, typename GridImp>
-class GeometryWrapper;
-
-
-template<int mydim, int coorddim, typename GridImp>
-class MakeableGeometryWrapper :
-    public Dune::Geometry<mydim, coorddim, GridImp, GeometryWrapper>
-{
-
-  template<int, int, typename>
-  friend class EntityWrapper;
-
-  template<typename, typename, typename>
-  friend class IntersectionWrapper;
-
-  template<typename, typename, typename, typename>
-  friend class SubDomainInterface;
-
-  typedef typename GridImp::HostGridType::Traits::template Codim<GridImp::dimension-mydim>::Geometry HostGeometry;
-
-  // MakeableGeometryWrapper(const HostGeometry& geometry) :
-  //   GridImp::template Codim<GridImp::dimension-mydim>::Geometry(GeometryWrapper<mydim,coorddim,GridImp>(geometry))
-  // {}
-
-  MakeableGeometryWrapper() :
-    GridImp::template Codim<GridImp::dimension-mydim>::Geometry(GeometryWrapper<mydim,coorddim,GridImp>())
-  {}
-
-  void reset(const HostGeometry& geometry) const {
-    GridImp::getRealImplementation(*this).reset(geometry);
-  }
-
-  void clear() const {
-    GridImp::getRealImplementation(*this).clear();
-  }
-
-  bool isSet() const {
-    return GridImp::getRealImplementation(*this).isSet();
-  }
-
-};
-
-
-template<int mydim, int coorddim, typename GridImp>
 class GeometryWrapper
 {
 
-  template<int, int, typename>
-  friend class MakeableGeometryWrapper;
+  template<int,int,typename>
+  friend class EntityWrapper;
+
+  template<typename,typename,typename>
+  friend class IntersectionWrapper;
+
+  template<typename,typename,typename,typename>
+  friend class SubDomainInterface;
 
 public:
 
@@ -74,76 +37,62 @@ private:
 public:
 
   GeometryType type() const {
-    return _wrappedGeometry->type();
+    return _wrappedGeometry.type();
   }
 
   int corners() const {
-    return _wrappedGeometry->corners();
-  }
-
-  const GlobalCoords& operator[](int i) const {
-    return _wrappedGeometry->operator[](i);
+    return _wrappedGeometry.corners();
   }
 
   bool affine() const {
-    return _wrappedGeometry->affine();
+    return _wrappedGeometry.affine();
   }
 
   GlobalCoords corner(int i) const {
-    return _wrappedGeometry->corner(i);
+    return _wrappedGeometry.corner(i);
   }
 
   GlobalCoords global(const LocalCoords& local) const {
-    return _wrappedGeometry->global(local);
+    return _wrappedGeometry.global(local);
   }
 
   LocalCoords local(const GlobalCoords& global) const {
-    return _wrappedGeometry->local(global);
+    return _wrappedGeometry.local(global);
   }
 
   bool checkInside(const LocalCoords& local) const {
-    return _wrappedGeometry->checkInside(local);
+    return _wrappedGeometry.checkInside(local);
   }
 
   ctype integrationElement(const LocalCoords& local) const {
-    return _wrappedGeometry->integrationElement(local);
+    return _wrappedGeometry.integrationElement(local);
   }
 
   ctype volume() const {
-    return _wrappedGeometry->volume();
+    return _wrappedGeometry.volume();
   }
 
   GlobalCoords center() const {
-    return _wrappedGeometry->center();
+    return _wrappedGeometry.center();
   }
 
   const FieldMatrix<ctype,mydimension,coorddimension>&
   jacobianTransposed(const LocalCoords& local) const {
-    return _wrappedGeometry->jacobianTransposed(local);
+    return _wrappedGeometry.jacobianTransposed(local);
   }
 
   const FieldMatrix<ctype,coorddimension,mydimension>&
   jacobianInverseTransposed(const LocalCoords& local) const {
-    return _wrappedGeometry->jacobianInverseTransposed(local);
+    return _wrappedGeometry.jacobianInverseTransposed(local);
   }
 
 private:
 
-  typedef const HostGeometry* ConstHostGeometryPointer;
+  GeometryWrapper(const HostGeometry& wrappedGeometry)
+    : _wrappedGeometry(wrappedGeometry)
+  {}
 
-  mutable ConstHostGeometryPointer _wrappedGeometry;
-
-  void reset(const HostGeometry& geometry) const {
-    _wrappedGeometry = &geometry;
-  }
-
-  bool isSet() const {
-    return _wrappedGeometry != NULL;
-  }
-
-  void clear() const {
-    _wrappedGeometry = NULL;
-  }
+  const HostGeometry _wrappedGeometry;
 
 };
 

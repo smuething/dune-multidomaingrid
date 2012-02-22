@@ -123,27 +123,18 @@ private:
     return _multiDomainIntersection->conforming();
   }
 
-  const LocalGeometry& geometryInInside() const {
-    if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset(hostIntersection().geometryInInside());
-    }
-    return _geometryInInside;
+  LocalGeometry geometryInInside() const {
+    return LocalGeometry(hostIntersection().geometryInInside());
   }
 
-  const LocalGeometry& geometryInOutside() const {
+  LocalGeometry geometryInOutside() const {
     checkIntersectionType();
     assert(_intersectionType == GridImp::neighbor);
-    if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset(hostIntersection().geometryInOutside());
-    }
-    return _geometryInOutside;
+    return LocalGeometry(hostIntersection().geometryInOutside());
   }
 
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(hostIntersection().geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(hostIntersection().geometry());
   }
 
   GeometryType type() const {
@@ -194,9 +185,6 @@ private:
 
   void clear() {
     _multiDomainIntersection = NULL;
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
-    _geometry.clear();
     _intersectionTypeTested = false;
   }
 
@@ -209,8 +197,6 @@ private:
 
   const IndexSet& _indexSet;
   const MultiDomainIntersection* _multiDomainIntersection;
-  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
   mutable bool _intersectionTypeTested;
   mutable typename GridImp::IntersectionType _intersectionType;
 

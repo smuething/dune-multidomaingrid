@@ -10,47 +10,14 @@ namespace mdgrid {
 namespace subdomain {
 
 template<int mydim, int coorddim, typename GridImp>
-class LocalGeometryWrapper;
-
-
-template<int mydim, int coorddim, typename GridImp>
-class MakeableLocalGeometryWrapper :
-    public Dune::Geometry<mydim, coorddim, GridImp, LocalGeometryWrapper>
-{
-
-  template<int, int, typename>
-  friend class EntityWrapper;
-
-  template<typename, typename, typename, typename>
-  friend class IntersectionWrapper;
-
-  typedef typename GridImp::HostGridType::Traits::template Codim<GridImp::dimension-mydim>::LocalGeometry HostLocalGeometry;
-
-  MakeableLocalGeometryWrapper() :
-    GridImp::template Codim<GridImp::dimension-mydim>::LocalGeometry(LocalGeometryWrapper<mydim,coorddim,GridImp>())
-  {}
-
-  void reset(const HostLocalGeometry& geometry) const {
-    GridImp::getRealImplementation(*this).reset(geometry);
-  }
-
-  void clear() const {
-    GridImp::getRealImplementation(*this).clear();
-  }
-
-  bool isSet() const {
-    return GridImp::getRealImplementation(*this).isSet();
-  }
-
-};
-
-
-template<int mydim, int coorddim, typename GridImp>
 class LocalGeometryWrapper
 {
 
-  template<int, int, typename>
-  friend class MakeableLocalGeometryWrapper;
+  template<int,int,typename>
+  friend class EntityWrapper;
+
+  template<typename,typename,typename,typename>
+  friend class IntersectionWrapper;
 
 public:
 
@@ -69,76 +36,62 @@ private:
 public:
 
   GeometryType type() const {
-    return _hostLocalGeometry->type();
+    return _hostLocalGeometry.type();
   }
 
   int corners() const {
-    return _hostLocalGeometry->corners();
-  }
-
-  const GlobalCoords& operator[](int i) const {
-    return _hostLocalGeometry->operator[](i);
+    return _hostLocalGeometry.corners();
   }
 
   bool affine() const {
-    return _hostLocalGeometry->affine();
+    return _hostLocalGeometry.affine();
   }
 
   GlobalCoords corner(int i) const {
-    return _hostLocalGeometry->corner(i);
+    return _hostLocalGeometry.corner(i);
   }
 
   GlobalCoords global(const LocalCoords& local) const {
-    return _hostLocalGeometry->global(local);
+    return _hostLocalGeometry.global(local);
   }
 
   LocalCoords local(const GlobalCoords& global) const {
-    return _hostLocalGeometry->local(global);
+    return _hostLocalGeometry.local(global);
   }
 
   bool checkInside(const LocalCoords& local) const {
-    return _hostLocalGeometry->checkInside(local);
+    return _hostLocalGeometry.checkInside(local);
   }
 
   ctype integrationElement(const LocalCoords& local) const {
-    return _hostLocalGeometry->integrationElement(local);
+    return _hostLocalGeometry.integrationElement(local);
   }
 
   ctype volume() const {
-    return _hostLocalGeometry->volume();
+    return _hostLocalGeometry.volume();
   }
 
   GlobalCoords center() const {
-    return _hostLocalGeometry->center();
+    return _hostLocalGeometry.center();
   }
 
   const FieldMatrix<ctype,mydimension,coorddimension>&
   jacobianTransposed(const LocalCoords& local) const {
-    return _hostLocalGeometry->jacobianTransposed(local);
+    return _hostLocalGeometry.jacobianTransposed(local);
   }
 
   const FieldMatrix<ctype,coorddimension,mydimension>&
   jacobianInverseTransposed(const LocalCoords& local) const {
-    return _hostLocalGeometry->jacobianInverseTransposed(local);
+    return _hostLocalGeometry.jacobianInverseTransposed(local);
   }
 
 private:
 
-  typedef const HostLocalGeometry* ConstHostLocalGeometryPointer;
+  const HostLocalGeometry _hostLocalGeometry;
 
-  mutable ConstHostLocalGeometryPointer _hostLocalGeometry;
-
-  void reset(const HostLocalGeometry& localGeometry) const {
-    _hostLocalGeometry = &localGeometry;
-  }
-
-  bool isSet() const {
-    return _hostLocalGeometry != NULL;
-  }
-
-  void clear() const {
-    _hostLocalGeometry = NULL;
-  }
+  LocalGeometryWrapper(const HostLocalGeometry& hostLocalGeometry)
+    : _hostLocalGeometry(hostLocalGeometry)
+  {}
 
 };
 

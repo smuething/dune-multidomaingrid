@@ -106,17 +106,11 @@ private:
     _hostIntersectionEnd = rhs._hostIntersectionEnd;
     _inverseHostIntersection = rhs._inverseHostIntersection;
     _inverseHostIntersectionValid = rhs._inverseHostIntersectionValid;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
   }
 
   void clear()
   {
     _inverseHostIntersectionValid = false;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
   }
 
 public:
@@ -170,19 +164,13 @@ public:
   }
 
   //! Returns the local geometry in the corresponding cell of the first subdomain.
-  const LocalGeometry& geometryInFirstCell() const {
-    if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset(_hostIntersectionIterator->geometryInInside());
-    }
-    return _geometryInInside;
+  LocalGeometry geometryInFirstCell() const {
+    return LocalGeometry(_hostIntersectionIterator->geometryInInside());
   }
 
   //! Returns the local geometry in the corresponding cell of the second subdomain.
-  const LocalGeometry& geometryInSecondCell() const {
-    if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset(_hostIntersectionIterator->geometryInOutside());
-    }
-    return _geometryInOutside;
+  LocalGeometry geometryInSecondCell() const {
+    return LocalGeometry(_hostIntersectionIterator->geometryInOutside());
   }
 
   //! Returns the subindex of the corresponding face in the cell belonging to the
@@ -272,27 +260,18 @@ public:
   }
 
   //! Returns the local geometry in the corresponding cell of the first subdomain.
-  const LocalGeometry& geometryInside() const {
-    if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset(_hostIntersectionIterator->geometryInInside());
-    }
-    return _geometryInInside;
+  LocalGeometry geometryInside() const {
+    return LocalGeometry(_hostIntersectionIterator->geometryInInside());
   }
 
   //! Returns the local geometry in the corresponding cell of the second subdomain.
-  const LocalGeometry& geometryInOutside() const {
-    if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset(_hostIntersectionIterator->geometryInOutside());
-    }
-    return _geometryInOutside;
+  LocalGeometry geometryInOutside() const {
+    return LocalGeometry(_hostIntersectionIterator->geometryInOutside());
   }
 
   //! Returns the global geometry of the intersection.
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(_hostIntersectionIterator->geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(_hostIntersectionIterator->geometry());
   }
 
   //! Returns the GeometryType of this intersection.
@@ -357,9 +336,6 @@ private:
 
   mutable HostIntersectionIterator _inverseHostIntersection;
   mutable bool _inverseHostIntersectionValid;
-
-  MakeableGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
 };
 

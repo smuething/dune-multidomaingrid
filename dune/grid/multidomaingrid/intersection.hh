@@ -84,25 +84,16 @@ private:
     return _hostIntersection->conforming();
   }
 
-  const LocalGeometry& geometryInInside() const {
-    if (!_geometryInInside.isSet()) {
-      _geometryInInside.reset(_hostIntersection->geometryInInside());
-    }
-    return _geometryInInside;
+  LocalGeometry geometryInInside() const {
+    return LocalGeometry(_hostIntersection->geometryInInside());
   }
 
-  const LocalGeometry& geometryInOutside() const {
-    if (!_geometryInOutside.isSet()) {
-      _geometryInOutside.reset(_hostIntersection->geometryInOutside());
-    }
-    return _geometryInOutside;
+  LocalGeometry geometryInOutside() const {
+    return LocalGeometry(_hostIntersection->geometryInOutside());
   }
 
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(_hostIntersection->geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(_hostIntersection->geometry());
   }
 
   GeometryType type() const {
@@ -141,9 +132,6 @@ private:
 
   void clear() {
     _hostIntersection = NULL;
-    _geometry.clear();
-    _geometryInInside.clear();
-    _geometryInOutside.clear();
   }
 
   void reset(const HostIntersection& hostIntersection) {
@@ -154,8 +142,6 @@ private:
   }
 
   const HostIntersection* _hostIntersection;
-  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _geometryInInside, _geometryInOutside;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
 };
 

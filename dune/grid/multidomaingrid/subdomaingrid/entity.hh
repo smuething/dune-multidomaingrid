@@ -126,18 +126,14 @@ public:
     return _multiDomainEntityPointer->template count<cc>();
   }
 
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(hostEntity().geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(hostEntity().geometry());
   }
 
 private:
 
   const GridImp& _grid;
   MultiDomainEntityPointer _multiDomainEntityPointer;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
 
   const EntityWrapper& operator=(const EntityWrapper& rhs) {
     assert(_grid == rhs._grid);
@@ -147,14 +143,10 @@ private:
 
   template<typename MultiDomainIteratorOrEntityPointer>
   void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
-    if (_multiDomainEntityPointer != multiDomainEntityPointer) {
-      _geometry.clear();
-      _multiDomainEntityPointer = multiDomainEntityPointer;
-    }
+    _multiDomainEntityPointer = multiDomainEntityPointer;
   }
 
   void compactify() {
-    _geometry.clear();
     _multiDomainEntityPointer.compactify();
   }
 
@@ -225,11 +217,8 @@ public:
     return _multiDomainEntityPointer->partitionType();
   }
 
-  const Geometry& geometry() const {
-    if (!_geometry.isSet()) {
-      _geometry.reset(hostEntity().geometry());
-    }
-    return _geometry;
+  Geometry geometry() const {
+    return Geometry(hostEntity().geometry());
   }
 
   template<int cc>
@@ -274,11 +263,8 @@ public:
     return _multiDomainEntityPointer->isRegular();
   }
 
-  const LocalGeometry& geometryInFather() const {
-    if (!_fatherGeometry.isSet()) {
-      _fatherGeometry.reset(hostEntity().geometryInFather());
-    }
-    return _fatherGeometry;
+  LocalGeometry geometryInFather() const {
+    return LocalGeometry(hostEntity().geometryInFather());
   }
 
   HierarchicIterator hbegin(int maxLevel) const {
@@ -305,8 +291,6 @@ private:
 
   const GridImp& _grid;
   MultiDomainEntityPointer _multiDomainEntityPointer;
-  MakeableGeometryWrapper<Geometry::mydimension,Geometry::coorddimension,GridImp> _geometry;
-  MakeableLocalGeometryWrapper<LocalGeometry::mydimension,LocalGeometry::coorddimension,GridImp> _fatherGeometry;
 
   const EntityWrapper& operator=(const EntityWrapper& rhs) {
     assert(_grid == rhs._grid);
@@ -316,16 +300,10 @@ private:
 
   template<typename MultiDomainIteratorOrEntityPointer>
   void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
-    if (_multiDomainEntityPointer != multiDomainEntityPointer) {
-      _geometry.clear();
-      _fatherGeometry.clear();
-      _multiDomainEntityPointer = multiDomainEntityPointer;
-    }
+    _multiDomainEntityPointer = multiDomainEntityPointer;
   }
 
   void compactify() {
-    _geometry.clear();
-    _fatherGeometry.clear();
     _multiDomainEntityPointer.compactify();
   }
 
