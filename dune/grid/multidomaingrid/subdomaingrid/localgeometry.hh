@@ -99,6 +99,17 @@ private:
 
 } // namespace mdgrid
 
+
+namespace FacadeOptions {
+
+template< int mydim, int coorddim, class GridImp >
+struct StoreGeometryReference< mydim, coorddim, GridImp, mdgrid::subdomain::LocalGeometryWrapper >
+{
+        static const bool v = false;
+};
+
+} // namespace FacadeOptions
+
 } // namespace Dune
 
 #endif // DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_LOCALGEOMETRY_HH
