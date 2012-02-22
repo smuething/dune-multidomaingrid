@@ -2,7 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_UTILITY_HH
 
 #include <tuple>
-#include <dune/common/geometrytype.hh>
+#include <dune/geometry/type.hh>
 #include <dune/common/iteratorfacades.hh>
 #include <boost/swap.hpp>
 #include <boost/fusion/support/is_sequence.hpp>
