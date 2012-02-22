@@ -6,7 +6,7 @@
 template<typename ST, typename E>
 void assembleLocalInterfaceTerm(ST s1, const E& e1, ST s2, const E& e2)
 {
-  const typename E::Geometry& geo1 = e1.geometry();
+  typename E::Geometry geo1 = e1.geometry();
   std::cout << s1 << " -> " << s2 << " (" << geo1.center() << " -> " << e2.geometry().center() << ")" << std::endl;
 }
 
