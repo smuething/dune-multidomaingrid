@@ -130,10 +130,6 @@ private:
     return _geometryInInside;
   }
 
-  const LocalGeometry& intersectionSelfLocal() const {
-    return geometryInInside();
-  }
-
   const LocalGeometry& geometryInOutside() const {
     checkIntersectionType();
     assert(_intersectionType == GridImp::neighbor);
@@ -143,19 +139,11 @@ private:
     return _geometryInOutside;
   }
 
-  const LocalGeometry& intersectionNeighborLocal() const {
-    return geometryInOutside();
-  }
-
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
       _geometry.reset(hostIntersection().geometry());
     }
     return _geometry;
-  }
-
-  const LocalGeometry& intersectionGlobal() const {
-    return geometry();
   }
 
   GeometryType type() const {
@@ -166,20 +154,10 @@ private:
     return _multiDomainIntersection->indexInInside();
   }
 
-  int numberInSelf() const {
-    return _multiDomainIntersection->numberInSelf();
-  }
-
   int indexInOutside() const {
     checkIntersectionType();
     assert(_intersectionType == GridImp::neighbor);
     return _multiDomainIntersection->indexInOutside();
-  }
-
-  int numberInNeighbor() const {
-    checkIntersectionType();
-    assert(_intersectionType == GridImp::neighbor);
-    return _multiDomainIntersection->numberInNeighbor();
   }
 
   GlobalCoords outerNormal(const LocalCoords& local) const {

@@ -91,10 +91,6 @@ private:
     return _geometryInInside;
   }
 
-  const LocalGeometry& intersectionSelfLocal() const {
-    return geometryInInside();
-  }
-
   const LocalGeometry& geometryInOutside() const {
     if (!_geometryInOutside.isSet()) {
       _geometryInOutside.reset(_hostIntersection->geometryInOutside());
@@ -102,19 +98,11 @@ private:
     return _geometryInOutside;
   }
 
-  const LocalGeometry& intersectionNeighborLocal() const {
-    return geometryInOutside();
-  }
-
   const Geometry& geometry() const {
     if (!_geometry.isSet()) {
       _geometry.reset(_hostIntersection->geometry());
     }
     return _geometry;
-  }
-
-  const LocalGeometry& intersectionGlobal() const {
-    return geometry();
   }
 
   GeometryType type() const {
@@ -125,16 +113,8 @@ private:
     return _hostIntersection->indexInInside();
   }
 
-  int numberInSelf() const {
-    return _hostIntersection->numberInSelf();
-  }
-
   int indexInOutside() const {
     return _hostIntersection->indexInOutside();
-  }
-
-  int numberInNeighbor() const {
-    return _hostIntersection->numberInNeighbor();
   }
 
   GlobalCoords outerNormal(const LocalCoords& local) const {
