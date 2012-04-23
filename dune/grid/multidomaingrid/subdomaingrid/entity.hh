@@ -28,6 +28,40 @@ class HierarchicIteratorWrapper;
 template<typename MDGrid>
 class SubDomainGrid;
 
+template<typename HostES>
+class EntitySeedWrapper
+{
+
+  typedef HostES HostEntitySeed;
+
+  template<typename>
+  friend class SubDomainGrid;
+
+  template<typename,typename>
+  friend class MultiDomainGrid;
+
+  template<int, int, typename>
+  friend class EntityWrapper;
+
+public:
+
+  static const std::size_t codimension = HostEntitySeed::codimension;
+
+private:
+
+  EntitySeedWrapper(const HostEntitySeed& hostEntitySeed)
+    : _hostEntitySeed(hostEntitySeed)
+  {}
+
+  const HostEntitySeed& hostEntitySeed() const
+  {
+    return _hostEntitySeed;
+  }
+
+  HostEntitySeed _hostEntitySeed;
+
+};
+
 template<int codim, int dim, typename GridImp>
 class MakeableEntityWrapper :
     public GridImp::template Codim<codim>::Entity
@@ -97,6 +131,8 @@ class EntityWrapper :
 
 public:
 
+  typedef EntitySeedWrapper<typename HostEntity::EntitySeed> EntitySeed;
+
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
   template<typename MultiDomainIteratorOrEntityPointer>
@@ -128,6 +164,10 @@ public:
 
   Geometry geometry() const {
     return Geometry(hostEntity().geometry());
+  }
+
+  EntitySeed seed() const {
+    return EntitySeed(hostEntity().seed());
   }
 
 private:
@@ -194,6 +234,7 @@ public:
   typedef typename GridImp::Traits::HierarchicIterator HierarchicIterator;
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
 
+  typedef EntitySeedWrapper<typename HostEntity::EntitySeed> EntitySeed;
 
   template<typename MultiDomainIteratorOrEntityPointer>
   EntityWrapper(const GridImp& grid, const MultiDomainIteratorOrEntityPointer& e) :
@@ -285,6 +326,10 @@ public:
 
   bool mightVanish() const {
     return _multiDomainEntityPointer->mightVanish();
+  }
+
+  EntitySeed seed() const {
+    return EntitySeed(hostEntity().seed());
   }
 
 private:

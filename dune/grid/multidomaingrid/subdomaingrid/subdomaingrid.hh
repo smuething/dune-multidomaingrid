@@ -90,7 +90,7 @@ struct SubDomainGridFamily {
       /** \brief The type of the entity pointer for entities of this codim.*/
       typedef Dune::EntityPointer<const GridImp,EntityPointerImp<cd,const GridImp> > EntityPointer;
 
-      typedef EntityPointer EntitySeed;
+      typedef EntitySeedWrapper<typename MDGrid::HostGridType::template Codim<cd>::EntitySeed> EntitySeed;
 
       /**
        * \brief Traits associated with a specific grid partition type.
@@ -278,6 +278,21 @@ public:
 
   /** @name Dune grid interface methods */
   /*@{*/
+
+  //! Reconstruct EntityPointer from EntitySeed
+  template<typename EntitySeed>
+  typename Traits::template Codim<EntitySeed::codimension>::EntityPointer
+  entityPointer(const EntitySeed& entitySeed) const
+  {
+    return
+      EntityPointerWrapper<EntitySeed::codimension,const GridImp>(
+        *this,
+        typename MDGrid::template Codim<EntitySeed::codimension>::EntityPointer(
+          _grid.entityPointer(entitySeed)
+        )
+      );
+  }
+
   int maxLevel() const {
     return _grid.maxLevel();
   }

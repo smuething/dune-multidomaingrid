@@ -23,6 +23,37 @@ class HierarchicIteratorWrapper;
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
+template<typename HostES>
+class EntitySeedWrapper
+{
+
+  typedef HostES HostEntitySeed;
+
+  template<typename, typename>
+  friend class MultiDomainGrid;
+
+  template<int, int, typename>
+  friend class EntityWrapper;
+
+public:
+
+  static const std::size_t codimension = HostEntitySeed::codimension;
+
+private:
+
+  EntitySeedWrapper(const HostEntitySeed& hostEntitySeed)
+    : _hostEntitySeed(hostEntitySeed)
+  {}
+
+  const HostEntitySeed& hostEntitySeed() const
+  {
+    return _hostEntitySeed;
+  }
+
+  HostEntitySeed _hostEntitySeed;
+
+};
+
 template<int codim, int dim, typename GridImp>
 class MakeableEntityWrapper :
     public GridImp::template Codim<codim>::Entity
@@ -87,6 +118,8 @@ public:
 
   typedef typename GridImp::template Codim<codim>::Geometry Geometry;
 
+  typedef EntitySeedWrapper<typename HostEntity::EntitySeed> EntitySeed;
+
   template<typename HostIteratorOrEntityPointer>
   explicit EntityWrapper(const HostIteratorOrEntityPointer& e) :
     _hostEntityPointer(e)
@@ -118,6 +151,10 @@ public:
 
   Geometry geometry() const {
     return Geometry(_hostEntityPointer->geometry());
+  }
+
+  EntitySeed seed() const {
+    return EntitySeed(_hostEntityPointer->seed());
   }
 
   private:
@@ -155,6 +192,7 @@ class EntityWrapper<0,dim,GridImp> :
   friend class MultiDomainGrid;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity HostEntity;
 
 public:
 
@@ -164,6 +202,8 @@ public:
   typedef typename GridImp::Traits::LevelIntersectionIterator LevelIntersectionIterator;
   typedef typename GridImp::Traits::HierarchicIterator HierarchicIterator;
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
+
+  typedef EntitySeedWrapper<typename HostEntity::EntitySeed> EntitySeed;
 
 
   template<typename HostIteratorOrEntityPointer>
@@ -250,6 +290,10 @@ public:
 
   bool mightVanish() const {
     return _hostEntityPointer->mightVanish();
+  }
+
+  EntitySeed seed() const {
+    return EntitySeed(_hostEntityPointer->seed());
   }
 
 private:
