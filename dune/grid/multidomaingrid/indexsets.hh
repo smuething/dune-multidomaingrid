@@ -473,7 +473,7 @@ private:
       if (me.domains.simple()) {
         return me.index;
       } else {
-        return _indexSet.multiIndexMap<codim>()[me.index].at(me.domains.domainOffset(_subDomain));
+        return _indexSet.multiIndexMap<codim>()[me.index][me.domains.domainOffset(_subDomain)];
       }
     }
 
