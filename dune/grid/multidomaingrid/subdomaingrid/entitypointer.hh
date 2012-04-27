@@ -5,6 +5,12 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<int,PartitionIteratorType,typename>
+class LeafIteratorWrapper;
+
+template<int,PartitionIteratorType,typename>
+class LevelIteratorWrapper;
+
 namespace subdomain {
 
 template<int codim, typename GridImp>
@@ -31,15 +37,15 @@ public:
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
-  template<PartitionType pitype>
+  template<PartitionIteratorType pitype>
   EntityPointerWrapper(const GridImp& grid,
-                       const typename GridImp::MDGridType::Traits::template Codim<codim>::template Partition<pitype>::LeafIterator& multiDomainEntityPointer) :
+                       const EntityIterator<codim,const typename GridImp::MDGridType,Dune::mdgrid::LeafIteratorWrapper<codim,pitype,const typename GridImp::MDGridType> >& multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
   template<PartitionType pitype>
   EntityPointerWrapper(const GridImp& grid,
-                       const typename GridImp::MDGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator& multiDomainEntityPointer) :
+                       const EntityIterator<codim,const typename GridImp::MDGridType,Dune::mdgrid::LevelIteratorWrapper<codim,pitype,const typename GridImp::MDGridType> >& multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 

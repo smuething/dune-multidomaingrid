@@ -878,13 +878,13 @@ public:
    */
   template<typename EntityType>
   const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
-    return *(getRealImplementation(e).hostEntityPointer());
+    return *(MultiDomainGrid::getRealImplementation(e).hostEntityPointer());
   }
 
   //! Returns an EntityPointer to the corresponding host entity.
   template<typename EntityType>
   const typename HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
-    return getRealImplementation(e).hostEntityPointer();
+    return MultiDomainGrid::getRealImplementation(e).hostEntityPointer();
   }
 
   template<typename EntityType>
