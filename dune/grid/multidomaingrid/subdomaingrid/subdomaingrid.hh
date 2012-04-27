@@ -530,22 +530,22 @@ public:
 
   template<typename EntityType>
   static const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) {
-    return *(getRealImplementation(e).multiDomainEntityPointer());
+    return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
   }
 
   template<typename EntityType>
   static typename MDGrid::template MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) {
-    return getRealImplementation(e).multiDomainEntityPointer();
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
   }
 
   template<typename EntityType>
   static const typename MDGrid::template HostEntity<EntityType>::type& hostEntity(const EntityType& e) {
-    return getRealImplementation(e).hostEntity();
+    return SubDomainGrid::getRealImplementation(e).hostEntity();
   }
 
   template<typename EntityType>
   static typename MDGrid::template HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) {
-    return typename MDGrid::template HostEntityPointer<EntityType>::type(getRealImplementation(e).hostEntity());
+    return typename MDGrid::template HostEntityPointer<EntityType>::type(SubDomainGrid::getRealImplementation(e).hostEntity());
   }
 
   template<typename IntersectionType>
@@ -556,7 +556,7 @@ public:
 
   template<typename IntersectionType>
   static const typename MultiDomainIntersection<IntersectionType>::Type& multiDomainIntersection(const IntersectionType& is) {
-    return getRealImplementation(is).multiDomainIntersection();
+    return SubDomainGrid::getRealImplementation(is).multiDomainIntersection();
   }
 
   /*@}*/
@@ -579,7 +579,7 @@ public:
 
   template<typename Intersection>
   IntersectionType intersectionType(const Intersection& intersection) const {
-    return getRealImplementation(intersection).intersectionType();
+    return SubDomainGrid::getRealImplementation(intersection).intersectionType();
   }
 
 private:
