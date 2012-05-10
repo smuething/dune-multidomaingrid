@@ -405,7 +405,7 @@ public:
     if (me.domains.simple()) {
       return me.index;
     } else {
-      return multiIndexMap<cc>()[me.index].at(me.domains.domainOffset(subDomain));
+      return multiIndexMap<cc>()[me.index][me.domains.domainOffset(subDomain)];
     }
   }
 
