@@ -5,6 +5,10 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<PartitionIteratorType>
+struct pitype_holder
+{};
+
 template<int codim, typename GridImp>
 class EntityPointerWrapper
 {
@@ -17,6 +21,27 @@ class EntityPointerWrapper
   struct Invalid {};
   struct InvalidHierarchic {};
 
+  template<PartitionIteratorType pitype>
+  struct HostLeafIterator
+  {
+    typedef typename GridImp::HostGridType::template Codim<codim>::template Partition<pitype>::LeafIterator type;
+  };
+
+  template<PartitionIteratorType pitype>
+  struct HostLevelIterator
+  {
+    typedef typename GridImp::HostGridType::template Codim<codim>::template Partition<pitype>::LeafIterator _type;
+
+    typedef typename SelectType<
+      !is_same<
+        typename HostLeafIterator<pitype>::type,
+        _type
+        >::value,
+      _type,
+      Invalid
+      >::Type type;
+  };
+
 public:
 
   typedef EntityPointerWrapper EntityPointerImp;
@@ -27,8 +52,6 @@ public:
   typedef EntityPointerWrapper<codim,GridImp> Base;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::LeafIterator HostLeafIterator;
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::LevelIterator HostLevelIterator;
   typedef typename GridImp::HostGridType::Traits::HierarchicIterator HostHierarchicIterator;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::Entity HostEntity;
@@ -37,12 +60,14 @@ public:
     _entityWrapper(hostEntityPointer)
   {}
 
-  explicit EntityPointerWrapper(const HostLeafIterator& hostEntityPointer) :
-    _entityWrapper(hostEntityPointer)
+  template<PartitionIteratorType pitype>
+  EntityPointerWrapper(pitype_holder<pitype> pth, const typename HostLeafIterator<pitype>::type& hostEntityPointer)
+    : _entityWrapper(hostEntityPointer)
   {}
 
-  explicit EntityPointerWrapper(typename SelectType<!is_same<HostLeafIterator,HostLevelIterator>::value,const HostLevelIterator&,Invalid>::Type hostEntityPointer) :
-    _entityWrapper(hostEntityPointer)
+  template<PartitionIteratorType pitype>
+  EntityPointerWrapper(pitype_holder<pitype> pth, const typename HostLevelIterator<pitype>::type& hostEntityPointer)
+    : _entityWrapper(hostEntityPointer)
   {}
 
   explicit EntityPointerWrapper(typename SelectType<codim==0,const HostHierarchicIterator&,InvalidHierarchic>::Type hostEntityPointer) :
