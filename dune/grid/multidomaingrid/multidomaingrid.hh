@@ -877,18 +877,18 @@ public:
    * hostEntityPointer() instead.
    */
   template<typename EntityType>
-  const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) const {
+  static const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) {
     return *(MultiDomainGrid::getRealImplementation(e).hostEntityPointer());
   }
 
   //! Returns an EntityPointer to the corresponding host entity.
   template<typename EntityType>
-  const typename HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) const {
+  static const typename HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) {
     return MultiDomainGrid::getRealImplementation(e).hostEntityPointer();
   }
 
   template<typename EntityType>
-  const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) const {
+  static const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) {
     return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
   }
 
@@ -999,7 +999,7 @@ private:
   }
 
   template<typename GridView, typename HostGridView>
-  typename GridView::IntersectionIterator multiDomainIntersectionIterator(typename HostGridView::IntersectionIterator iit) const {
+  static typename GridView::IntersectionIterator multiDomainIntersectionIterator(typename HostGridView::IntersectionIterator iit) {
     return typename GridView::IntersectionIterator::ImplementationType(iit);
   }
 
