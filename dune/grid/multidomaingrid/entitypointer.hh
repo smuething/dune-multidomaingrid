@@ -30,7 +30,7 @@ class EntityPointerWrapper
   template<PartitionIteratorType pitype>
   struct HostLevelIterator
   {
-    typedef typename GridImp::HostGridType::template Codim<codim>::template Partition<pitype>::LeafIterator _type;
+    typedef typename GridImp::HostGridType::template Codim<codim>::template Partition<pitype>::LevelIterator _type;
 
     typedef typename SelectType<
       !is_same<
