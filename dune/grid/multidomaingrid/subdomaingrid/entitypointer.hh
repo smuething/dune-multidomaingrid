@@ -43,7 +43,7 @@ public:
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
-  template<PartitionType pitype>
+  template<PartitionIteratorType pitype>
   EntityPointerWrapper(const GridImp& grid,
                        const EntityIterator<codim,const typename GridImp::MDGridType,Dune::mdgrid::LevelIteratorWrapper<codim,pitype,const typename GridImp::MDGridType> >& multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
