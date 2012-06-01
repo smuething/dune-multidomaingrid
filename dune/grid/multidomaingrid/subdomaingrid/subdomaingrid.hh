@@ -299,28 +299,28 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(levelIndexSet(level),
                                                                    _grid.template lbegin<codim>(level),
                                                                    _grid.template lend<codim>(level));
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(*_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(levelIndexSet(level),
                                                                    _grid.template lend<codim>(level),
                                                                    _grid.template lend<codim>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(levelIndexSet(level),
                                                             _grid.template lbegin<codim,PiType>(level),
                                                             _grid.template lend<codim,PiType>(level));
   }
 
   template<int codim, PartitionIteratorType PiType>
   typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(*_levelIndexSets[level],
+    return LevelIteratorWrapper<codim,PiType,const GridImp>(levelIndexSet(level),
                                                             _grid.template lend<codim,PiType>(level),
                                                             _grid.template lend<codim,PiType>(level));
   }
