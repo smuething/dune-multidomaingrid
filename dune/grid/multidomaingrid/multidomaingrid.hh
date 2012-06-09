@@ -2,7 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <dune/common/shared_ptr.hh>
 
 namespace Dune {
 namespace mdgrid {
@@ -45,8 +45,8 @@ namespace Dune {
 namespace mdgrid {
 
 template<typename T>
-boost::shared_ptr<T> make_shared_ptr(T* ptr) {
-  return boost::shared_ptr<T>(ptr);
+shared_ptr<T> make_shared_ptr(T* ptr) {
+  return shared_ptr<T>(ptr);
 }
 
 template<typename HostGrid, typename MDGridTraits>
@@ -789,7 +789,7 @@ public:
   void postUpdateSubDomains() {
     assert(_state == statePostUpdate && _adaptState == stateFixed);
     _tmpLevelIndexSets.clear();
-    _tmpLeafIndexSet.reset(NULL);
+    _tmpLeafIndexSet.reset(nullptr);
     _state = stateFixed;
   }
 
@@ -832,7 +832,7 @@ public:
   /*@{*/
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   const SubDomainGrid& subDomain(SubDomainIndexType subDomain) const {
-    boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
+    shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(const_cast<MultiDomainGrid&>(*this),subDomain));
       // subGridPointer->update();
@@ -842,7 +842,7 @@ public:
 
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   SubDomainGrid& subDomain(SubDomainIndexType subDomain) {
-    boost::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
+    shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(*this,subDomain));
       // subGridPointer->update();
@@ -908,11 +908,11 @@ private:
 
   HostGrid& _hostGrid;
 
-  std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
+  std::vector<shared_ptr<LevelIndexSetImp> > _levelIndexSets;
   LeafIndexSetImp _leafIndexSet;
 
-  std::vector<boost::shared_ptr<LevelIndexSetImp> > _tmpLevelIndexSets;
-  boost::scoped_ptr<LeafIndexSetImp> _tmpLeafIndexSet;
+  std::vector<shared_ptr<LevelIndexSetImp> > _tmpLevelIndexSets;
+  std::unique_ptr<LeafIndexSetImp> _tmpLeafIndexSet;
 
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
@@ -921,8 +921,8 @@ private:
   State _adaptState;
   const bool _supportLevelIndexSets;
 
-  mutable std::map<SubDomainIndexType,boost::shared_ptr<SubDomainGrid> > _subDomainGrids;
   SubDomainIndexType _maxAssignedSubDomainIndex;
+  mutable std::map<SubDomainIndexType,shared_ptr<SubDomainGrid> > _subDomainGrids;
 
   AdaptationStateMap _adaptationStateMap;
   LoadBalanceStateMap _loadBalanceStateMap;

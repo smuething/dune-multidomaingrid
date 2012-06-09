@@ -604,7 +604,7 @@ private:
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
   LeafIndexSetImp _leafIndexSet;
-  mutable std::vector<boost::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
+  mutable std::vector<shared_ptr<LevelIndexSetImp> > _levelIndexSets;
 
   SubDomainGrid(MDGrid& grid, SubDomainIndexType subDomain) :
     _grid(grid),

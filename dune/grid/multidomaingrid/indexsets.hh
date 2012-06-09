@@ -322,7 +322,7 @@ private:
 
   typedef typename detail::buildMap<Containers,dimension>::type ContainerMap;
 
-  typedef std::vector<boost::shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
+  typedef std::vector<shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
 
   //! Convenience subclass of dispatchToCodim for automatically passing in the MDGridTraits and the dimension
   template<typename Impl,typename result_type, bool protect = true>
