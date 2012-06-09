@@ -14,13 +14,13 @@ template<typename GridImp,
 class IntersectionWrapper {
 
   template<class, template<class> class, template<class> class>
-  friend class IntersectionIterator;
+  friend class Dune::IntersectionIterator;
 
   template<class,class,class,class,class>
   friend class IntersectionIteratorWrapper;
 
   template<class, template<class> class>
-  friend class Intersection;
+  friend class Dune::Intersection;
 
   template<typename MDGrid>
   friend class SubDomainGrid;

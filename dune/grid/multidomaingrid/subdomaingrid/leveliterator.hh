@@ -16,10 +16,10 @@ class LevelIteratorWrapper :
   friend class SubDomainGrid;
 
   template< int cd, class Grid, class IteratorImp >
-  friend class EntityIterator;
+  friend class Dune::EntityIterator;
 
   template<typename,typename>
-  friend class EntityPointer;
+  friend class Dune::EntityPointer;
 
   typedef typename GridImp::MDGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator MultiDomainLevelIterator;
   typedef typename GridImp::Traits::LevelIndexSet IndexSet;

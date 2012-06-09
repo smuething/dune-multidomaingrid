@@ -11,7 +11,7 @@ template<typename GridImp,
 class IntersectionWrapper {
 
   template<class, template<class> class>
-  friend class Intersection;
+  friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>
   friend class subdomain::IntersectionWrapper;

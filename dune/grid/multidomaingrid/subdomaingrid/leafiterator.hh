@@ -19,10 +19,10 @@ class LeafIteratorWrapper :
   friend class SubDomainGrid;
 
   template< int cd, class Grid, class IteratorImp >
-  friend class EntityIterator;
+  friend class Dune::EntityIterator;
 
   template<typename,typename>
-  friend class EntityPointer;
+  friend class Dune::EntityPointer;
 
   typedef typename GridImp::MultiDomainGrid::Traits::template Codim<codim>::template Partition<pitype>::LeafIterator MultiDomainLeafIterator;
   typedef typename GridImp::Traits::LeafIndexSet IndexSet;

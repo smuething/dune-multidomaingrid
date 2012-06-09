@@ -14,7 +14,7 @@ class LevelIteratorWrapper :
   friend class MultiDomainGrid;
 
   template< int cd, class Grid, class IteratorImp >
-  friend class EntityIterator;
+  friend class Dune::EntityIterator;
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::template Partition<pitype>::LevelIterator HostLevelIterator;
 

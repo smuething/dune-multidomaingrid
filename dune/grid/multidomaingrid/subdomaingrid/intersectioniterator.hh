@@ -15,10 +15,10 @@ template<typename GridImp,
 class IntersectionIteratorWrapper {
 
   template<class, template<class> class, template<class> class>
-  friend class IntersectionIterator;
+  friend class Dune::IntersectionIterator;
 
   template<class, template<class> class>
-  friend class Intersection;
+  friend class Dune::Intersection;
 
   typedef MultiDomainIntersectionIteratorType MultiDomainIntersectionIterator;
   typedef IntersectionType Intersection;
