@@ -173,7 +173,7 @@ public:
   {}
 
   bool operator==(const ArrayBasedSet& r) const {
-    return _size == r._size && std::equal(_set.begin(),_set.begin()+size,r._set.begin());
+    return _size == r._size && std::equal(_set.begin(),_set.begin()+_size,r._set.begin());
   }
 
   bool operator!=(const ArrayBasedSet& r) const {
