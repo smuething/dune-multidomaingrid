@@ -364,8 +364,9 @@ private:
 public:
 
   //! The (integer) type used to identify subdomains.
-  typedef typename MDGridTraits::SubDomainIndexType SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename MDGridTraits::SubDomainIndexType SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubdomainIndex instead");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("SubDomainType is deprecated, use SubdomainIndex instead");
 
   //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
@@ -374,7 +375,7 @@ public:
    * \note As subdomain indices always start at 0, this constant also determines the maximum
    * number of possible subdomains.
    */
-  static const SubDomainIndexType maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
+  static const SubDomainIndex maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
 
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
@@ -483,12 +484,12 @@ public:
    * \param subDomain1 the first subdomain
    * \param subDomain2 the second subdomain
    */
-  LeafSubDomainInterfaceIterator leafSubDomainInterfaceBegin(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2) const {
+  LeafSubDomainInterfaceIterator leafSubDomainInterfaceBegin(SubDomainIndex subDomain1, SubDomainIndex subDomain2) const {
     return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2);
   }
 
   //! Returns the corresponding end iterator for leafSubDomainInterfaceBegin().
-  LeafSubDomainInterfaceIterator leafSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2) const {
+  LeafSubDomainInterfaceIterator leafSubDomainInterfaceEnd(SubDomainIndex subDomain1, SubDomainIndex subDomain2) const {
     return LeafSubDomainInterfaceIterator(*this,subDomain1,subDomain2,true);
   }
 
@@ -503,7 +504,7 @@ public:
    * \param subDomain2 the second subdomain
    * \param level      the grid level over which to iterate
    */
-  LevelSubDomainInterfaceIterator levelSubDomainInterfaceBegin(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
+  LevelSubDomainInterfaceIterator levelSubDomainInterfaceBegin(SubDomainIndex subDomain1, SubDomainIndex subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level);
   }
 
@@ -511,7 +512,7 @@ public:
   /**
    * \param level the grid level to be iterated over.
    */
-  LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainIndexType subDomain1, SubDomainIndexType subDomain2, int level) const {
+  LevelSubDomainInterfaceIterator levelSubDomainInterfaceEnd(SubDomainIndex subDomain1, SubDomainIndex subDomain2, int level) const {
     return LevelSubDomainInterfaceIterator(*this,subDomain1,subDomain2,level,true);
   }
 
@@ -794,7 +795,7 @@ public:
   }
 
   //! Adds the given leaf entity to the specified subdomain.
-  void addToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+  void addToSubDomain(SubDomainIndex subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
     assert(e.partitionType() == Dune::InteriorEntity);
@@ -803,7 +804,7 @@ public:
   }
 
   //! Removes the given leaf entity from the specified subdomain.
-  void removeFromSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+  void removeFromSubDomain(SubDomainIndex subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
     assert(e.partitionType() == Dune::InteriorEntity);
@@ -811,7 +812,7 @@ public:
   }
 
   //! Assigns the given leaf entity to the specified subdomain, clearing any previous subdomain assignments.
-  void assignToSubDomain(SubDomainIndexType subDomain, const typename Traits::template Codim<0>::Entity& e) {
+  void assignToSubDomain(SubDomainIndex subDomain, const typename Traits::template Codim<0>::Entity& e) {
     assert(_state == stateMarking);
     assert(e.isLeaf());
     assert(e.partitionType() == Dune::InteriorEntity);
@@ -831,7 +832,7 @@ public:
   /** @name Access to the subdomain grids */
   /*@{*/
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
-  const SubDomainGrid& subDomain(SubDomainIndexType subDomain) const {
+  const SubDomainGrid& subDomain(SubDomainIndex subDomain) const {
     shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(const_cast<MultiDomainGrid&>(*this),subDomain));
@@ -841,7 +842,7 @@ public:
   }
 
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
-  SubDomainGrid& subDomain(SubDomainIndexType subDomain) {
+  SubDomainGrid& subDomain(SubDomainIndex subDomain) {
     shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(*this,subDomain));
@@ -857,7 +858,7 @@ public:
    * belonging to that index might not contain any entities anymore if all entities have been
    * removed from it at a later point.
    */
-  SubDomainIndexType maxAssignedSubDomainIndex() const
+  SubDomainIndex maxAssignedSubDomainIndex() const
   {
     return _maxAssignedSubDomainIndex;
   }
@@ -921,8 +922,8 @@ private:
   State _adaptState;
   const bool _supportLevelIndexSets;
 
-  SubDomainIndexType _maxAssignedSubDomainIndex;
-  mutable std::map<SubDomainIndexType,shared_ptr<SubDomainGrid> > _subDomainGrids;
+  mutable std::map<SubDomainIndex,shared_ptr<SubDomainGrid> > _subDomainGrids;
+  SubDomainIndex _maxAssignedSubDomainIndex;
 
   AdaptationStateMap _adaptationStateMap;
   LoadBalanceStateMap _loadBalanceStateMap;
@@ -1070,12 +1071,12 @@ private:
 
     union Data
     {
-      SubDomainType data;
+      SubDomainIndex data;
       typename WrappedDataHandle::DataType buffer;
     };
 
-    dune_static_assert(sizeof(WrappedDataHandle::DataType) >= sizeof(SubDomainType),
-                       "During load balancing, the data type has to be large enough to contain SubDomainType");
+    dune_static_assert(sizeof(WrappedDataHandle::DataType) >= sizeof(SubDomainIndex),
+                       "During load balancing, the data type has to be large enough to contain MultiDomaingrid::SubDomainIndex");
 
     bool contains(int dim, int codim) const
     {
@@ -1147,7 +1148,7 @@ private:
 
   struct EmptyDataHandle
     : public Dune::CommDataHandleIF<EmptyDataHandle,
-                                    SubDomainType
+                                    SubDomainIndex
                                     >
   {
 
