@@ -70,7 +70,7 @@ struct invokeIf {
 
   template<int codim>
   result_type invoke() {
-    return _impl.invoke<codim>();
+    return _impl.template invoke<codim>();
   }
 
   Impl& _impl;
@@ -769,7 +769,7 @@ private:
       MapEntry<0>& me = im[hgt][hostIndex];
 
       if (_grid.supportLevelIndexSets()) {
-        levelIndexSets[he.level()]->indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.addAll(me.domains);
+        levelIndexSets[he.level()]->template indexMap<0>()[hgt][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.addAll(me.domains);
         markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
       }
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
@@ -831,7 +831,7 @@ private:
   void markAncestors(LevelIndexSets& levelIndexSets, HostEntityPointer he, const SubDomainSet& domains) {
     while (he->level() > 0) {
       he = he->father();
-      SubDomainSet& fatherDomains = levelIndexSets[he->level()]->indexMap<0>()[he->type()][levelIndexSets[he->level()]->_hostGridView.indexSet().index(*he)].domains;
+      SubDomainSet& fatherDomains = levelIndexSets[he->level()]->template indexMap<0>()[he->type()][levelIndexSets[he->level()]->_hostGridView.indexSet().index(*he)].domains;
       if (fatherDomains.containsAll(domains))
         break;
       fatherDomains.addAll(domains);

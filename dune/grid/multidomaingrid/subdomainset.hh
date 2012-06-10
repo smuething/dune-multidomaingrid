@@ -146,7 +146,7 @@ namespace sds_detail {
 						SubDomainIndex,
 						std::ptrdiff_t> {
 
-    template<std::size_t capacity>
+    template<typename,std::size_t>
     friend class ::Dune::mdgrid::IntegralTypeSubDomainSet;
 
   public:

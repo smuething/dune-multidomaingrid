@@ -158,7 +158,7 @@ class LeafIntersectionWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
-  template<typename,typename>
+  template<typename,template<class> class>
   friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>
@@ -202,7 +202,7 @@ class LevelIntersectionWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
-  template<typename,typename>
+  template<typename,template<class> class>
   friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>

@@ -46,7 +46,7 @@ struct CellAndVertexCodims {
   static const bool supported = (codim == 0 || codim == dim);
 };
 
-template<int dim, std::size_t subDomainsPerCell, std::size_t subDomainCount, template<int dim, int codim> class supportedCodims = AllCodims>
+template<int dim, std::size_t subDomainsPerCell, std::size_t subDomainCount, template<int dim_, int codim> class supportedCodims = AllCodims>
 struct ArrayBasedTraits {
 
   typedef int SubDomainIndexType;
@@ -78,7 +78,7 @@ struct ArrayBasedTraits {
 
 };
 
-template<int dim, std::size_t maxSubDomains, template<int dim, int codim> class supportedCodims = AllCodims >
+template<int dim, std::size_t maxSubDomains, template<int dim_, int codim> class supportedCodims = AllCodims >
 struct FewSubDomainsTraits {
 
   typedef unsigned int SubDomainIndexType;
