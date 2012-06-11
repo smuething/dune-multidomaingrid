@@ -216,8 +216,8 @@ class IntegralTypeSubDomainSet {
 public:
   static const std::size_t maxSize = capacity;
   typedef SubDomainIndexT SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED("SubDomainIndexType is deprecated, use SubDomainIndex instead.");
-  typedef SubDomainIndex DomainType DUNE_DEPRECATED("DomainType is deprecated, use SubDomainIndex instead.");
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubDomainIndex instead.");
+  typedef SubDomainIndex DomainType DUNE_DEPRECATED_MSG("DomainType is deprecated, use SubDomainIndex instead.");
   typedef sds_detail::Iterator<SubDomainIndex,SetStorage> Iterator;
   typedef IntegralTypeSubDomainSet<SubDomainIndex,capacity> This;
 
