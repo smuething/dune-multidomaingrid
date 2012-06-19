@@ -42,8 +42,8 @@ class SingleValueSet {
 public:
 
   typedef SI SubDomainIndex;
-  typedef SI SubDomainIndexType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubDomainIndex instead.");
-  typedef SI DomainType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubDomainIndex instead.");
+  typedef SI SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SI DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   static const std::size_t maxSize = 1;
   static const SubDomainIndex emptyTag = ~SubDomainIndex(0);

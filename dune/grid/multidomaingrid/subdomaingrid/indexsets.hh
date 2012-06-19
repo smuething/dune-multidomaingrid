@@ -52,8 +52,9 @@ class IndexSetWrapper :
 public:
 
   //typedef typename remove_const<GridImp>::type::SubDomainSet SubDomainSet;
-  typedef typename remove_const<GridImp>::type::SubDomainIndexType SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename remove_const<GridImp>::type::SubDomainIndex SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   typedef typename MDIndexSet::IndexType IndexType;
   static const int dimension = remove_const<GridImp>::type::dimension;
   //typedef typename SubDomainSet::DomainType DomainType;

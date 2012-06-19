@@ -13,7 +13,7 @@ template<typename GridImp,
          typename IterationController>
 class SubDomainInterfaceIterator;
 
-template<typename SubDomainIndexType>
+template<typename SI>
 class SubDomainToSubDomainController;
 
 template<typename SubDomainSet>
@@ -55,8 +55,9 @@ private:
 
 public:
 
-  typedef typename GridImp::SubDomainIndexType SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename GridImp::SubDomainIndex SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
   typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
@@ -220,22 +221,22 @@ public:
   }
 
   //! Returns the index of the subdomain the first (inside) cell belongs to.
-  SubDomainIndexType subDomain1() const {
+  SubDomainIndex subDomain1() const {
     return _controller.subDomain1();
   }
 
   //! Returns the index of the subdomain the second (outside) cell belongs to.
-  SubDomainIndexType subDomain2() const {
+  SubDomainIndex subDomain2() const {
     return _controller.subDomain2();
   }
 
   //! Use subDomain1() instead.
-  SubDomainIndexType domain1() const DUNE_DEPRECATED {
+  SubDomainIndex domain1() const DUNE_DEPRECATED {
     return this->subDomain1();
   }
 
   //! Use subDomain2() instead.
-  SubDomainIndexType domain2() const DUNE_DEPRECATED {
+  SubDomainIndex domain2() const DUNE_DEPRECATED {
     return this->subDomain2();
   }
 
@@ -295,7 +296,7 @@ public:
   /**
    * \note This method is equivalent to subDomain1().
    */
-  SubDomainIndexType subDomainInInside() const {
+  SubDomainIndex subDomainInInside() const {
     return this->subDomain1();
   }
 
@@ -303,7 +304,7 @@ public:
   /**
    * \note This method is equivalent to subDomain2().
    */
-  SubDomainIndexType subDomainInOutside() const {
+  SubDomainIndex subDomainInOutside() const {
     return this->subDomain2();
   }
 

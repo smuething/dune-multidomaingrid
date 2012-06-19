@@ -364,9 +364,9 @@ private:
 public:
 
   //! The (integer) type used to identify subdomains.
-  typedef typename MDGridTraits::SubDomainIndexType SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubdomainIndex instead");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("SubDomainType is deprecated, use SubdomainIndex instead");
+  typedef typename MDGridTraits::SubDomainIndex SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubdomainIndex instead");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubdomainIndex instead");
 
   //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;

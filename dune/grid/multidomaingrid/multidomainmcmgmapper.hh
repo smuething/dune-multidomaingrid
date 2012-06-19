@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <dune/grid/common/mcmgmapper.hh>
+#include <dune/geometry/referenceelements.hh>
 
 /**
  * @file
@@ -57,8 +58,9 @@ class MultiDomainMCMGMapper : public MultipleCodimMultipleGeomTypeMapper<GV,Layo
 public:
 
   typedef typename GV::IndexSet::IndexType IndexType;
-  typedef typename GV::Grid::SubDomainIndexType SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
+  typedef typename GV::Grid::SubDomainIndex SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SubDomainIndex DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   MultiDomainMCMGMapper (const GV& gridView, const Layout<GV::dimension> layout) :
     Base(gridView,layout),
@@ -87,7 +89,7 @@ public:
       \return An index in the range 0 ... Max number of entities in set - 1.
   */
   template<class EntityType>
-  int map (SubDomainIndexType subDomain, const EntityType& e) const
+  int map (SubDomainIndex subDomain, const EntityType& e) const
   {
     return _is.index(subDomain,e) + _offset[subDomain].find(e.type())->second;
   }
@@ -99,7 +101,7 @@ public:
       \param codim Codimension of the subendity
       \return An index in the range 0 ... Max number of entities in set - 1.
   */
-  int map (SubDomainIndexType subDomain, const typename GV::template Codim<0>::Entity& e, int i, unsigned int codim) const
+  int map (SubDomainIndex subDomain, const typename GV::template Codim<0>::Entity& e, int i, unsigned int codim) const
   {
     GeometryType gt=GenericReferenceElements<double,GV::dimension>::general(e.type()).type(i,codim);
     return _is.subIndex(subDomain,e,i,codim) + _offset[subDomain].find(gt)->second;
@@ -113,7 +115,7 @@ public:
 
       \return Size of the entity set.
   */
-  int size (SubDomainIndexType subDomain) const
+  int size (SubDomainIndex subDomain) const
   {
     return _n[subDomain];
   }
@@ -125,7 +127,7 @@ public:
       \return true if entity is in entity set of the mapper
   */
   template<class EntityType>
-  bool contains (SubDomainIndexType subDomain, const EntityType& e, IndexType& result) const
+  bool contains (SubDomainIndex subDomain, const EntityType& e, IndexType& result) const
   {
     if(!_is.contains(subDomain,e) || !_layout.contains(e.type()))
       {
@@ -144,7 +146,7 @@ public:
       \return true if entity is in entity set of the mapper
   */
   template<int cc> // this is now the subentity's codim
-  bool contains (SubDomainIndexType subDomain, const typename GV::template Codim<0>::Entity& e, int i, IndexType& result) const
+  bool contains (SubDomainIndex subDomain, const typename GV::template Codim<0>::Entity& e, int i, IndexType& result) const
   {
     result = this->template map<cc>(subDomain,e,i);
     return true;
@@ -156,7 +158,7 @@ public:
   void update()
   {
     static_cast<Base*>(this)->update();
-    for (SubDomainIndexType subDomain = 0; subDomain < GV::Grid::maxSubDomainIndex; ++subDomain) {
+    for (SubDomainIndex subDomain = 0; subDomain < GV::Grid::maxSubDomainIndex; ++subDomain) {
       std::size_t& n = _n[subDomain];
       std::map<GeometryType,IndexType>& offset = _offset[subDomain];
       n=0; // zero data elements

@@ -5,6 +5,7 @@
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/push_back.hpp>
 #include <boost/integer_traits.hpp>
+#include <dune/common/deprecated.hh>
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 #include <dune/grid/multidomaingrid/arraybasedset.hh>
 #include <dune/grid/multidomaingrid/singlevalueset.hh>
@@ -49,13 +50,14 @@ struct CellAndVertexCodims {
 template<int dim, std::size_t subDomainsPerCell, std::size_t subDomainCount, template<int dim_, int codim> class supportedCodims = AllCodims>
 struct ArrayBasedTraits {
 
-  typedef int SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
-  static const SubDomainIndexType empty = -1;
+  typedef int SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  static const SubDomainIndex empty = -1;
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
-  static const SubDomainIndexType maxSubDomainIndex = subDomainCount;
+  static const SubDomainIndex maxSubDomainIndex = subDomainCount;
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -66,7 +68,7 @@ struct ArrayBasedTraits {
   template<int codim>
   struct CodimBase {
     static const std::size_t maxSubDomainsPerEntity = (2<<(codim)) * maxSubDomainsPerCell;
-    typedef Dune::mdgrid::ArrayBasedSet<SubDomainIndexType,maxSubDomainsPerEntity> SubDomainSet;
+    typedef Dune::mdgrid::ArrayBasedSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer; // TODO: really int??
     typedef std::array<int,maxSubDomainIndex> SizeContainer; // TODO: really int??
   };
@@ -81,13 +83,14 @@ struct ArrayBasedTraits {
 template<int dim, std::size_t maxSubDomains, template<int dim_, int codim> class supportedCodims = AllCodims >
 struct FewSubDomainsTraits {
 
-  typedef unsigned int SubDomainIndexType;
-  typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
-  static const SubDomainIndexType empty = 0; // this is not used, but has to be present to make the compiler happy
+  typedef unsigned int SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  static const SubDomainIndex empty = ~SubDomainIndex(0); // this is not used, but has to be present to make the compiler happy
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
-  static const SubDomainIndexType maxSubDomainIndex = maxSubDomains - 1;
+  static const SubDomainIndex maxSubDomainIndex = maxSubDomains - 1;
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -98,7 +101,7 @@ struct FewSubDomainsTraits {
   template<int codim>
   struct CodimBase {
     static const std::size_t maxSubDomainsPerEntity = maxSubDomains;
-    typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainIndexType,maxSubDomainsPerEntity> SubDomainSet;
+    typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
     typedef std::array<int,maxSubDomainIndex+1> SizeContainer;
   };

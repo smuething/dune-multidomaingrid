@@ -39,7 +39,8 @@ class AllInterfacesController
   template<typename GridImp>
   friend class LevelAllSubDomainInterfacesIterator;
 
-  typedef typename SubDomainSet::SubDomainIndexType SubDomainIndexType;
+  typedef typename SubDomainSet::SubDomainIndex SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   typedef typename SubDomainSet::Iterator SubDomainIterator;
 
   template<typename Iterator>
@@ -114,12 +115,12 @@ class AllInterfacesController
     , _subDomain2End(_subDomain2Iterator)
   {}
 
-  SubDomainIndexType subDomain1() const
+  SubDomainIndex subDomain1() const
   {
     return *_subDomain1Iterator;
   }
 
-  SubDomainIndexType subDomain2() const
+  SubDomainIndex subDomain2() const
   {
     return *_subDomain2Iterator;
   }
