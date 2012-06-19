@@ -16,44 +16,45 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename SubDomainIndexType>
+template<typename SI>
 class SingleValueSet;
 
 
-template<typename SubDomainIndexType>
-bool setContains(const SingleValueSet<SubDomainIndexType>& a,
-                 const SingleValueSet<SubDomainIndexType>& b);
+template<typename SI>
+bool setContains(const SingleValueSet<SI>& a,
+                 const SingleValueSet<SI>& b);
 
 
-template<typename SubDomainIndexType>
-void setAdd(SingleValueSet<SubDomainIndexType>& a,
-            const SingleValueSet<SubDomainIndexType>& b);
+template<typename SI>
+void setAdd(SingleValueSet<SI>& a,
+            const SingleValueSet<SI>& b);
 
 
-template<typename SubDomainIndexT>
+template<typename SI>
 class SingleValueSet {
 
-  friend bool setContains<>(const SingleValueSet<SubDomainIndexT>& a,
-                        const SingleValueSet<SubDomainIndexT>& b);
+  friend bool setContains<>(const SingleValueSet<SI>& a,
+                        const SingleValueSet<SI>& b);
 
-  friend void setAdd<>(SingleValueSet<SubDomainIndexT>& a,
-                   const SingleValueSet<SubDomainIndexT>& b);
+  friend void setAdd<>(SingleValueSet<SI>& a,
+                   const SingleValueSet<SI>& b);
 
 public:
 
-  typedef SubDomainIndexT SubDomainIndexType;
-  typedef SubDomainIndexType DomainType DUNE_DEPRECATED;
+  typedef SI SubDomainIndex;
+  typedef SI SubDomainIndexType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubDomainIndex instead.");
+  typedef SI DomainType DUNE_DEPRECATED_MSG("SubDomainIndexType is deprecated, use SubDomainIndex instead.");
 
   static const std::size_t maxSize = 1;
-  static const SubDomainIndexType emptyTag = ~SubDomainIndexType(0);
-  typedef const SubDomainIndexType* Iterator;
-  typedef SingleValueSet<SubDomainIndexType> This;
+  static const SubDomainIndex emptyTag = ~SubDomainIndex(0);
+  typedef const SubDomainIndex* Iterator;
+  typedef SingleValueSet<SubDomainIndex> This;
 
   enum SetState {emptySet,simpleSet,multipleSet};
 
   struct DataHandle
   {
-    typedef SubDomainIndexType DataType;
+    typedef SubDomainIndex DataType;
 
     static bool fixedsize(int dim, int codim)
     {
@@ -74,7 +75,7 @@ public:
     template<typename MessageBufferImp>
     static void scatter(MessageBufferImp& buf, SingleValueSet& sds, std::size_t n)
     {
-      SubDomainIndexType i;
+      SubDomainIndex i;
       buf.read(i);
       assert(sds._set == emptyTag || sds._set == i);
       sds._set = i;
@@ -90,7 +91,7 @@ public:
     return &_set + (_set != emptyTag ? 1 : 0);
   }
 
-  bool contains(SubDomainIndexType domain) const {
+  bool contains(SubDomainIndex domain) const {
     return _set == domain;
   }
 
@@ -119,17 +120,17 @@ public:
     _set = emptyTag;
   }
 
-  void add(SubDomainIndexType domain) {
+  void add(SubDomainIndex domain) {
     assert(_set == emptyTag || _set == domain);
     _set = domain;
   }
 
-  void remove(SubDomainIndexType domain) {
+  void remove(SubDomainIndex domain) {
     assert(_set == domain);
     _set = emptyTag;
   }
 
-  void set(SubDomainIndexType domain) {
+  void set(SubDomainIndex domain) {
     _set = domain;
   }
 
@@ -138,7 +139,7 @@ public:
     setAdd(*this,set);
   }
 
-  int domainOffset(SubDomainIndexType domain) const {
+  int domainOffset(SubDomainIndex domain) const {
     assert(_set == domain);
     return 0;
   }
@@ -148,21 +149,21 @@ public:
   {}
 
 private:
-  SubDomainIndexType _set;
+  SubDomainIndex _set;
 
 };
 
 
-template<typename SubDomainIndexType>
-inline bool setContains(const SingleValueSet<SubDomainIndexType>& a,
-                        const SingleValueSet<SubDomainIndexType>& b) {
+template<typename SI>
+inline bool setContains(const SingleValueSet<SI>& a,
+                        const SingleValueSet<SI>& b) {
   return a._set == b._set;
 }
 
-template<typename SubDomainIndexType>
-inline void setAdd(SingleValueSet<SubDomainIndexType>& a,
-                   const SingleValueSet<SubDomainIndexType>& b) {
-  assert(a._set == SingleValueSet<SubDomainIndexType>::emptyTag || a._set == b._set);
+template<typename SI>
+inline void setAdd(SingleValueSet<SI>& a,
+                   const SingleValueSet<SI>& b) {
+  assert(a._set == SingleValueSet<SI>::emptyTag || a._set == b._set);
   a._set = b._set;
 }
 
