@@ -83,7 +83,7 @@ struct FewSubDomainsTraits {
 
   typedef unsigned int SubDomainIndexType;
   typedef SubDomainIndexType SubDomainType DUNE_DEPRECATED;
-  static const SubDomainIndexType empty = -1; // this is not used, but has to be present to make the compiler happy
+  static const SubDomainIndexType empty = 0; // this is not used, but has to be present to make the compiler happy
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
