@@ -7,6 +7,7 @@
 #include <dune/common/static_assert.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>
+#include <dune/common/deprecated.hh>
 #include <type_traits>
 #include <cassert>
 #include <strings.h>
