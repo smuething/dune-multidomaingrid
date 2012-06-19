@@ -7,7 +7,6 @@
 #include <dune/common/static_assert.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>
-#include <boost/integer_traits.hpp>
 #include <type_traits>
 #include <cassert>
 #include <strings.h>
@@ -45,7 +44,7 @@ public:
   typedef SubDomainIndexType DomainType DUNE_DEPRECATED;
 
   static const std::size_t maxSize = 1;
-  static const SubDomainIndexType emptyTag = boost::integer_traits<SubDomainIndexType>::const_max;
+  static const SubDomainIndexType emptyTag = ~SubDomainIndexType(0);
   typedef const SubDomainIndexType* Iterator;
   typedef SingleValueSet<SubDomainIndexType> This;
 
