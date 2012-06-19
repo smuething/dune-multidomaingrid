@@ -1,6 +1,7 @@
 #ifndef DUNE_MULTIDOMAINGRID_ALLSUBDOMAININTERFACESITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_ALLSUBDOMAININTERFACESITERATOR_HH
 
+#include <dune/common/fvector.hh>
 #include <dune/grid/multidomaingrid/subdomaininterfaceiterator.hh>
 
 namespace Dune {
