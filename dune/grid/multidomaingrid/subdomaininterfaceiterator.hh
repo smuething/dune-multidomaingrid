@@ -261,7 +261,7 @@ public:
   }
 
   //! Returns the local geometry in the corresponding cell of the first subdomain.
-  LocalGeometry geometryInside() const {
+  LocalGeometry geometryInInside() const {
     return LocalGeometry(_hostIntersectionIterator->geometryInInside());
   }
 
