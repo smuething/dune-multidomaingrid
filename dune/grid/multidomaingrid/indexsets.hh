@@ -712,6 +712,12 @@ private:
         if (_full) {
           // resize index map
           c.indexMap[*it].resize(_his.size(*it));
+        } else if (codim > 0) {
+          // clear out marked state for codim > 0 (we cannot keep the old
+          // state for subentities, as doing so will leave stale entries if
+          // elements are removed from a subdomain
+          for (auto& mapEntry : c.indexMap[*it])
+            mapEntry.domains.clear();
         }
         // reset SizeMap counter
         std::fill(c.sizeMap[*it].begin(),c.sizeMap[*it].end(),0);
