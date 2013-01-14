@@ -13,13 +13,13 @@ template<typename GridImp,
 	 typename MultiDomainIntersectionType>
 class IntersectionWrapper {
 
-  template<class, template<class> class, template<class> class>
+  template<class, class, class>
   friend class Dune::IntersectionIterator;
 
   template<class,class,class,class,class>
   friend class IntersectionIteratorWrapper;
 
-  template<class, template<class> class>
+  template<class, class>
   friend class Dune::Intersection;
 
   template<typename MDGrid>

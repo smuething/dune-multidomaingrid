@@ -60,13 +60,13 @@ struct SubDomainGridFamily {
     typedef GridImp Grid;
 
     /** \brief The type of the intersection at the leafs of the grid. */
-    typedef Dune::Intersection<const GridImp, LeafIntersectionImp>  LeafIntersection;
+    typedef Dune::Intersection<const GridImp, LeafIntersectionImp<const GridImp> >  LeafIntersection;
     /** \brief The type of the intersection at the levels of the grid. */
-    typedef Dune::Intersection<const GridImp, LevelIntersectionImp> LevelIntersection;
+    typedef Dune::Intersection<const GridImp, LevelIntersectionImp<const GridImp> > LevelIntersection;
     /** \brief The type of the intersection iterator at the leafs of the grid. */
-    typedef Dune::IntersectionIterator<const GridImp, LeafIntersectionIteratorImp, LeafIntersectionImp>   LeafIntersectionIterator;
+    typedef Dune::IntersectionIterator<const GridImp, LeafIntersectionIteratorImp<const GridImp>, LeafIntersectionImp<const GridImp> >   LeafIntersectionIterator;
     /** \brief The type of the intersection iterator at the levels of the grid. */
-    typedef Dune::IntersectionIterator<const GridImp, LevelIntersectionIteratorImp, LevelIntersectionImp> LevelIntersectionIterator;
+    typedef Dune::IntersectionIterator<const GridImp, LevelIntersectionIteratorImp<const GridImp>, LevelIntersectionImp<const GridImp> > LevelIntersectionIterator;
 
     /** \brief The type of the  hierarchic iterator. */
     typedef Dune::EntityIterator< 0, const GridImp, HierarchicIteratorImp< const GridImp > > HierarchicIterator;
