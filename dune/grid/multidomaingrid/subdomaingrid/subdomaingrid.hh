@@ -18,6 +18,7 @@
 #include <dune/grid/multidomaingrid/subdomaingrid/intersectioniterator.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/indexsets.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/gridview.hh>
 
 
 namespace Dune {
@@ -51,8 +52,8 @@ struct SubDomainGridFamily {
             template<int,PartitionIteratorType,class> class LeafIteratorImp,
             class LevelIndexSetImp, class LeafIndexSetImp,
             class GlobalIdSetImp, class GIDType, class LocalIdSetImp, class LIDType, class CCType,
-            template<class,PartitionIteratorType> class LevelGridViewTraits = DefaultLevelGridViewTraits,
-            template<class,PartitionIteratorType> class LeafGridViewTraits = DefaultLeafGridViewTraits
+            template<class,PartitionIteratorType> class LevelGridViewTraits,
+            template<class,PartitionIteratorType> class LeafGridViewTraits
             >
   struct SubDomainGridTraits
   {
@@ -170,7 +171,9 @@ struct SubDomainGridFamily {
     typename MDGrid::Traits::GlobalIdSet::IdType,
     IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::LocalIdSet>,
     typename MDGrid::Traits::LocalIdSet::IdType,
-    typename MDGrid::HostGridType::CollectiveCommunication
+    typename MDGrid::HostGridType::CollectiveCommunication,
+    LevelGridViewTraits,
+    LeafGridViewTraits
     > Traits;
 
 };
@@ -239,6 +242,12 @@ class SubDomainGrid :
 
   template<typename GridImp>
   friend class LevelIntersectionWrapper;
+
+  template<typename, PartitionIteratorType>
+  friend class LevelGridView;
+
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
 
   typedef GridDefaultImplementation<MDGrid::dimension,
                                     MDGrid::dimensionworld,

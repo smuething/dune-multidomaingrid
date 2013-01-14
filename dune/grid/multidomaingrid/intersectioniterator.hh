@@ -5,6 +5,13 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename, PartitionIteratorType>
+class LevelGridView;
+
+template<typename, PartitionIteratorType>
+class LeafGridView;
+
+
 template<typename GridImp,
 	 typename WrapperImp,
 	 typename HostIntersectionIteratorType,
@@ -101,6 +108,10 @@ class LeafIntersectionIteratorWrapper :
   template<typename,typename>
   friend class MultiDomainGrid;
 
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
+
   typedef typename GridImp::HostGridType::Traits::LeafIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LeafIntersection Intersection;
 
@@ -136,6 +147,10 @@ class LevelIntersectionIteratorWrapper :
 
   template<typename,typename>
   friend class MultiDomainGrid;
+
+  template<typename, PartitionIteratorType>
+  friend class LevelGridView;
+
 
   typedef typename GridImp::HostGridType::Traits::LevelIntersectionIterator HostIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;

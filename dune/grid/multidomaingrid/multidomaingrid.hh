@@ -35,6 +35,7 @@ namespace detail {
 #include <dune/grid/multidomaingrid/intersectioniterator.hh>
 #include <dune/grid/multidomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/indexsets.hh>
+#include <dune/grid/multidomaingrid/gridview.hh>
 #include <dune/grid/multidomaingrid/mdgridtraits.hh>
 
 #include <dune/grid/multidomaingrid/subdomaintosubdomaininterfaceiterator.hh>
@@ -73,8 +74,8 @@ struct MultiDomainGridFamily {
             template<class> class LevelSubDomainInterfaceIteratorImp,
             template<class> class LeafAllSubDomainInterfacesIteratorImp,
             template<class> class LevelAllSubDomainInterfacesIteratorImp,
-            template<class,PartitionIteratorType> class LevelGridViewTraits = DefaultLevelGridViewTraits,
-            template<class,PartitionIteratorType> class LeafGridViewTraits = DefaultLeafGridViewTraits
+            template<class,PartitionIteratorType> class LevelGridViewTraits,
+            template<class,PartitionIteratorType> class LeafGridViewTraits
             >
   struct MultiDomainGridTraits
   {
@@ -198,7 +199,9 @@ struct MultiDomainGridFamily {
     LeafSubDomainInterfaceIterator,
     LevelSubDomainInterfaceIterator,
     LeafAllSubDomainInterfacesIterator,
-    LevelAllSubDomainInterfacesIterator
+    LevelAllSubDomainInterfacesIterator,
+    LevelGridViewTraits,
+    LeafGridViewTraits
     > Traits;
 
 };
@@ -301,6 +304,12 @@ class MultiDomainGrid :
 
   template<typename,typename,typename,typename>
   friend class subdomain::IntersectionWrapper;
+
+  template<typename,PartitionIteratorType>
+  friend class LeafGridView;
+
+  template<typename,PartitionIteratorType>
+  friend class LevelGridView;
 
   typedef GridDefaultImplementation<HostGrid::dimension,
                                     HostGrid::dimensionworld,
