@@ -7,6 +7,13 @@ namespace mdgrid {
 
 namespace subdomain {
 
+template<typename, PartitionIteratorType>
+class LevelGridView;
+
+template<typename, PartitionIteratorType>
+class LeafGridView;
+
+
 template<typename GridImp,
 	 typename WrapperImp,
          typename IndexSet,
@@ -14,10 +21,10 @@ template<typename GridImp,
 	 typename IntersectionType>
 class IntersectionIteratorWrapper {
 
-  template<class, template<class> class, template<class> class>
+  template<class, class, class>
   friend class Dune::IntersectionIterator;
 
-  template<class, template<class> class>
+  template<class, class>
   friend class Dune::Intersection;
 
   typedef MultiDomainIntersectionIteratorType MultiDomainIntersectionIterator;
@@ -101,6 +108,10 @@ class LeafIntersectionIteratorWrapper :
   template<typename>
   friend class SubDomainGrid;
 
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
+
   typedef typename GridImp::MultiDomainGrid::Traits::LeafIntersectionIterator MultiDomainIntersectionIterator;
   typedef typename GridImp::Traits::LeafIntersection Intersection;
 
@@ -135,6 +146,10 @@ class LevelIntersectionIteratorWrapper :
 
   template<typename>
   friend class SubDomainGrid;
+
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
 
   typedef typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator MultiDomainIntersectionIterator;
   typedef typename GridImp::Traits::LevelIntersection Intersection;

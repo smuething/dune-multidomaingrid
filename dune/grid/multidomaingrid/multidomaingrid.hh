@@ -35,6 +35,7 @@ namespace detail {
 #include <dune/grid/multidomaingrid/intersectioniterator.hh>
 #include <dune/grid/multidomaingrid/idsets.hh>
 #include <dune/grid/multidomaingrid/indexsets.hh>
+#include <dune/grid/multidomaingrid/gridview.hh>
 #include <dune/grid/multidomaingrid/mdgridtraits.hh>
 
 #include <dune/grid/multidomaingrid/subdomaintosubdomaininterfaceiterator.hh>
@@ -73,8 +74,8 @@ struct MultiDomainGridFamily {
             template<class> class LevelSubDomainInterfaceIteratorImp,
             template<class> class LeafAllSubDomainInterfacesIteratorImp,
             template<class> class LevelAllSubDomainInterfacesIteratorImp,
-            template<class,PartitionIteratorType> class LevelGridViewTraits = DefaultLevelGridViewTraits,
-            template<class,PartitionIteratorType> class LeafGridViewTraits = DefaultLeafGridViewTraits
+            template<class,PartitionIteratorType> class LevelGridViewTraits,
+            template<class,PartitionIteratorType> class LeafGridViewTraits
             >
   struct MultiDomainGridTraits
   {
@@ -82,13 +83,13 @@ struct MultiDomainGridFamily {
     typedef GridImp Grid;
 
     /** \brief The type of the intersection at the leafs of the grid. */
-    typedef Dune::Intersection<const GridImp, LeafIntersectionImp>  LeafIntersection;
+    typedef Dune::Intersection<const GridImp, LeafIntersectionImp<const GridImp> >  LeafIntersection;
     /** \brief The type of the intersection at the levels of the grid. */
-    typedef Dune::Intersection<const GridImp, LevelIntersectionImp> LevelIntersection;
+    typedef Dune::Intersection<const GridImp, LevelIntersectionImp<const GridImp> > LevelIntersection;
     /** \brief The type of the intersection iterator at the leafs of the grid. */
-    typedef Dune::IntersectionIterator<const GridImp, LeafIntersectionIteratorImp, LeafIntersectionImp>   LeafIntersectionIterator;
+    typedef Dune::IntersectionIterator<const GridImp, LeafIntersectionIteratorImp<const GridImp>, LeafIntersectionImp<const GridImp> >   LeafIntersectionIterator;
     /** \brief The type of the intersection iterator at the levels of the grid. */
-    typedef Dune::IntersectionIterator<const GridImp, LevelIntersectionIteratorImp, LevelIntersectionImp> LevelIntersectionIterator;
+    typedef Dune::IntersectionIterator<const GridImp, LevelIntersectionIteratorImp<const GridImp>, LevelIntersectionImp<const GridImp> > LevelIntersectionIterator;
 
     /** \brief The type of the  hierarchic iterator. */
     typedef Dune::EntityIterator< 0, const GridImp, HierarchicIteratorImp< const GridImp > > HierarchicIterator;
@@ -198,7 +199,9 @@ struct MultiDomainGridFamily {
     LeafSubDomainInterfaceIterator,
     LevelSubDomainInterfaceIterator,
     LeafAllSubDomainInterfacesIterator,
-    LevelAllSubDomainInterfacesIterator
+    LevelAllSubDomainInterfacesIterator,
+    LevelGridViewTraits,
+    LeafGridViewTraits
     > Traits;
 
 };
@@ -301,6 +304,12 @@ class MultiDomainGrid :
 
   template<typename,typename,typename,typename>
   friend class subdomain::IntersectionWrapper;
+
+  template<typename,PartitionIteratorType>
+  friend class LeafGridView;
+
+  template<typename,PartitionIteratorType>
+  friend class LevelGridView;
 
   typedef GridDefaultImplementation<HostGrid::dimension,
                                     HostGrid::dimensionworld,

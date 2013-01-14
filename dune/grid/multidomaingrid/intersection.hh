@@ -10,7 +10,7 @@ template<typename GridImp,
 	 typename HostIntersectionType>
 class IntersectionWrapper {
 
-  template<class, template<class> class>
+  template<class, class>
   friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>
@@ -158,7 +158,7 @@ class LeafIntersectionWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
-  template<typename,template<class> class>
+  template<typename, typename>
   friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>
@@ -202,7 +202,7 @@ class LevelIntersectionWrapper :
   template<typename, typename, typename, typename>
   friend class IntersectionIteratorWrapper;
 
-  template<typename,template<class> class>
+  template<typename, typename>
   friend class Dune::Intersection;
 
   template<typename,typename,typename,typename>

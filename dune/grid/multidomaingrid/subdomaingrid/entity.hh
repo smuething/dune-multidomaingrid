@@ -28,6 +28,12 @@ class HierarchicIteratorWrapper;
 template<typename MDGrid>
 class SubDomainGrid;
 
+template<typename, PartitionIteratorType>
+class LevelGridView;
+
+template<typename, PartitionIteratorType>
+class LeafGridView;
+
 template<typename HostES>
 class EntitySeedWrapper
 {
@@ -81,6 +87,13 @@ class MakeableEntityWrapper :
 
   template<typename>
   friend class HierarchicIteratorWrapper;
+
+  template<typename, PartitionIteratorType>
+  friend class LevelGridView;
+
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
 
   typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
 
@@ -227,6 +240,13 @@ class EntityWrapper<0,dim,GridImp> :
   template<int, int, typename, template<int,int,typename> class>
   friend class Entity;
 
+  template<typename, PartitionIteratorType>
+  friend class LevelGridView;
+
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
+
   typedef typename GridImp::MDGridType::Traits::template Codim<0>::EntityPointer MultiDomainEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity HostEntity;
@@ -276,22 +296,6 @@ public:
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
     return EntityPointerWrapper<cc,GridImp>(_grid,_multiDomainEntityPointer->subEntity<cc>(i));
-  }
-
-  LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_multiDomainEntityPointer->ileafbegin());
-  }
-
-  LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_grid,_multiDomainEntityPointer->ileafend());
-  }
-
-  LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_multiDomainEntityPointer->ilevelbegin());
-  }
-
-  LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_grid,level(),_multiDomainEntityPointer->ilevelend());
   }
 
   EntityPointer father() const {

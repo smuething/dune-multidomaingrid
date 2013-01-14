@@ -23,6 +23,13 @@ class HierarchicIteratorWrapper;
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
+template<typename, PartitionIteratorType>
+class LevelGridView;
+
+template<typename, PartitionIteratorType>
+class LeafGridView;
+
+
 template<typename HostES>
 class EntitySeedWrapper
 {
@@ -73,6 +80,13 @@ class MakeableEntityWrapper :
 
   template<typename>
   friend class HierarchicIteratorWrapper;
+
+  template<typename, PartitionIteratorType>
+  friend class LevelGridView;
+
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
 
   typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
 
@@ -197,6 +211,13 @@ class EntityWrapper<0,dim,GridImp> :
   template<typename,typename>
   friend class MultiDomainGrid;
 
+  template<typename, PartitionIteratorType>
+  friend class LevelGridView;
+
+  template<typename, PartitionIteratorType>
+  friend class LeafGridView;
+
+
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
   typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity HostEntity;
 
@@ -244,22 +265,6 @@ public:
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
     return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->subEntity<cc>(i));
-  }
-
-  LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafbegin());
-  }
-
-  LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafend());
-  }
-
-  LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelbegin());
-  }
-
-  LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelend());
   }
 
   EntityPointer father() const {
