@@ -89,6 +89,12 @@ class MakeableEntityWrapper :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(grid,multiDomainEntityPointer))
   {}
 
+  MakeableEntityWrapper& operator=(const MakeableEntityWrapper& rhs)
+  {
+    reset(rhs.multiDomainEntityPointer());
+    return *this;
+  }
+
   template<typename MultiDomainIteratorOrEntityPointer>
   void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
     GridImp::getRealImplementation(*this).reset(multiDomainEntityPointer);

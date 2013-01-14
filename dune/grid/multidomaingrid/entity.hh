@@ -81,6 +81,12 @@ class MakeableEntityWrapper :
     GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(hostEntityPointer))
   {}
 
+  MakeableEntityWrapper& operator=(const MakeableEntityWrapper& rhs)
+  {
+    reset(rhs.hostEntityPointer());
+    return *this;
+  }
+
   template<typename HostIteratorOrEntityPointer>
   void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
     GridImp::getRealImplementation(*this).reset(hostEntityPointer);
