@@ -105,7 +105,10 @@ private:
   }
 
   std::size_t boundarySegmentIndex() const {
-    return _multiDomainIntersection->boundarySegmentIndex();
+    checkIntersectionType();
+    // FIXME: We need to do something about subdomain boundaries in the interior of
+    //        the MultiDomainGrid
+    return _intersectionType == GridImp::boundary ? _multiDomainIntersection->boundarySegmentIndex() : 0;
   }
 
   bool neighbor() const {
