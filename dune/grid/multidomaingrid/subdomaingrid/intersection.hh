@@ -72,17 +72,21 @@ private:
     if (!_intersectionTypeTested) {
       if (_multiDomainIntersection->boundary()) {
         _intersectionType = GridImp::boundary;
+        _intersectionTypeTested = true;
         return;
       }
       if (!_multiDomainIntersection->neighbor()) {
         _intersectionType = GridImp::processor;
+        _intersectionTypeTested = true;
         return;
       }
       if (_indexSet.containsMultiDomainEntity(*(_multiDomainIntersection->outside()))) {
         _intersectionType = GridImp::neighbor;
+        _intersectionTypeTested = true;
         return;
       } else {
         _intersectionType = GridImp::foreign;
+        _intersectionTypeTested = true;
         return;
       }
       assert(false && "Should never get here - invalid intersection type!");
@@ -92,7 +96,7 @@ private:
   bool boundary() const {
     checkIntersectionType();
     return
-      _multiDomainIntersection->boundary() ||
+      _intersectionType == GridImp::boundary ||
       _intersectionType == GridImp::foreign;
   }
 
