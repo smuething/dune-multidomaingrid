@@ -33,12 +33,12 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.levelView(this->level()).ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelView(entity.level()).ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
   }
 
   IntersectionIterator iend(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.levelView(this->level()).iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelView(entity.level()).iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
   }
 
 };
