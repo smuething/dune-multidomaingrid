@@ -48,10 +48,11 @@ class HierarchicIteratorWrapper :
     incrementToNextValidPosition();
   }
 
-  const HierarchicIteratorWrapper& operator=(const HierarchicIteratorWrapper& rhs) {
+  HierarchicIteratorWrapper& operator=(const HierarchicIteratorWrapper& rhs) {
     assert(_grid == rhs._grid);
-    _multiDomainIterator == rhs._multiDomainIterator;
+    _multiDomainIterator = rhs._multiDomainIterator;
     _multiDomainEnd = rhs._multiDomainEnd;
+    static_cast<EntityPointerWrapper<0,GridImp>&>(*this) = static_cast<const EntityPointerWrapper<0,GridImp>&>(rhs);
     return *this;
   }
 
