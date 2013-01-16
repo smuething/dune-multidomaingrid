@@ -307,6 +307,11 @@ public:
     return EntitySeed(_hostEntityPointer->seed());
   }
 
+  bool hasBoundaryIntersections () const
+  {
+    return _hostEntityPointer->hasBoundaryIntersections();
+  }
+
 private:
 
   HostEntityPointer _hostEntityPointer;

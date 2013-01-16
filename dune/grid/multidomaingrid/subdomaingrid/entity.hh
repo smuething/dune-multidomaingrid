@@ -342,6 +342,32 @@ public:
     return EntitySeed(hostEntity().seed());
   }
 
+  bool hasBoundaryIntersections () const
+  {
+    typedef typename GridImp::template Codim<0>::Entity Entity;
+    Entity entity(*this);
+
+    {
+      typedef typename GridImp::LevelIntersectionIterator IntersectionIterator;
+      IntersectionIterator end = _grid.levelView(level()).iend(entity);
+      for(IntersectionIterator it = _grid.levelView(level()).ibegin(entity); it != end; ++it)
+      {
+        if( it->boundary() ) return true;
+      }
+    }
+
+    {
+      typedef typename GridImp::LeafIntersectionIterator IntersectionIterator;
+      IntersectionIterator end = _grid.leafView().iend(entity);
+      for(IntersectionIterator it = _grid.leafView().ibegin(entity); it != end; ++it)
+      {
+        if( it->boundary() ) return true;
+      }
+    }
+
+    return false;
+  }
+
 private:
 
   const GridImp& _grid;
