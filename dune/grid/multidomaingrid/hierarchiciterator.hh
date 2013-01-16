@@ -11,7 +11,7 @@ class HierarchicIteratorWrapper :
 {
 
   template< int cd, class Grid, class IteratorImp >
-  friend class EntityIterator;
+  friend class ::Dune::EntityIterator;
 
   template<int, int, typename>
   friend class MakeableEntityWrapper;

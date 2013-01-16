@@ -44,7 +44,7 @@ class EntitySeedWrapper
   friend class SubDomainGrid;
 
   template<typename,typename>
-  friend class MultiDomainGrid;
+  friend class ::Dune::mdgrid::MultiDomainGrid;
 
   template<int, int, typename>
   friend class EntityWrapper;
@@ -295,7 +295,7 @@ public:
 
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
-    return EntityPointerWrapper<cc,GridImp>(_grid,_multiDomainEntityPointer->subEntity<cc>(i));
+    return EntityPointerWrapper<cc,GridImp>(_grid,_multiDomainEntityPointer->template subEntity<cc>(i));
   }
 
   EntityPointer father() const {

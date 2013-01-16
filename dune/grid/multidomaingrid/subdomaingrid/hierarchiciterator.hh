@@ -13,7 +13,7 @@ class HierarchicIteratorWrapper :
 {
 
   template< int cd, class Grid, class IteratorImp >
-  friend class EntityIterator;
+  friend class ::Dune::EntityIterator;
 
   template<int, int, typename>
   friend class MakeableEntityWrapper;
@@ -22,7 +22,7 @@ class HierarchicIteratorWrapper :
   friend class EntityWrapper;
 
   template<typename, typename>
-  friend class EntityPointer;
+  friend class ::Dune::EntityPointer;
 
   typedef typename GridImp::MDGridType::Traits::template Codim<0>::Entity::HierarchicIterator MultiDomainHierarchicIterator;
   typedef typename GridImp::Traits::LevelIndexSet IndexSet;

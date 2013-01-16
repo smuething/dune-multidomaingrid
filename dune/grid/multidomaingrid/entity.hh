@@ -264,7 +264,7 @@ public:
 
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
-    return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->subEntity<cc>(i));
+    return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->template subEntity<cc>(i));
   }
 
   EntityPointer father() const {
