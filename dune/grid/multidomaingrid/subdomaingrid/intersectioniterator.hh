@@ -148,7 +148,7 @@ class LevelIntersectionIteratorWrapper :
   friend class SubDomainGrid;
 
   template<typename, PartitionIteratorType>
-  friend class LeafGridView;
+  friend class LevelGridView;
 
 
   typedef typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator MultiDomainIntersectionIterator;
