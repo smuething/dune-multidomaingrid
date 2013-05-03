@@ -56,35 +56,18 @@ void iterate2(const Grid& grid)
 }
 
 
-int main(int argc, char** argv)
+template<typename MDGrid>
+void driver(MDGrid& mdgrid)
 {
-  if (argc < 2)
-    {
-      std::cerr << "Usage: " << argv[0] << " <refinement level>" << std::endl;
-      exit(1);
-    }
-
-  Dune::FieldVector<double,2> L(1.0);
-  Dune::FieldVector<int,2> s(2);
-  Dune::FieldVector<bool,2> p(false);
-  int overlap = 0;
-
-  typedef Dune::YaspGrid<2> HostGrid;
-  HostGrid hostgrid(L,s,p,overlap);
-
-  //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
-  typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
-  MDGrid mdgrid(hostgrid,true);
-
-  typedef MDGrid::LeafGridView MDGV;
-  typedef MDGV::Codim<0>::Iterator Iterator;
-  typedef MDGrid::SubDomainIndexType SubDomainIndexType;
+  typedef typename MDGrid::LeafGridView MDGV;
+  typedef typename MDGV::template Codim<0>::Iterator Iterator;
+  typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
 
   MDGV mdgv = mdgrid.leafView();
 
   mdgrid.startSubDomainMarking();
 
-  for(Iterator it = mdgv.begin<0>(); it != mdgv.end<0>(); ++it)
+  for(Iterator it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
     {
       SubDomainIndexType subdomain = 0;
       if (it->geometry().center()[0] > 0.5)
@@ -106,8 +89,49 @@ int main(int argc, char** argv)
   mdgrid.updateSubDomains();
   mdgrid.postUpdateSubDomains();
 
-  mdgrid.globalRefine(atoi(argv[1]));
-
   //iterate(mdgv);
   iterate2(mdgrid);
+}
+
+
+int main(int argc, char** argv)
+{
+  if (argc < 2)
+    {
+      std::cerr << "Usage: " << argv[0] << " <refinement level>" << std::endl;
+      exit(1);
+    }
+
+  Dune::FieldVector<double,2> L(1.0);
+  Dune::FieldVector<int,2> s(2);
+  Dune::FieldVector<bool,2> p(false);
+  int overlap = 0;
+
+  typedef Dune::YaspGrid<2> HostGrid;
+  HostGrid hostgrid(L,s,p,overlap);
+  hostgrid.globalRefine(atoi(argv[1]));
+
+  {
+    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
+    typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
+    MDGrid mdgrid(hostgrid,true);
+    driver(mdgrid);
+  }
+
+  {
+    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
+    typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
+    MDGrid mdgrid(hostgrid,true);
+    driver(mdgrid);
+  }
+
+  {
+    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
+    typedef Dune::mdgrid::DynamicSubDomainCountTraits<2,8> Traits;
+    typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::DynamicSubDomainCountTraits<2,8> > MDGrid;
+    MDGrid mdgrid(hostgrid,Traits(8),true);
+    driver(mdgrid);
+  }
+
+  return 0;
 }
