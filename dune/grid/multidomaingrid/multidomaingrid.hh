@@ -416,6 +416,7 @@ public:
    */
   explicit MultiDomainGrid(HostGrid& hostGrid, bool supportLevelIndexSets = true) :
     _hostGrid(hostGrid),
+    _traits(),
     _leafIndexSet(*this,hostGrid.leafView()),
     _globalIdSet(*this),
     _localIdSet(*this),
@@ -426,6 +427,28 @@ public:
   {
     updateIndexSets();
   }
+
+  //! Constructs a new MultiDomainGrid from the given host grid.
+  /**
+   *
+   * \param hostGrid                the host grid that will be wrapped by the MultiDomainGrid
+   * \param traits                  an instance of the grid traits, which might contain runtime information
+   * \param supportLevelIndexSets   flag indicating support for level index sets on subdomains
+   */
+  explicit MultiDomainGrid(HostGrid& hostGrid, const MDGridTraitsType& traits, bool supportLevelIndexSets = true) :
+    _hostGrid(hostGrid),
+    _traits(traits),
+    _leafIndexSet(*this,hostGrid.leafView()),
+    _globalIdSet(*this),
+    _localIdSet(*this),
+    _state(stateFixed),
+    _adaptState(stateFixed),
+    _supportLevelIndexSets(supportLevelIndexSets),
+    _maxAssignedSubDomainIndex(0)
+  {
+    updateIndexSets();
+  }
+
   /*@}*/
 
   /** @name Dune grid interface methods */
@@ -921,6 +944,7 @@ public:
 private:
 
   HostGrid& _hostGrid;
+  const MDGridTraitsType _traits;
 
   std::vector<shared_ptr<LevelIndexSetImp> > _levelIndexSets;
   LeafIndexSetImp _leafIndexSet;
