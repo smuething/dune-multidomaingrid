@@ -57,7 +57,11 @@ struct ArrayBasedTraits {
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
-  static const SubDomainIndex maxSubDomainIndex = subDomainCount;
+
+  constexpr SubDomainIndex maxSubDomainIndex()
+  {
+    return subDomainCount;
+  }
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -70,7 +74,7 @@ struct ArrayBasedTraits {
     static const std::size_t maxSubDomainsPerEntity = (2<<(codim)) * maxSubDomainsPerCell;
     typedef Dune::mdgrid::ArrayBasedSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer; // TODO: really int??
-    typedef std::array<int,maxSubDomainIndex> SizeContainer; // TODO: really int??
+    typedef std::array<int,subDomainCount> SizeContainer; // TODO: really int??
   };
 
   template<int codim>
@@ -90,7 +94,11 @@ struct FewSubDomainsTraits {
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
-  static const SubDomainIndex maxSubDomainIndex = maxSubDomains - 1;
+
+  constexpr SubDomainIndex maxSubDomainIndex()
+  {
+    return maxSubDomains - 1;
+  }
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -103,7 +111,7 @@ struct FewSubDomainsTraits {
     static const std::size_t maxSubDomainsPerEntity = maxSubDomains;
     typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
-    typedef std::array<int,maxSubDomainIndex+1> SizeContainer;
+    typedef std::array<int,maxSubDomains> SizeContainer;
   };
 
   template<int codim>

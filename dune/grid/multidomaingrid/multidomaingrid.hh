@@ -379,12 +379,16 @@ public:
 
   //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
+
   //! The largest allowed index for a subdomain.
   /**
-   * \note As subdomain indices always start at 0, this constant also determines the maximum
+   * \note As subdomain indices always start at 0, this also determines the maximum
    * number of possible subdomains.
    */
-  static const SubDomainIndex maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
+  const SubDomainIndex maxSubDomainIndex() const
+  {
+    return _traits.maxSubDomainIndex();
+  }
 
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
