@@ -394,7 +394,7 @@ public:
   static const int dimensionworld = GridImp::dimensionworld;
 
   template<typename, typename, typename, typename>
-  friend class ForwardIteratorFacade;
+  friend class ::Dune::ForwardIteratorFacade;
 
 protected:
 
