@@ -112,21 +112,18 @@ int main(int argc, char** argv)
   hostgrid.globalRefine(atoi(argv[1]));
 
   {
-    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
     typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
     MDGrid mdgrid(hostgrid,true);
     driver(mdgrid);
   }
 
   {
-    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
     typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
     MDGrid mdgrid(hostgrid,true);
     driver(mdgrid);
   }
 
   {
-    //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
     typedef Dune::mdgrid::DynamicSubDomainCountTraits<2,8> Traits;
     typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::DynamicSubDomainCountTraits<2,8> > MDGrid;
     MDGrid mdgrid(hostgrid,Traits(8),true);
