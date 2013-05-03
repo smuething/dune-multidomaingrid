@@ -82,6 +82,10 @@ struct ArrayBasedTraits {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
 
+  template<int codim, typename SizeContainer>
+  void setupSizeContainer(SizeContainer&) const
+  {}
+
 };
 
 template<int dim, std::size_t maxSubDomains, template<int dim_, int codim> class supportedCodims = AllCodims >
@@ -118,6 +122,10 @@ struct FewSubDomainsTraits {
   struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
+
+  template<int codim>
+  void setupSizeContainer(typename Codim<codim>::SizeContainer&) const
+  {}
 
 };
 
