@@ -708,6 +708,8 @@ private:
 
     template<int codim>
     void apply(Containers<codim>& c) const {
+      // setup per-codim sizemap
+      _traits.template setupSizeContainer<codim>(c.codimSizeMap);
       for (std::vector<GeometryType>::const_iterator it = _his.geomTypes(codim).begin(); it != _his.geomTypes(codim).end(); ++it) {
         if (_full) {
           // resize index map
@@ -719,20 +721,23 @@ private:
           for (auto& mapEntry : c.indexMap[*it])
             mapEntry.domains.clear();
         }
-        // reset SizeMap counter
+        // setup / reset SizeMap counter
+        _traits.template setupSizeContainer<codim>(c.sizeMap[*it]);
         std::fill(c.sizeMap[*it].begin(),c.sizeMap[*it].end(),0);
       }
       // clear MultiIndexMap
       c.multiIndexMap.clear();
     }
 
-    resetPerCodim(bool full, const HostIndexSet& his) :
+    resetPerCodim(bool full, const HostIndexSet& his, const MDGridTraits& traits) :
       _full(full),
-      _his(his)
+      _his(his),
+      _traits(traits)
     {}
 
     const bool _full;
     const HostIndexSet& _his;
+    const MDGridTraits& _traits;
   };
 
   void reset(bool full) {
@@ -741,7 +746,7 @@ private:
       ContainerMap cm = ContainerMap();
       util::swap(_containers,cm);
     }
-    applyToCodims(resetPerCodim(full,his));
+    applyToCodims(resetPerCodim(full,his,_grid._traits));
   }
 
   struct updatePerCodimSizes : public applyToCodim<updatePerCodimSizes> {

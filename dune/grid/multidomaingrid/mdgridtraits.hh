@@ -1,6 +1,7 @@
 #ifndef DUNE_MULTIDOMAINGRID_MDGRIDTRAITS_HH
 #define DUNE_MULTIDOMAINGRID_MDGRIDTRAITS_HH
 
+#include <vector>
 
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/push_back.hpp>
@@ -57,7 +58,11 @@ struct ArrayBasedTraits {
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
-  static const SubDomainIndex maxSubDomainIndex = subDomainCount;
+
+  constexpr SubDomainIndex maxSubDomainIndex()
+  {
+    return subDomainCount;
+  }
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -70,7 +75,7 @@ struct ArrayBasedTraits {
     static const std::size_t maxSubDomainsPerEntity = (2<<(codim)) * maxSubDomainsPerCell;
     typedef Dune::mdgrid::ArrayBasedSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer; // TODO: really int??
-    typedef std::array<int,maxSubDomainIndex> SizeContainer; // TODO: really int??
+    typedef std::array<int,subDomainCount> SizeContainer; // TODO: really int??
   };
 
   template<int codim>
@@ -78,7 +83,75 @@ struct ArrayBasedTraits {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
 
+  template<int codim, typename SizeContainer>
+  void setupSizeContainer(SizeContainer&) const
+  {}
+
 };
+
+
+template<int dim, std::size_t subDomainsPerCell, template<int dim_, int codim> class supportedCodims = AllCodims>
+struct DynamicSubDomainCountTraits {
+
+  typedef int SubDomainIndex;
+  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
+  static const SubDomainIndex empty = -1;
+  static const int dimension = dim;
+
+  static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
+
+  SubDomainIndex maxSubDomainIndex() const
+  {
+    return _subDomainCount;
+  }
+
+  struct EmptyCodimBase {
+    typedef int SizeContainer;
+    typedef int MultiIndexContainer;
+    typedef int SubDomainSet;
+
+    template<typename SC>
+    static void setupSizeContainer(const SC&, std::size_t)
+    {}
+
+  };
+
+  template<int codim>
+  struct CodimBase {
+    static const std::size_t maxSubDomainsPerEntity = (2<<(codim)) * maxSubDomainsPerCell;
+    typedef Dune::mdgrid::ArrayBasedSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
+    typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer; // TODO: really int??
+    typedef std::vector<int> SizeContainer; // TODO: really int??
+
+    static void setupSizeContainer(SizeContainer& container, std::size_t subDomainCount)
+    {
+      container.resize(subDomainCount);
+    }
+
+  };
+
+  template<int codim>
+  struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
+    static const bool supported = supportedCodims<dim,codim>::supported;
+  };
+
+  DynamicSubDomainCountTraits(std::size_t subDomainCount)
+    : _subDomainCount(subDomainCount)
+  {}
+
+  template<int codim, typename SizeContainer>
+  void setupSizeContainer(SizeContainer& container) const
+  {
+    Codim<codim>::setupSizeContainer(container,_subDomainCount);
+  }
+
+private:
+
+  const std::size_t _subDomainCount;
+
+};
+
 
 template<int dim, std::size_t maxSubDomains, template<int dim_, int codim> class supportedCodims = AllCodims >
 struct FewSubDomainsTraits {
@@ -90,7 +163,11 @@ struct FewSubDomainsTraits {
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
-  static const SubDomainIndex maxSubDomainIndex = maxSubDomains - 1;
+
+  constexpr SubDomainIndex maxSubDomainIndex()
+  {
+    return maxSubDomains - 1;
+  }
 
   struct EmptyCodimBase {
     typedef int SizeContainer;
@@ -103,13 +180,17 @@ struct FewSubDomainsTraits {
     static const std::size_t maxSubDomainsPerEntity = maxSubDomains;
     typedef Dune::mdgrid::IntegralTypeSubDomainSet<SubDomainIndex,maxSubDomainsPerEntity> SubDomainSet;
     typedef std::array<int,maxSubDomainsPerEntity> MultiIndexContainer;
-    typedef std::array<int,maxSubDomainIndex+1> SizeContainer;
+    typedef std::array<int,maxSubDomains> SizeContainer;
   };
 
   template<int codim>
   struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
+
+  template<int codim>
+  void setupSizeContainer(typename Codim<codim>::SizeContainer&) const
+  {}
 
 };
 

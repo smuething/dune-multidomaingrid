@@ -379,12 +379,16 @@ public:
 
   //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
+
   //! The largest allowed index for a subdomain.
   /**
-   * \note As subdomain indices always start at 0, this constant also determines the maximum
+   * \note As subdomain indices always start at 0, this also determines the maximum
    * number of possible subdomains.
    */
-  static const SubDomainIndex maxSubDomainIndex = MDGridTraits::maxSubDomainIndex;
+  const SubDomainIndex maxSubDomainIndex() const
+  {
+    return _traits.maxSubDomainIndex();
+  }
 
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
@@ -412,6 +416,7 @@ public:
    */
   explicit MultiDomainGrid(HostGrid& hostGrid, bool supportLevelIndexSets = true) :
     _hostGrid(hostGrid),
+    _traits(),
     _leafIndexSet(*this,hostGrid.leafView()),
     _globalIdSet(*this),
     _localIdSet(*this),
@@ -422,6 +427,28 @@ public:
   {
     updateIndexSets();
   }
+
+  //! Constructs a new MultiDomainGrid from the given host grid.
+  /**
+   *
+   * \param hostGrid                the host grid that will be wrapped by the MultiDomainGrid
+   * \param traits                  an instance of the grid traits, which might contain runtime information
+   * \param supportLevelIndexSets   flag indicating support for level index sets on subdomains
+   */
+  explicit MultiDomainGrid(HostGrid& hostGrid, const MDGridTraitsType& traits, bool supportLevelIndexSets = true) :
+    _hostGrid(hostGrid),
+    _traits(traits),
+    _leafIndexSet(*this,hostGrid.leafView()),
+    _globalIdSet(*this),
+    _localIdSet(*this),
+    _state(stateFixed),
+    _adaptState(stateFixed),
+    _supportLevelIndexSets(supportLevelIndexSets),
+    _maxAssignedSubDomainIndex(0)
+  {
+    updateIndexSets();
+  }
+
   /*@}*/
 
   /** @name Dune grid interface methods */
@@ -917,6 +944,7 @@ public:
 private:
 
   HostGrid& _hostGrid;
+  const MDGridTraitsType _traits;
 
   std::vector<shared_ptr<LevelIndexSetImp> > _levelIndexSets;
   LeafIndexSetImp _leafIndexSet;
