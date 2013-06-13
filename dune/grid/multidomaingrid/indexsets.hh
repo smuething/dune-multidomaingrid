@@ -63,8 +63,11 @@ struct buildMap<StructForCodim,0> {
  * operate on. This is handled by the template parameter doDispatch: The specialisation for
  * doDispatch == false will simply throw an exception.
  */
-template<bool doDispatch, typename Impl, typename resulttype>
-struct invokeIf {
+template<bool doDispatch, typename Impl, typename resulttype,bool alternate_dispatch>
+struct invokeIf;
+
+template<typename Impl, typename resulttype, bool alternate_dispatch>
+struct invokeIf<true,Impl,resulttype,alternate_dispatch> {
 
   typedef resulttype result_type;
 
@@ -83,7 +86,7 @@ struct invokeIf {
 
 //! \internal
 template<typename Impl, typename resulttype>
-struct invokeIf<false,Impl, resulttype> {
+struct invokeIf<false,Impl, resulttype,false> {
 
   typedef resulttype result_type;
 
@@ -100,51 +103,71 @@ struct invokeIf<false,Impl, resulttype> {
 
 };
 
+template<typename Impl, typename resulttype>
+struct invokeIf<false,Impl, resulttype,true> {
+
+  typedef resulttype result_type;
+
+  template<int codim>
+  result_type invoke() {
+    return _impl.template invoke_unsupported<codim>();
+  }
+
+  Impl& _impl;
+
+  invokeIf(Impl& impl) :
+    _impl(impl)
+  {}
+
+};
+
 //! \internal Template meta program for dispatching a method to the correctly parameterised template method base on a run-time parameter
-template<typename Impl, typename resulttype, typename MDGridTraits, int codim, bool protect = true>
-struct dispatchToCodim : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1,protect> {
+template<typename Impl, typename resulttype, typename MDGridTraits, int codim, bool protect = true, bool alternate_dispatch = false>
+struct dispatchToCodim
+  : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1,protect,alternate_dispatch> {
 
   typedef resulttype result_type;
 
   result_type dispatch(int cc) {
     if (cc == codim)
-      return invokeIf<MDGridTraits::template Codim<codim>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template invoke<codim>();
-    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1,protect>&>(*this).dispatch(cc);
+      return invokeIf<MDGridTraits::template Codim<codim>::supported,Impl,result_type,alternate_dispatch>(static_cast<Impl&>(*this)).template invoke<codim>();
+    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1,protect,alternate_dispatch>&>(*this).dispatch(cc);
   }
 
 };
 
 //! \internal Recursion limit for dispatchToCodim
-template<typename Impl, typename resulttype, typename MDGridTraits>
-struct dispatchToCodim<Impl,resulttype,MDGridTraits,0,true> {
+template<typename Impl, typename resulttype, typename MDGridTraits, bool alternate_dispatch>
+struct dispatchToCodim<Impl,resulttype,MDGridTraits,0,true,alternate_dispatch> {
 
   typedef resulttype result_type;
 
   result_type dispatch(int cc) {
     if (cc == 0)
-      return invokeIf<MDGridTraits::template Codim<0>::supported,Impl,result_type>(static_cast<Impl&>(*this)).template invoke<0>();
+      return invokeIf<MDGridTraits::template Codim<0>::supported,Impl,result_type,alternate_dispatch>(static_cast<Impl&>(*this)).template invoke<0>();
     DUNE_THROW(GridError,"invalid codimension specified");
   }
 
 };
 
 //! \internal Template meta program for dispatching a method to the correctly parameterised template method base on a run-time parameter
-template<typename Impl, typename resulttype, typename MDGridTraits, int codim>
-struct dispatchToCodim<Impl,resulttype,MDGridTraits,codim,false> : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1,false> {
+template<typename Impl, typename resulttype, typename MDGridTraits, int codim, bool alternate_dispatch>
+struct dispatchToCodim<Impl,resulttype,MDGridTraits,codim,false,alternate_dispatch>
+  : public dispatchToCodim<Impl,resulttype,MDGridTraits,codim-1,false,alternate_dispatch> {
 
   typedef resulttype result_type;
 
   result_type dispatch(int cc) {
     if (cc == codim)
       return static_cast<Impl&>(*this).template invoke<codim>();
-    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1,false>&>(*this).dispatch(cc);
+    return static_cast<dispatchToCodim<Impl,result_type,MDGridTraits,codim-1,false,alternate_dispatch>&>(*this).dispatch(cc);
   }
 
 };
 
 //! \internal Recursion limit for dispatchToCodim
-template<typename Impl, typename resulttype, typename MDGridTraits>
-struct dispatchToCodim<Impl,resulttype,MDGridTraits,0,false> {
+template<typename Impl, typename resulttype, typename MDGridTraits, bool alternate_dispatch>
+struct dispatchToCodim<Impl,resulttype,MDGridTraits,0,false,alternate_dispatch> {
 
   typedef resulttype result_type;
 
@@ -327,8 +350,8 @@ private:
   typedef std::vector<shared_ptr<IndexSetWrapper<GridImp, typename HostGridView::Grid::LevelGridView> > > LevelIndexSets;
 
   //! Convenience subclass of dispatchToCodim for automatically passing in the MDGridTraits and the dimension
-  template<typename Impl,typename result_type, bool protect = true>
-  struct dispatchToCodim : public detail::dispatchToCodim<Impl,result_type,MDGridTraits,dimension,protect> {};
+  template<typename Impl,typename result_type, bool protect = true, bool alternate_dispatch = false>
+  struct dispatchToCodim : public detail::dispatchToCodim<Impl,result_type,MDGridTraits,dimension,protect,alternate_dispatch> {};
 
 public:
 
@@ -504,11 +527,16 @@ private:
     return geomTypes(codim);
   }
 
-  struct getGeometryTypeSizeForSubDomain : public dispatchToCodim<getGeometryTypeSizeForSubDomain,IndexType> {
+  struct getGeometryTypeSizeForSubDomain : public dispatchToCodim<getGeometryTypeSizeForSubDomain,IndexType,true,true> {
 
     template<int codim>
     IndexType invoke() const {
       return _indexSet.sizeMap<codim>().find(_gt)->second[_subDomain];
+    }
+
+    template<int codim>
+    IndexType invoke_unsupported() const {
+      return 0;
     }
 
     SubDomainIndex _subDomain;
@@ -527,11 +555,16 @@ private:
     return getGeometryTypeSizeForSubDomain(subDomain,type,*this).dispatch(dimension-type.dim());
   }
 
-  struct getCodimSizeForSubDomain : public dispatchToCodim<getCodimSizeForSubDomain,IndexType> {
+  struct getCodimSizeForSubDomain : public dispatchToCodim<getCodimSizeForSubDomain,IndexType,true,true> {
 
     template<int codim>
     IndexType invoke() const {
       return _indexSet.codimSizes<codim>()[_subDomain];
+    }
+
+    template<int codim>
+    IndexType invoke_unsupported() const {
+      return 0;
     }
 
     SubDomainIndex _subDomain;
