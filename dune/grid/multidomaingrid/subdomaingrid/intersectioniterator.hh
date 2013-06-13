@@ -50,14 +50,15 @@ protected:
   {}
 
   IntersectionIteratorWrapper(const IntersectionIteratorWrapper& rhs)
-    : _multiDomainIterator(rhs._multiDomainIterator)
-    , _intersection(GridImp::getRealImplementation(rhs._intersection))
-  {}
+  {
+    // make sure we do not point at data from rhs
+    GridImp::getRealImplementation(_intersection).clear();
+  }
 
   const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
     assert(GridImp::getRealImplementation(_intersection)._indexSet == GridImp::getRealImplementation(rhs._intersection)._indexSet);
     _multiDomainIterator = rhs._multiDomainIterator;
-    GridImp::getRealImplementation(_intersection).clear();
+    GridImp::getRealImplementation(_intersection).reset(*_multiDomainIterator);
     return *this;
   }
 
