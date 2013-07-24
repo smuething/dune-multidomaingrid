@@ -50,6 +50,8 @@ protected:
   {}
 
   IntersectionIteratorWrapper(const IntersectionIteratorWrapper& rhs)
+    : _multiDomainIterator(rhs._multiDomainIterator)
+    , _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(GridImp::getRealImplementation(rhs._intersection)))
   {
     // make sure we do not point at data from rhs
     GridImp::getRealImplementation(_intersection).clear();
