@@ -59,7 +59,7 @@ struct ArrayBasedTraits {
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
 
-  constexpr SubDomainIndex maxSubDomainIndex()
+  static constexpr SubDomainIndex maxSubDomainIndex()
   {
     return subDomainCount;
   }
@@ -164,7 +164,7 @@ struct FewSubDomainsTraits {
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
 
-  constexpr SubDomainIndex maxSubDomainIndex()
+  static constexpr SubDomainIndex maxSubDomainIndex()
   {
     return maxSubDomains - 1;
   }
