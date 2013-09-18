@@ -2,6 +2,9 @@
 #define DUNE_MULTIDOMAINGRID_SUBDOMAININTERFACEITERATOR_HH
 
 #include <dune/common/iteratorfacades.hh>
+#include <dune/geometry/type.hh>
+
+#include "entity.hh"
 
 namespace Dune {
 

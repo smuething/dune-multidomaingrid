@@ -20,7 +20,12 @@
 #include <boost/fusion/algorithm/transformation/zip.hpp>
 #include <boost/swap.hpp>
 
+#include <dune/common/shared_ptr.hh>
+#include <dune/grid/common/exceptions.hh>
+#include <dune/grid/common/indexidset.hh>
+
 #include <dune/grid/multidomaingrid/utility.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/indexsets.hh>
 
 namespace Dune {
 

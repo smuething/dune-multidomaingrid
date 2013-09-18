@@ -1,6 +1,11 @@
 #ifndef DUNE_MULTIDOMAINGRID_ENTITYPOINTER_HH
 #define DUNE_MULTIDOMAINGRID_ENTITYPOINTER_HH
 
+#include <dune/grid/common/gridenums.hh>
+
+#include "entity.hh"
+#include "subdomaingrid/entity.hh"
+
 namespace Dune {
 
 namespace mdgrid {
