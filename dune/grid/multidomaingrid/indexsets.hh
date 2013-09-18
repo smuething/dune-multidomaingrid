@@ -518,7 +518,7 @@ private:
 
   IndexType subIndexForSubDomain(SubDomainIndex subDomain, const typename remove_const<GridImp>::type::HostGridType::Traits::template Codim<0>::Entity& he, int i, int codim) const {
     return getSubIndexForSubDomain(subDomain,
-                                   GenericReferenceElements<ctype,dimension>::general(he.type()).type(i,codim),
+                                   ReferenceElements<ctype,dimension>::general(he.type()).type(i,codim),
                                    _hostGridView.indexSet().subIndex(he,i,codim),
                                    *this).dispatch(codim);
   }
@@ -819,7 +819,7 @@ private:
         markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
       }
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
-      applyToCodims(markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
+      applyToCodims(markSubIndices(he,me.domains,his,ReferenceElements<ctype,dimension>::general(hgt)));
     }
 
     propagateBorderEntitySubDomains();
@@ -846,7 +846,7 @@ private:
       IndexType hostIndex = his.index(he);
       MapEntry<0>& me = im[hgt][hostIndex];
       updateMapEntry(me,sm[hgt],multiIndexMap<0>());
-      applyToCodims(markSubIndices(he,me.domains,his,GenericReferenceElements<ctype,dimension>::general(hgt)));
+      applyToCodims(markSubIndices(he,me.domains,his,ReferenceElements<ctype,dimension>::general(hgt)));
     }
 
     propagateBorderEntitySubDomains();
@@ -903,9 +903,9 @@ private:
     const HostEntity& _he;
     const DomainSet& _domains;
     const HostIndexSet& _his;
-    const GenericReferenceElement<ctype,dimension>& _refEl;
+    const ReferenceElement<ctype,dimension>& _refEl;
 
-    markSubIndices(const HostEntity& he, const DomainSet& domains, const HostIndexSet& his, const GenericReferenceElement<ctype,dimension>& refEl) :
+    markSubIndices(const HostEntity& he, const DomainSet& domains, const HostIndexSet& his, const ReferenceElement<ctype,dimension>& refEl) :
       _he(he),
       _domains(domains),
       _his(his),
