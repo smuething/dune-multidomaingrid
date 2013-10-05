@@ -4,22 +4,9 @@
 #include <string>
 #include <dune/common/shared_ptr.hh>
 
-namespace Dune {
-namespace mdgrid {
-namespace detail {
-
-  template<typename GridImp>
-  struct HostGridAccessor {
-    typedef typename GridImp::HostGridType::Traits Traits;
-    typedef typename GridImp::HostGridType Type;
-  };
-
-}
-}
-}
-
 #include <dune/grid/common/grid.hh>
 
+#include <dune/grid/multidomaingrid/hostgridaccessor.hh>
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/subdomaingrid.hh>

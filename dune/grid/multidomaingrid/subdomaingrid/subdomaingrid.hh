@@ -5,6 +5,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <dune/common/exceptions.hh>
+
+#include <dune/grid/multidomaingrid/hostgridaccessor.hh>
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/geometry.hh>

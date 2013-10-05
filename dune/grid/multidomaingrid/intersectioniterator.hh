@@ -1,6 +1,13 @@
 #ifndef DUNE_MULTIDOMAINGRID_INTERSECTIONITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_INTERSECTIONITERATOR_HH
 
+#include <dune/grid/common/gridenums.hh>
+#include <dune/grid/common/intersectioniterator.hh>
+
+#include <dune/grid/multidomaingrid/hostgridaccessor.hh>
+
+#include <dune/grid/multidomaingrid/subdomaingrid/intersectioniterator.hh>
+
 namespace Dune {
 
 namespace mdgrid {

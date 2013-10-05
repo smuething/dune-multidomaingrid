@@ -1,9 +1,11 @@
 #ifndef DUNE_MULTIDOMAINGRID_ARRAYBASEDSET_HH
 #define DUNE_MULTIDOMAINGRID_ARRAYBASEDSET_HH
 
-#include <limits>
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
+
 #include <dune/common/static_assert.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>

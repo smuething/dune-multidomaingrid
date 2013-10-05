@@ -1,6 +1,7 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINTOSUBDOMAININTERFACEITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINTOSUBDOMAININTERFACEITERATOR_HH
 
+#include <dune/grid/multidomaingrid/hostgridaccessor.hh>
 #include <dune/grid/multidomaingrid/subdomaininterfaceiterator.hh>
 
 namespace Dune {

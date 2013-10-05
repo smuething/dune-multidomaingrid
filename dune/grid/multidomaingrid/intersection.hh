@@ -4,6 +4,7 @@
 #include <dune/grid/common/intersection.hh>
 
 #include <dune/grid/multidomaingrid/entitypointer.hh>
+#include <dune/grid/multidomaingrid/hostgridaccessor.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/intersection.hh>
 
 namespace Dune {

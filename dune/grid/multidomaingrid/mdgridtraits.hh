@@ -6,7 +6,9 @@
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/push_back.hpp>
 #include <boost/integer_traits.hpp>
+
 #include <dune/common/deprecated.hh>
+
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 #include <dune/grid/multidomaingrid/arraybasedset.hh>
 #include <dune/grid/multidomaingrid/singlevalueset.hh>
@@ -16,6 +18,7 @@ namespace Dune {
 namespace mdgrid {
 
 namespace mpl = boost::mpl;
+namespace fusion = boost::fusion;
 
 template<typename sequence, bool val, int codim>
 struct makeBoolVectorHelper {

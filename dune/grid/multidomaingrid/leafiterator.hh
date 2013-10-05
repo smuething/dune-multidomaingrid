@@ -1,6 +1,11 @@
 #ifndef DUNE_MULTIDOMAINGRID_LEAFITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_LEAFITERATOR_HH
 
+#include <dune/grid/common/gridenums.hh>
+
+#include <dune/grid/multidomaingrid/entity.hh>
+#include <dune/grid/multidomaingrid/entitypointer.hh>
+
 namespace Dune {
 
 namespace mdgrid {
