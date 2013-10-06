@@ -28,3 +28,5 @@ multidomaingrid_HEADER = \
 SUBDIRS = subdomaingrid
 
 include $(top_srcdir)/am/global-rules
+
+EXTRA_DIST = CMakeLists.txt

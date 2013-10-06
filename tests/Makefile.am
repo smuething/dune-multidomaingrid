@@ -2,6 +2,8 @@ testdir = $(includedir)/test
 
 include $(top_srcdir)/am/global-rules
 
+EXTRA_DIST = CMakeLists.txt
+
 #noinst_PROGRAMS = testwrapper
 
 #testsubdomainset_SOURCES = testsubdomainset.cc
