@@ -49,6 +49,7 @@ check_PROGRAMS += multidomain-leveliterator-bug
 multidomain_leveliterator_bug_SOURCES = multidomain-leveliterator-bug.cc
 
 check_PROGRAMS += testintersectionconversion
+testintersectionconversion_SOURCES = testintersectionconversion.cc
 
 check_PROGRAMS += testintersectiongeometrytypes
 testintersectiongeometrytypes_SOURCES = testintersectiongeometrytypes.cc

@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include <iostream>
@@ -20,7 +24,6 @@ int main(int argc, char** argv)
 
   typedef MDGrid::LeafGridView MDGV;
   typedef MDGV::Codim<0>::Iterator Iterator;
-  typedef MDGrid::SubDomainIndexType SubDomainIndexType;
 
   MDGV mdgv = mdgrid.leafView();
 

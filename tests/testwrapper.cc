@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     vtkWriter.addVertexData(sdv0,"vertex_subdomain0");
     vtkWriter.addVertexData(sdv1,"vertex_subdomain1");
     vtkWriter.addVertexData(hvid,"vertex_hostIndex");
-    vtkWriter.write("testwrapper",Dune::VTKOptions::binary);
+    vtkWriter.write("testwrapper",Dune::VTK::base64);
 
     for (int i = 0; i <= 2; ++i) {
       std::cout << "codim " << i << ":";
