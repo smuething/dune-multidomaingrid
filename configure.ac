@@ -23,6 +23,7 @@ AC_CONFIG_FILES([
   dune/Makefile
   dune/grid/Makefile
   dune/grid/multidomaingrid/Makefile
+  dune/grid/multidomaingrid/subdomaingrid/Makefile
   doc/Makefile
   doc/doxygen/Makefile
   doc/doxygen/Doxyfile

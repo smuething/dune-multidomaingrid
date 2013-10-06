@@ -1,4 +1,4 @@
-dunedir = $(includedir)/dune
+testdir = $(includedir)/test
 
 include $(top_srcdir)/am/global-rules
 

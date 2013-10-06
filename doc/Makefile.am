@@ -5,7 +5,7 @@ CURDIR = doc
 
 BASEDIR = ..
 
-docdir=$(datadir)/doc/dune-doctest
+docdir=$(datadir)/doc/dune-multidomaingrid
 
 include $(top_srcdir)/am/webstuff
 
