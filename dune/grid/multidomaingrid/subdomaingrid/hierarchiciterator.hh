@@ -1,6 +1,8 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HIERARCHICITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HIERARCHICITERATOR_HH
 
+#include <dune/grid/multidomaingrid/entity.hh>
+
 namespace Dune {
 
 namespace mdgrid {

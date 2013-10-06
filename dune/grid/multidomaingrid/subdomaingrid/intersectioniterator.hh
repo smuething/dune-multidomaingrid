@@ -1,6 +1,8 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_INTERSECTIONITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_INTERSECTIONITERATOR_HH
 
+#include <dune/grid/common/intersectioniterator.hh>
+
 namespace Dune {
 
 namespace mdgrid {

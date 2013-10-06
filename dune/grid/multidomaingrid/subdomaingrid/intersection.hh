@@ -1,6 +1,10 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_INTERSECTION_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_INTERSECTION_HH
 
+#include <dune/grid/common/intersection.hh>
+
+#include <dune/grid/multidomaingrid/subdomaingrid/entitypointer.hh>
+
 namespace Dune {
 
 namespace mdgrid {

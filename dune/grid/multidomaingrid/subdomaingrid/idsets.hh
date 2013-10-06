@@ -1,6 +1,8 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_IDSETS_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_IDSETS_HH
 
+#include <dune/grid/common/indexidset.hh>
+
 namespace Dune {
 
 namespace mdgrid {

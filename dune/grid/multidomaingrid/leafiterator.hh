@@ -3,7 +3,6 @@
 
 #include <dune/grid/common/gridenums.hh>
 
-#include <dune/grid/multidomaingrid/entity.hh>
 #include <dune/grid/multidomaingrid/entitypointer.hh>
 
 namespace Dune {

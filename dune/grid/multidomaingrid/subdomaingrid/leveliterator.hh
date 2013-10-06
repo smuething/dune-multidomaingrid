@@ -1,6 +1,10 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_LEVELITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_LEVELITERATOR_HH
 
+#include <dune/grid/common/gridenums.hh>
+
+#include <dune/grid/multidomaingrid/subdomaingrid/entitypointer.hh>
+
 namespace Dune {
 
 namespace mdgrid {
