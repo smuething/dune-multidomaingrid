@@ -21,8 +21,7 @@ dune_project()
 add_subdirectory("doc")
 add_subdirectory("dune")
 add_subdirectory("m4")
-# TODO: rename subdirectory to test, otherwise the tests will not be found
-add_subdirectory("tests")
+add_subdirectory("test")
 
 # finalize the dune project, e.g. generating config.h etc.
 finalize_dune_project(GENERATE_CONFIG_H_CMAKE)

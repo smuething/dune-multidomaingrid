@@ -32,7 +32,7 @@ add_dependencies(${_test_target} ${TESTS})
 
 # install the header as done for the auto-tools
 install(FILES output.hh
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tests)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/test)
 
 foreach(_test ${TESTS})
   add_test(${_test} ${_test})

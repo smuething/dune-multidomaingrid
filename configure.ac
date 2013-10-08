@@ -27,7 +27,7 @@ AC_CONFIG_FILES([
   doc/Makefile
   doc/doxygen/Makefile
   doc/doxygen/Doxyfile
-  tests/Makefile
+  test/Makefile
   dune-multidomaingrid.pc
 ])
 AC_OUTPUT

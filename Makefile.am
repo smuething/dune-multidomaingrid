@@ -3,7 +3,7 @@
 # we need the module file to be able to build via dunecontrol
 EXTRA_DIST= CMakeLists.txt dune.module
 
-SUBDIRS = m4 dune doc tests 
+SUBDIRS = m4 dune doc test
 
 # possible options
 #LDADD = $(UG_LDFLAGS) $(AMIRAMESH_LDFLAGS) $(UG_LIBS) $(AMIRAMESH_LIBS)
@@ -18,4 +18,3 @@ DISTCHECK_CONFIGURE_FLAGS = --with-dune-common=$(DUNE_COMMON_ROOT) --with-dune-g
 
 include $(top_srcdir)/am/top-rules
 include $(top_srcdir)/am/global-rules
-
