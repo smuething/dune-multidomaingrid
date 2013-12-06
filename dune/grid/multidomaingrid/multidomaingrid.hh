@@ -716,7 +716,6 @@ public:
     typedef typename MultiDomainGrid::LeafGridView GV;
     GV gv = this->leafView();
     typedef typename GV::template Codim<0>::Iterator Iterator;
-    typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
     typedef typename GV::template Codim<0>::Entity Entity;
     typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
     for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
@@ -1002,8 +1001,6 @@ private:
     GV gv = this->leafView();
     typedef typename GV::template Codim<0>::Iterator Iterator;
     typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
-    typedef typename GV::template Codim<0>::Entity Entity;
-    typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
     for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
       EntityPointer ep(it);
       // First try to exploit the information in the underlying grid
