@@ -82,7 +82,7 @@ struct ArrayBasedTraits {
   };
 
   template<int codim>
-  struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
+  struct Codim : public Dune::conditional<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::type {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
 
@@ -135,7 +135,7 @@ struct DynamicSubDomainCountTraits {
   };
 
   template<int codim>
-  struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
+  struct Codim : public Dune::conditional<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::type {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
 
@@ -187,7 +187,7 @@ struct FewSubDomainsTraits {
   };
 
   template<int codim>
-  struct Codim : public SelectType<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::Type {
+  struct Codim : public Dune::conditional<supportedCodims<dim,codim>::supported,CodimBase<codim>,EmptyCodimBase>::type {
     static const bool supported = supportedCodims<dim,codim>::supported;
   };
 

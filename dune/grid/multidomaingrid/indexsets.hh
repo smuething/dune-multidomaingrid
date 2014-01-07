@@ -304,25 +304,25 @@ private:
 
     dune_static_assert(codim > 0 || supported, "index mapping of codimension 0 must be supported!");
 
-    typedef typename SelectType<supported,
-                                std::map<GeometryType,std::vector<MapEntry<codim> > >,
-                                NotSupported
-                                >::Type IndexMap;
+    typedef typename Dune::conditional<supported,
+                                             std::map<GeometryType,std::vector<MapEntry<codim> > >,
+                                             NotSupported
+                                             >::type IndexMap;
 
-    typedef typename SelectType<supported,
-                                std::map<GeometryType,typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::SizeContainer>,
-                                NotSupported
-                                >::Type SizeMap;
+    typedef typename Dune::conditional<supported,
+                                             std::map<GeometryType,typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::SizeContainer>,
+                                             NotSupported
+                                             >::type SizeMap;
 
-    typedef typename SelectType<supported,
-                                typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::SizeContainer,
-                                NotSupported
-                                >::Type CodimSizeMap;
+    typedef typename Dune::conditional<supported,
+                                             typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::SizeContainer,
+                                             NotSupported
+                                             >::type CodimSizeMap;
 
-    typedef typename SelectType<supported,
-                                std::vector<typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::MultiIndexContainer>,
-                                NotSupported
-                                >::Type MultiIndexMap;
+    typedef typename Dune::conditional<supported,
+                                             std::vector<typename remove_const<GridImp>::type::MDGridTraits::template Codim<codim>::MultiIndexContainer>,
+                                             NotSupported
+                                             >::type MultiIndexMap;
 
     IndexMap indexMap;
     SizeMap sizeMap;

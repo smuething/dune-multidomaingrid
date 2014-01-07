@@ -54,7 +54,7 @@ public:
   {}
 
   EntityPointerWrapper(const GridImp& grid,
-                       typename SelectType<codim==0,const MultiDomainHierarchicIterator&,Invalid>::Type multiDomainEntityPointer) :
+                       typename Dune::conditional<codim==0,const MultiDomainHierarchicIterator&,Invalid>::type multiDomainEntityPointer) :
     _entityWrapper(grid,multiDomainEntityPointer)
   {}
 
