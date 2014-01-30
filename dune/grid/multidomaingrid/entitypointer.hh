@@ -37,7 +37,7 @@ class EntityPointerWrapper
   {
     typedef typename GridImp::HostGridType::template Codim<codim>::template Partition<pitype>::LevelIterator _type;
 
-    typedef typename Dune::conditional<
+    typedef typename conditional<
       !is_same<
         typename HostLeafIterator<pitype>::type,
         _type
