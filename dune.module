@@ -4,6 +4,6 @@
 #Name of the module
 Module: dune-multidomaingrid
 Version: 0.1
-Maintainer: steffen.muething@ipvs.uni-stuttgart.de
-#depending on 
-Depends: dune-common dune-grid
+Maintainer: steffen.muething@iwr.uni-heidelberg.de
+#depending on
+Depends: dune-grid
