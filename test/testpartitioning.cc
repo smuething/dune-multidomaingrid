@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     Grid grid(wgrid);
     grid.globalRefine(5);
     typedef Grid::LeafGridView GridView;
-    GridView gv = grid.leafView();
+    GridView gv = grid.leafGridView();
     typedef GridView::Codim<0>::Iterator Iterator;
     typedef GridView::Codim<2>::Iterator VIterator;
     typedef GridView::Codim<0>::Entity Entity;
@@ -44,12 +44,12 @@ int main(int argc, char** argv) {
     grid.updateSubDomains();
     grid.postUpdateSubDomains();
 
-    Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p0 = grid.subDomain(0).leafView().begin<0>();
+    Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p0 = grid.subDomain(0).leafGridView().begin<0>();
     const Entity& e0 = grid.subDomain(0).multiDomainEntity(*p0);
     const Entity& e02 = grid.multiDomainEntity(*p0);
     Grid::SubDomainGrid::LeafGridView::Codim<0>::EntityPointer p02 = grid.subDomain(0).subDomainEntityPointer(e0);
 
-    Grid::SubDomainGrid::LeafGridView::Codim<2>::EntityPointer p1 = grid.subDomain(0).leafView().begin<2>();
+    Grid::SubDomainGrid::LeafGridView::Codim<2>::EntityPointer p1 = grid.subDomain(0).leafGridView().begin<2>();
     const Vertex& e1 = grid.subDomain(0).multiDomainEntity(*p1);
     const Vertex& e12 = grid.multiDomainEntity(*p1);
 

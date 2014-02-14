@@ -404,7 +404,7 @@ public:
   explicit MultiDomainGrid(HostGrid& hostGrid, bool supportLevelIndexSets = true) :
     _hostGrid(hostGrid),
     _traits(),
-    _leafIndexSet(*this,hostGrid.leafView()),
+    _leafIndexSet(*this,hostGrid.leafGridView()),
     _globalIdSet(*this),
     _localIdSet(*this),
     _state(stateFixed),
@@ -425,7 +425,7 @@ public:
   explicit MultiDomainGrid(HostGrid& hostGrid, const MDGridTraitsType& traits, bool supportLevelIndexSets = true) :
     _hostGrid(hostGrid),
     _traits(traits),
-    _leafIndexSet(*this,hostGrid.leafView()),
+    _leafIndexSet(*this,hostGrid.leafGridView()),
     _globalIdSet(*this),
     _localIdSet(*this),
     _state(stateFixed),
@@ -714,7 +714,7 @@ public:
   bool loadBalance(DataHandle& dataHandle)
   {
     typedef typename MultiDomainGrid::LeafGridView GV;
-    GV gv = this->leafView();
+    GV gv = this->leafGridView();
     typedef typename GV::template Codim<0>::Iterator Iterator;
     typedef typename GV::template Codim<0>::Entity Entity;
     typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
@@ -786,7 +786,7 @@ public:
     assert(_state == stateMarking && _adaptState == stateFixed);
     if (_supportLevelIndexSets) {
       for (unsigned int l = 0; l <= maxLevel(); ++l) {
-        _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(l))));
+        _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelGridView(l))));
       }
     }
     _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
@@ -955,7 +955,7 @@ private:
     // make sure we have enough LevelIndexSets
     if (_supportLevelIndexSets) {
       while (_levelIndexSets.size() <= maxLevel()) {
-        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelView(_levelIndexSets.size()))));
+        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelGridView(_levelIndexSets.size()))));
       }
       // and make sure we don't have too many...
       if (_levelIndexSets.size() > maxLevel() + 1)
@@ -973,7 +973,7 @@ private:
 
   void saveMultiDomainState() {
     typedef typename ThisType::LeafGridView GV;
-    GV gv = this->leafView();
+    GV gv = this->leafGridView();
     typedef typename GV::template Codim<0>::Iterator Iterator;
     typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
     typedef typename GV::template Codim<0>::Entity Entity;
@@ -998,7 +998,7 @@ private:
 
   void restoreMultiDomainState() {
     typedef typename ThisType::LeafGridView GV;
-    GV gv = this->leafView();
+    GV gv = this->leafGridView();
     typedef typename GV::template Codim<0>::Iterator Iterator;
     typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
     for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
@@ -1113,8 +1113,8 @@ private:
     template<typename Entity>
     std::size_t size(const Entity& e) const
     {
-      if (_grid.leafView().indexSet().contains(e) && e.partitionType() == Dune::InteriorEntity)
-        return _grid.leafView().indexSet().subDomains(e).size() + 1 + _wrappedDataHandle.size(e);
+      if (_grid.leafGridView().indexSet().contains(e) && e.partitionType() == Dune::InteriorEntity)
+        return _grid.leafGridView().indexSet().subDomains(e).size() + 1 + _wrappedDataHandle.size(e);
       else
         return _wrappedDataHandle.size(e);
     }
@@ -1123,10 +1123,10 @@ private:
     void gather(MessageBufferImp& buf, const Entity& e) const
     {
       assert(Entity::codimension == 0);
-      if (e.partitionType() == Dune::InteriorEntity && _grid.leafView().indexSet().contains(e))
+      if (e.partitionType() == Dune::InteriorEntity && _grid.leafGridView().indexSet().contains(e))
         {
           typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
-          const SubDomainSet& subDomains = _grid.leafView().indexSet().subDomains(e);
+          const SubDomainSet& subDomains = _grid.leafGridView().indexSet().subDomains(e);
           Data size = { subDomains.size() };
           buf.write(size.buffer);
           for (typename SubDomainSet::const_iterator it = subDomains.begin(); it != subDomains.end(); ++it)
@@ -1141,7 +1141,7 @@ private:
     template<typename MessageBufferImp, typename Entity>
     void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
     {
-      if (e.partitionType() != Dune::InteriorEntity && _grid.leafView().indexSet().contains(e))
+      if (e.partitionType() != Dune::InteriorEntity && _grid.leafGridView().indexSet().contains(e))
         {
           Data subDomains = { 0 };
           buf.read(subDomains.buffer);

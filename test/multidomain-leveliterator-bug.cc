@@ -20,7 +20,7 @@ int main (int argc, char *argv[])
     MultiDomainGridType multiDomainGrid(grid,true);
     
     typedef MultiDomainGridType::LeafGridView MultiDomainGridView;
-    MultiDomainGridView gv = multiDomainGrid.leafView();
+    MultiDomainGridView gv = multiDomainGrid.leafGridView();
     
     multiDomainGrid.startSubDomainMarking();
     

@@ -32,12 +32,12 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.levelView(entity.level()).ibegin(*GridImp::getRealImplementation(entity).hostEntityPointer()));
+    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.levelGridView(entity.level()).ibegin(*GridImp::getRealImplementation(entity).hostEntityPointer()));
   }
 
   IntersectionIterator iend(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.levelView(entity.level()).iend(*GridImp::getRealImplementation(entity).hostEntityPointer()));
+    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.levelGridView(entity.level()).iend(*GridImp::getRealImplementation(entity).hostEntityPointer()));
   }
 
 };
@@ -68,12 +68,12 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT:: template Codim<0>::Entity& entity) const
   {
-    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.leafView().ibegin(*GridImp::getRealImplementation(entity).hostEntityPointer()));
+    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.leafGridView().ibegin(*GridImp::getRealImplementation(entity).hostEntityPointer()));
   }
 
   IntersectionIterator iend(const typename BaseT:: template Codim<0>::Entity& entity) const
   {
-    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.leafView().iend(*GridImp::getRealImplementation(entity).hostEntityPointer()));
+    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid()._hostGrid.leafGridView().iend(*GridImp::getRealImplementation(entity).hostEntityPointer()));
   }
 
 };

@@ -74,12 +74,12 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
   //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;
 
-  hostgrid.leafIndexSet().index(*hostgrid.leafView().template begin<0>());
+  hostgrid.leafIndexSet().index(*hostgrid.leafGridView().template begin<0>());
 
   MDGrid grid(hostgrid,true);
   typedef typename MDGrid::LeafGridView MDGV;
   typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
-  MDGV mdgv = grid.leafView();
+  MDGV mdgv = grid.leafGridView();
 
   grid.startSubDomainMarking();
 
@@ -133,7 +133,7 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
       typedef typename MDGrid::SubDomainGrid SDGrid;
       typedef typename SDGrid::LeafGridView SDGV;
       const SDGrid& sdgrid = grid.subDomain(s);
-      SDGV sdgv = sdgrid.leafView();
+      SDGV sdgv = sdgrid.leafGridView();
 
       typedef std::vector<std::size_t> DataVector;
       DataVector celldata(sdgv.size(0));

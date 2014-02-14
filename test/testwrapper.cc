@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     Dune::MultiDomainGrid<GridType> grid(wgrid);
     grid.globalRefine(5);
     typedef Dune::MultiDomainGrid<GridType>::LeafGridView GridView;
-    GridView gv = grid.leafView();
+    GridView gv = grid.leafGridView();
     typedef Dune::mdgrid::IndexSet<GridView,Dune::mdgrid::IntegralTypeSubDomainSet<3> > IndexSet;
     IndexSet is(gv);
     is.update(true);

@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     Grid grid(wgrid);
     grid.globalRefine(5);
     typedef Grid::LeafGridView GridView;
-    GridView gv = grid.leafView();
+    GridView gv = grid.leafGridView();
     typedef GridView::Codim<0>::Iterator Iterator;
     typedef GridView::Codim<2>::Iterator VIterator;
     typedef GridView::Codim<0>::Entity Entity;

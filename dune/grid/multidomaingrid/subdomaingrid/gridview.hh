@@ -33,12 +33,12 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelView(entity.level()).ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelGridView(entity.level()).ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
   }
 
   IntersectionIterator iend(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelView(entity.level()).iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelGridView(entity.level()).iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
   }
 
 };
@@ -69,12 +69,12 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.leafView().ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.leafGridView().ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
   }
 
   IntersectionIterator iend(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.leafView().iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.leafGridView().iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
   }
 
 };

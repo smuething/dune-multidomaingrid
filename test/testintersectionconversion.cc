@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   typedef MDGrid::LeafGridView MDGV;
   typedef MDGV::Codim<0>::Iterator Iterator;
 
-  MDGV mdgv = mdgrid.leafView();
+  MDGV mdgv = mdgrid.leafGridView();
 
   mdgrid.startSubDomainMarking();
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
   typedef MDGrid::SubDomainGrid SDGrid;
   const SDGrid& sdgrid = mdgrid.subDomain(0);
-  SDGrid::LeafGridView sdgv = sdgrid.leafView();
+  SDGrid::LeafGridView sdgv = sdgrid.leafGridView();
 
   SDGrid::LeafGridView::Codim<0>::Iterator it = sdgv.begin<0>();
   SDGrid::LeafGridView::IntersectionIterator iit = sdgv.ibegin(*it);

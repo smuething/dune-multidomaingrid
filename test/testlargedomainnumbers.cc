@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     Grid grid(wgrid,false);
     grid.globalRefine(8);
     typedef Grid::LeafGridView GridView;
-    GridView gv = grid.leafView();
+    GridView gv = grid.leafGridView();
     typedef GridView::Codim<0>::Iterator Iterator;
     typedef GridView::Codim<2>::Iterator VIterator;
     typedef GridView::Codim<0>::Entity Entity;
@@ -38,10 +38,10 @@ int main(int argc, char** argv) {
     grid.postUpdateSubDomains();
 
     const Grid::SubDomainGrid& sd0 = grid.subDomain(0);
-    vtkOut(gv,"largedomainnumbers_leafView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
+    vtkOut(gv,"largedomainnumbers_leafGridView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
 
-    //vtkOut2(grid.subDomain(0).leafView(),"subdomain0");
-    //vtkOut2(grid.subDomain(1).leafView(),"subdomain1");
+    //vtkOut2(grid.subDomain(0).leafGridView(),"subdomain0");
+    //vtkOut2(grid.subDomain(1).leafGridView(),"subdomain1");
 
     /*for (int i = 0; i <= 2; ++i) {
       std::cout << "codim " << i << ":";

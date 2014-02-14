@@ -216,7 +216,7 @@ public:
       @param grid A reference to a grid.
   */
   LeafMultipleCodimMultipleGeomTypeMapper (const G& grid)
-    : MultipleCodimMultipleGeomTypeMapper<typename G::LeafGridView,Layout>(grid.leafView())
+    : MultipleCodimMultipleGeomTypeMapper<typename G::LeafGridView,Layout>(grid.leafGridView())
   {}
 
   /** @brief The constructor
@@ -264,7 +264,7 @@ public:
       @param level A valid level of the grid.
   */
   LevelMultipleCodimMultipleGeomTypeMapper (const G& grid, int level)
-    : MultipleCodimMultipleGeomTypeMapper<typename G::LevelGridView,Layout>(grid.levelView(level))
+    : MultipleCodimMultipleGeomTypeMapper<typename G::LevelGridView,Layout>(grid.levelGridView(level))
   {}
 
   /** @brief The constructor

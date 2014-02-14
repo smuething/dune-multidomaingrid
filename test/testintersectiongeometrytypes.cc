@@ -18,7 +18,7 @@ void run_test(HostGrid& hostgrid)
   typedef typename MDGV::template Codim<0>::Iterator Iterator;
   typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
 
-  MDGV mdgv = mdgrid.leafView();
+  MDGV mdgv = mdgrid.leafGridView();
 
   mdgrid.startSubDomainMarking();
 
@@ -31,7 +31,7 @@ void run_test(HostGrid& hostgrid)
 
   typedef typename MDGrid::SubDomainGrid SDGrid;
   const SDGrid& sdgrid = mdgrid.subDomain(0);
-  typename SDGrid::LeafGridView sdgv = sdgrid.leafView();
+  typename SDGrid::LeafGridView sdgv = sdgrid.leafGridView();
 
   const typename SDGrid::LeafGridView::template Codim<0>::Iterator endit = sdgv.template end<0>();
   for (typename SDGrid::LeafGridView::template Codim<0>::Iterator it = sdgv.template begin<0>();

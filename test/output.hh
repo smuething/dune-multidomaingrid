@@ -104,18 +104,18 @@ template<typename Grid>
 void printStatus(Grid& grid, std::string prefix, int counter = -1) {
   std::ostringstream s;
 
-  setup(s,prefix,counter) << "leafView";
-  vtkOut(grid.leafView(),s.str(),grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
+  setup(s,prefix,counter) << "leafGridView";
+  vtkOut(grid.leafGridView(),s.str(),grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
 
   for (unsigned int level = 0; level <= grid.maxLevel(); ++level) {
-    setup(s,prefix,counter) << "levelView_" << std::setw(2) << std::setfill('0') << level;
-    vtkOut(grid.levelView(level),s.str(),grid.levelSubDomainInterfaceBegin(0,1,level),grid.levelSubDomainInterfaceEnd(0,1,level));
+    setup(s,prefix,counter) << "levelGridView_" << std::setw(2) << std::setfill('0') << level;
+    vtkOut(grid.levelGridView(level),s.str(),grid.levelSubDomainInterfaceBegin(0,1,level),grid.levelSubDomainInterfaceEnd(0,1,level));
   }
 
   setup(s,prefix,counter) << "subdomain_0";
-  vtkOut2(grid.subDomain(0).leafView(),s.str());
+  vtkOut2(grid.subDomain(0).leafGridView(),s.str());
    setup(s,prefix,counter) << "subdomain_1";
-  vtkOut2(grid.subDomain(1).leafView(),s.str());
+  vtkOut2(grid.subDomain(1).leafGridView(),s.str());
 }
 
 

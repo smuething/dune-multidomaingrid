@@ -352,8 +352,8 @@ public:
 
     {
       typedef typename GridImp::LevelIntersectionIterator IntersectionIterator;
-      IntersectionIterator end = _grid.levelView(level()).iend(entity);
-      for(IntersectionIterator it = _grid.levelView(level()).ibegin(entity); it != end; ++it)
+      IntersectionIterator end = _grid.levelGridView(level()).iend(entity);
+      for(IntersectionIterator it = _grid.levelGridView(level()).ibegin(entity); it != end; ++it)
       {
         if( it->boundary() ) return true;
       }
@@ -361,8 +361,8 @@ public:
 
     {
       typedef typename GridImp::LeafIntersectionIterator IntersectionIterator;
-      IntersectionIterator end = _grid.leafView().iend(entity);
-      for(IntersectionIterator it = _grid.leafView().ibegin(entity); it != end; ++it)
+      IntersectionIterator end = _grid.leafGridView().iend(entity);
+      for(IntersectionIterator it = _grid.leafGridView().ibegin(entity); it != end; ++it)
       {
         if( it->boundary() ) return true;
       }

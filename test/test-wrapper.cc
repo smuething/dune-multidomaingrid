@@ -32,13 +32,13 @@ void check_grid() {
   typedef typename MDGrid::template Codim<0>::Entity Entity;
   typedef typename MDGrid::LeafGridView::template Codim<0>::Iterator Iterator;
 
-  typename MDGrid::LeafGridView gv = grid.leafView();
+  typename MDGrid::LeafGridView gv = grid.leafGridView();
 
   grid.startSubDomainMarking();
   for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
     const Entity& e = *it;
     //IndexSet::SubDomainSet& sds = is.subDomainSet(e);
-    Dune::FieldVector<typename MDGrid::ctype,dim> c = e.geometry().global(Dune::GenericReferenceElements<typename MDGrid::ctype,dim>::general(e.type()).position(0,0));
+    Dune::FieldVector<typename MDGrid::ctype,dim> c = e.geometry().global(Dune::ReferenceElements<typename MDGrid::ctype,dim>::general(e.type()).position(0,0));
     double x = c[0];
     double y = dim > 1 ? c[1] : 0.5;
     if (x > 0.2) {

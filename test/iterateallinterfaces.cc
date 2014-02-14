@@ -63,7 +63,7 @@ void driver(MDGrid& mdgrid)
   typedef typename MDGV::template Codim<0>::Iterator Iterator;
   typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
 
-  MDGV mdgv = mdgrid.leafView();
+  MDGV mdgv = mdgrid.leafGridView();
 
   mdgrid.startSubDomainMarking();
 
