@@ -2,7 +2,7 @@
 #define GRIDDIM 2
 #define ALUGRID_SIMPLEX
 
-#include <dune/common/mpihelper.hh>
+#include <dune/common/parallel/mpihelper.hh>
 #include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"

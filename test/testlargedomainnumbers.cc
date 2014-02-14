@@ -1,5 +1,5 @@
 #include "config.h"
-#include <dune/common/mpihelper.hh>
+#include <dune/common/parallel/mpihelper.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 #include <cstdlib>

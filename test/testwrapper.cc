@@ -1,6 +1,6 @@
 #include "config.h"
 #include <iostream>
-#include <dune/common/mpihelper.hh>
+#include <dune/common/parallel/mpihelper.hh>
 #include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
 #include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <dune/grid/multidomaingrid/indexset.hh>
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
       const Entity& e = *it;
       IndexSet::SubDomainSet& sds = is.subDomainSet(e);
-      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(Dune::GenericReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
+      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(Dune::ReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
       double x = c[0];
       double y = c[1];
       if (x > 0.2) {
