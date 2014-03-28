@@ -11,12 +11,10 @@ int main(int argc, char** argv)
 {
 
   Dune::FieldVector<double,2> L(1.0);
-  Dune::FieldVector<int,2> s(2);
-  Dune::FieldVector<bool,2> p(false);
-  int overlap = 0;
+  Dune::array<int,2> s = {{2, 2}};
 
   typedef Dune::YaspGrid<2> HostGrid;
-  HostGrid hostgrid(L,s,p,overlap);
+  HostGrid hostgrid(L,s);
 
   //typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<2,8> > MDGrid;
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::ArrayBasedTraits<2,8,8> > MDGrid;

@@ -1,7 +1,6 @@
 #include "config.h"
 
 #include <dune/common/parallel/mpihelper.hh>
-#include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 
@@ -9,8 +8,8 @@
 int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
-    //typedef Dune::YaspGrid<2> GridType;
-    Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
+    typedef Dune::YaspGrid<2> GridType;
+    Dune::GridPtr<GridType> gridPtr("../../dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
     Grid grid(wgrid);

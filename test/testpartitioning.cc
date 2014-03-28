@@ -1,7 +1,6 @@
 #include "config.h"
 
 #include <dune/common/parallel/mpihelper.hh>
-#include <dune/grid/io/file/dgfparser/dgfgridtype.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 
@@ -9,8 +8,8 @@
 int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
-    //typedef Dune::YaspGrid<2> GridType;
-    Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
+    typedef Dune::YaspGrid<2> GridType;
+    Dune::GridPtr<GridType> gridPtr("../../dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
     Grid grid(wgrid);
@@ -31,14 +30,14 @@ int main(int argc, char** argv) {
       double x = c[0];
       double y = c[1];
       if (x > 0.2) {
-	if (y > 0.3 && y < 0.7) {
-	  if (x < 0.8)
+        if (y > 0.3 && y < 0.7) {
+          if (x < 0.8)
             grid.addToSubDomain(1,e);
-	  else // if (x > 0.6)
+          else // if (x > 0.6)
             grid.addToSubDomain(0,e);
-	} else {
+        } else {
             grid.addToSubDomain(0,e);
-	}
+        }
       }
     }
     grid.preUpdateSubDomains();
@@ -82,7 +81,7 @@ int main(int argc, char** argv) {
     /*for (int i = 0; i <= 2; ++i) {
       std::cout << "codim " << i << ":";
       for (int s = 0; s <= 2; ++s) {
-	std::cout << " " << is.size(i,s);
+        std::cout << " " << is.size(i,s);
       }
       std::cout << std::endl;
       }*/

@@ -182,6 +182,13 @@ int main(int argc, char** argv)
     const int dim = 2;
     Dune::MPIHelper& mpihelper = Dune::MPIHelper::instance(argc,argv);
 
+    if (argc < 2)
+    {
+      std::cerr << "Usage: " << argv[0] <<
+        " <number of elements per dim> <overlap>" << std::endl;
+      exit(1);
+    }
+
     /* helper code for attaching debugger
     if (mpihelper.rank() == 0)
       {
@@ -194,8 +201,9 @@ int main(int argc, char** argv)
 
     {
       const Dune::FieldVector<double,dim> h(1.0);
-      const Dune::FieldVector<int,dim> s(atoi(argv[1]));
-      const Dune::FieldVector<bool,dim> p(false);
+      Dune::array<int,dim> s;
+      std::fill(s.begin(), s.end(), atoi(argv[1]));
+      std::bitset<dim> p(false);
       typedef Dune::YaspGrid<dim> HostGrid;
       HostGrid hostgrid(Dune::MPIHelper::getCommunicator(),h,s,p,atoi(argv[2]));
 
