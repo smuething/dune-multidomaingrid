@@ -1,7 +1,7 @@
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 #include <iostream>
 #include <typeinfo>
-#include <dune/grid/common/genericreferenceelements.hh>
+#include <dune/geometry/referenceelements.hh>
 
 int main(int argc, char** argv) {
   try {
@@ -27,7 +27,8 @@ int main(int argc, char** argv) {
       std::cout << "size=" << set.size() << std::endl;*/
     //Dune::GeometryType gt;
     //gt.makeQuadrilateral();
-    const Dune::GenericReferenceElement<double,2>& refEl = Dune::GenericReferenceElements<double,2>::cube();
+    const Dune::ReferenceElement<double,2>& refEl =
+      Dune::ReferenceElements<double,2>::cube();
     std::cout << refEl.position(refEl.subEntity(2,1,0,2),2) << std::endl;
     std::cout << refEl.position(refEl.subEntity(3,1,0,2),2) << std::endl;
     return 0;
