@@ -22,6 +22,45 @@ namespace mdgrid {
  * @{
  */
 
+namespace {
+
+  template<typename GV, bool max_subomain_index_is_static>
+  struct MCMGMapperStorageProvider
+  {
+
+  protected:
+
+    typedef typename GV::IndexSet::IndexType IndexType;
+
+    MCMGMapperStorageProvider(const GV& gv)
+    {}
+
+    std::array<std::size_t,GV::Grid::maxSubDomainIndex()> _n;
+    std::array<std::map<GeometryType,IndexType>,GV::Grid::maxSubDomainIndex()> _offset; // provide a map with all geometry types
+
+  };
+
+  template<typename GV>
+  struct MCMGMapperStorageProvider<GV,false>
+  {
+
+  protected:
+
+    typedef typename GV::IndexSet::IndexType IndexType;
+
+    MCMGMapperStorageProvider(const GV& gv)
+      : _n(gv.grid().maxSubDomainIndex())
+      , _offset(gv.grid().maxSubDomainIndex())
+    {}
+
+    std::vector<std::size_t> _n;
+    std::vector<std::map<GeometryType,IndexType> > _offset; // provide a map with all geometry types
+
+  };
+
+
+}
+
 /** @brief Implementation class for a multiple codim and multiple geometry type mapper.
  *
  * In this implementation of a mapper the entity set used as domain for the map consists
@@ -51,9 +90,17 @@ namespace mdgrid {
  * and hand it to the respective constructor.
  */
 template <typename GV, template<int> class Layout>
-class MultiDomainMCMGMapper : public MultipleCodimMultipleGeomTypeMapper<GV,Layout > {
+class MultiDomainMCMGMapper : public MultipleCodimMultipleGeomTypeMapper<GV,Layout >,
+                              public MCMGMapperStorageProvider<GV,GV::Grid::maxSubDomainIndexIsStatic()>
+
+{
 
   typedef MultipleCodimMultipleGeomTypeMapper<GV,Layout > Base;
+
+  typedef MCMGMapperStorageProvider<GV,GV::Grid::maxSubDomainIndexIsStatic()> StorageProvider;
+
+  using StorageProvider::_n;
+  using StorageProvider::_offset;
 
 public:
 
@@ -62,10 +109,11 @@ public:
   typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   typedef SubDomainIndex DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
-  MultiDomainMCMGMapper (const GV& gridView, const Layout<GV::dimension> layout) :
-    Base(gridView,layout),
-    _is(gridView.indexSet()),
-    _layout(layout)
+  MultiDomainMCMGMapper (const GV& gridView, const Layout<GV::dimension> layout)
+    : Base(gridView,layout)
+    , StorageProvider(gridView)
+    , _gv(gridView)
+    , _layout(layout)
   {
     update();
   }
@@ -76,9 +124,10 @@ public:
       \param indexset IndexSet object returned by grid.
 
   */
-  MultiDomainMCMGMapper (const GV& gridView) :
-    Base(gridView),
-    _is(gridView.indexSet())
+  MultiDomainMCMGMapper (const GV& gridView)
+    : Base(gridView)
+    , StorageProvider(gridView)
+    , _gv(gridView)
   {
     update();
   }
@@ -91,7 +140,7 @@ public:
   template<class EntityType>
   int map (SubDomainIndex subDomain, const EntityType& e) const
   {
-    return _is.index(subDomain,e) + _offset[subDomain].find(e.type())->second;
+    return _gv.indexSet().index(subDomain,e) + _offset[subDomain].find(e.type())->second;
   }
 
   /** @brief Map subentity of codim 0 entity to array index.
@@ -104,7 +153,7 @@ public:
   int map (SubDomainIndex subDomain, const typename GV::template Codim<0>::Entity& e, int i, unsigned int codim) const
   {
     GeometryType gt=ReferenceElements<double,GV::dimension>::general(e.type()).type(i,codim);
-    return _is.subIndex(subDomain,e,i,codim) + _offset[subDomain].find(gt)->second;
+    return _gv.indexSet().subIndex(subDomain,e,i,codim) + _offset[subDomain].find(gt)->second;
   }
 
   /** @brief Return total number of entities in the entity set managed by the mapper.
@@ -129,7 +178,7 @@ public:
   template<class EntityType>
   bool contains (SubDomainIndex subDomain, const EntityType& e, IndexType& result) const
   {
-    if(!_is.contains(subDomain,e) || !_layout.contains(e.type()))
+    if(!_gv.indexSet().contains(subDomain,e) || !_layout.contains(e.type()))
       {
         result = 0;
         return false;
@@ -158,7 +207,7 @@ public:
   void update()
   {
     static_cast<Base*>(this)->update();
-    for (SubDomainIndex subDomain = 0; subDomain < GV::Grid::maxSubDomainIndex; ++subDomain) {
+    for (SubDomainIndex subDomain = 0; subDomain < _gv.grid().maxSubDomainIndex(); ++subDomain) {
       std::size_t& n = _n[subDomain];
       std::map<GeometryType,IndexType>& offset = _offset[subDomain];
       n=0; // zero data elements
@@ -167,19 +216,17 @@ public:
       // Compute offsets for the different geometry types.
       // Note that mapper becomes invalid when the grid is modified.
       for (int c=0; c<=GV::dimension; c++)
-        for (size_t i=0; i<_is.geomTypes(subDomain,c).size(); i++)
-          if (_layout.contains(_is.geomTypes(subDomain,c)[i]))
+        for (size_t i=0; i<_gv.indexSet().geomTypes(subDomain,c).size(); i++)
+          if (_layout.contains(_gv.indexSet().geomTypes(subDomain,c)[i]))
             {
-              offset[_is.geomTypes(subDomain,c)[i]] = n;
-              n += _is.size(subDomain,_is.geomTypes(subDomain,c)[i]);
+              offset[_gv.indexSet().geomTypes(subDomain,c)[i]] = n;
+              n += _gv.indexSet().size(subDomain,_gv.indexSet().geomTypes(subDomain,c)[i]);
             }
     }
   }
 
 private:
-  std::array<std::size_t,GV::Grid::maxSubDomainIndex> _n;
-  const typename GV::IndexSet& _is;
-  std::array<std::map<GeometryType,IndexType>,GV::Grid::maxSubDomainIndex> _offset; // provide a map with all geometry types
+  GV _gv;
   mutable Layout<GV::dimension> _layout; // get layout object
 };
 
