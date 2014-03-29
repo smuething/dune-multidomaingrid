@@ -75,7 +75,7 @@ public:
     : _entityWrapper(hostEntityPointer)
   {}
 
-  explicit EntityPointerWrapper(typename SelectType<codim==0,const HostHierarchicIterator&,InvalidHierarchic>::Type hostEntityPointer) :
+  explicit EntityPointerWrapper(typename conditional<codim==0,const HostHierarchicIterator&,InvalidHierarchic>::type hostEntityPointer) :
     _entityWrapper(hostEntityPointer)
   {}
 
