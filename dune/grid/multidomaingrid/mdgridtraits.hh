@@ -62,6 +62,11 @@ struct ArrayBasedTraits {
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
 
+  static constexpr bool maxSubDomainIndexIsStatic()
+  {
+    return true;
+  }
+
   static constexpr SubDomainIndex maxSubDomainIndex()
   {
     return subDomainCount;
@@ -101,6 +106,11 @@ struct DynamicSubDomainCountTraits {
   typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   static const SubDomainIndex empty = -1;
   static const int dimension = dim;
+
+  static constexpr bool maxSubDomainIndexIsStatic()
+  {
+    return false;
+  }
 
   static const std::size_t maxSubDomainsPerCell = subDomainsPerCell;
 
@@ -166,6 +176,11 @@ struct FewSubDomainsTraits {
   static const int dimension = dim;
 
   static const std::size_t maxSubDomainsPerCell = maxSubDomains;
+
+  static constexpr bool maxSubDomainIndexIsStatic()
+  {
+    return true;
+  }
 
   static constexpr SubDomainIndex maxSubDomainIndex()
   {

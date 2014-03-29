@@ -376,6 +376,10 @@ public:
   {
     return _traits.maxSubDomainIndex();
   }
+  static constexpr bool maxSubDomainIndexIsStatic()
+  {
+    return MDGridTraits::maxSubDomainIndexIsStatic();
+  }
 
   //! The type used for representing the grid of a subdomain, always a specialization of Dune::mdgrid::subdomain::SubDomainGrid.
   typedef subdomain::SubDomainGrid<ThisType> SubDomainGrid;
