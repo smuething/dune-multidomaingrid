@@ -193,6 +193,36 @@ struct MultiDomainGridFamily {
 
 };
 
+namespace {
+
+  template<typename Grid, typename SI, bool max_subdomain_index_is_static>
+  struct MaxSubDomainIndexProvider
+  {
+
+    typedef SI SubDomainIndex;
+
+    const SubDomainIndex maxSubDomainIndex() const
+    {
+      return static_cast<const Grid*>(this)->traits().maxSubDomainIndex();
+    }
+
+  };
+
+  template<typename Grid, typename SI>
+  struct MaxSubDomainIndexProvider<Grid,SI,true>
+  {
+
+    typedef SI SubDomainIndex;
+
+    static constexpr SubDomainIndex maxSubDomainIndex()
+    {
+      return Grid::MDGridTraits::maxSubDomainIndex();
+    }
+
+  };
+
+}
+
 
 //! A meta grid for dividing an existing DUNE grid into subdomains that can be accessed as a grid in their own right.
 /**
@@ -205,7 +235,13 @@ class MultiDomainGrid :
     public GridDefaultImplementation<HostGrid::dimension,
 				     HostGrid::dimensionworld,
 				     typename HostGrid::ctype,
-				     MultiDomainGridFamily<HostGrid,MDGridTraitsType> > {
+				     MultiDomainGridFamily<HostGrid,MDGridTraitsType> >,
+    public MaxSubDomainIndexProvider<MultiDomainGrid<HostGrid,MDGridTraitsType>,
+                                     typename MDGridTraitsType::SubDomainIndex,
+                                     MDGridTraitsType::maxSubDomainIndexIsStatic()
+                                     >
+
+{
 
 
   template<int codim, int dim, typename GridImp>
@@ -367,6 +403,7 @@ public:
   //! The largest number of subdomains any given grid cell may belong to.
   static const std::size_t maxNumberOfSubDomains = MDGridTraits::maxSubDomainsPerCell;
 
+#ifdef DOXYGEN
   //! The largest allowed index for a subdomain.
   /**
    * \note As subdomain indices always start at 0, this also determines the maximum
@@ -376,6 +413,8 @@ public:
   {
     return _traits.maxSubDomainIndex();
   }
+#endif
+
   static constexpr bool maxSubDomainIndexIsStatic()
   {
     return MDGridTraits::maxSubDomainIndexIsStatic();
