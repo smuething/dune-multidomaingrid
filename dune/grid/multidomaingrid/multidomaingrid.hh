@@ -1022,7 +1022,9 @@ private:
 
   template<typename GridView, typename HostGridView>
   static typename GridView::IntersectionIterator multiDomainIntersectionIterator(typename HostGridView::IntersectionIterator iit) {
-    return typename GridView::IntersectionIterator::ImplementationType(iit);
+    //return typename std::remove_reference<decltype(MultiDomainGrid::getRealImplementation(*((GridView::IntersectionIterator*)nullptr)))>::type(iit);
+    typedef decltype(MultiDomainGrid::getRealImplementation(*static_cast<typename GridView::IntersectionIterator*>(nullptr))) Implementation;
+    return Implementation(iit);
   }
 
   template<typename Entity>
