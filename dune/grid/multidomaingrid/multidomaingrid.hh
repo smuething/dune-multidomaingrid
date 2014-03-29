@@ -931,6 +931,11 @@ public:
   }
  /*@}*/
 
+  const MDGridTraits& traits() const
+  {
+    return _traits;
+  }
+
 private:
 
   HostGrid& _hostGrid;
