@@ -9,10 +9,14 @@ int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
     typedef Dune::YaspGrid<2> GridType;
-    Dune::GridPtr<GridType> gridPtr("/Users/muethisn/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
+    Dune::GridPtr<GridType> gridPtr("/Users/smuething/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
     GridType& wgrid = *gridPtr;
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::ArrayBasedTraits<GridType::dimension,1,65536> > Grid;
     Grid grid(wgrid,false);
+    //typedef Dune::mdgrid::DynamicSubDomainCountTraits<GridType::dimension,1> MDGridTraits;
+    //typedef Dune::MultiDomainGrid<GridType,MDGridTraits> Grid;
+    //MDGridTraits md_grid_traits(65536);
+    //Grid grid(wgrid,md_grid_traits,false);
     grid.globalRefine(8);
     typedef Grid::LeafGridView GridView;
     GridView gv = grid.leafGridView();
