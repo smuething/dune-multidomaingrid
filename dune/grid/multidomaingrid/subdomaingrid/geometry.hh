@@ -103,6 +103,16 @@ private:
 } // namespace mdgrid
 
 
+namespace FacadeOptions {
+
+template< int mydim, int coorddim, class GridImp >
+struct StoreGeometryReference< mydim, coorddim, GridImp, mdgrid::subdomain::GeometryWrapper >
+{
+        static const bool v = false;
+};
+
+} // namespace FacadeOptions
+
 } // namespace Dune
 
 #endif // DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_GEOMETRY_HH
