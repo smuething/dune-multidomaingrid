@@ -49,7 +49,8 @@ public:
 
   static const std::size_t codimension = HostEntitySeed::codimension;
 
-private:
+  EntitySeedWrapper()
+  {}
 
   EntitySeedWrapper(const HostEntitySeed& hostEntitySeed)
     : _hostEntitySeed(hostEntitySeed)
