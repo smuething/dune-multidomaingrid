@@ -28,6 +28,10 @@ Changes
 
 * Some minor bugfixes.
 
+* Release history
+
+  * `2.3.0-rc1` Initial release candidate
+
 
 Caveats
 -------
@@ -43,7 +47,7 @@ encounter with the current release.
   development and bug-testing to reduce compile times.
 
 * After MultiDomainGrid 2.3, the minimum compiler requirement of MultiDomainGrid
-   will be increased to GCC 4.7. Please be aware of this change in minimum requirements.
+  will be increased to GCC 4.7. Please be aware of this change in minimum requirements.
 
 
 Links

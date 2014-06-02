@@ -3,7 +3,7 @@
 
 #Name of the module
 Module: dune-multidomaingrid
-Version: 2.3-dev
+Version: 2.3.0-rc1
 Maintainer: steffen.muething@iwr.uni-heidelberg.de
 #depending on
 Depends: dune-grid
