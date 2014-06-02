@@ -334,6 +334,29 @@ public:
                                               _multiDomainEntityPointer->hend(maxLevel));
   }
 
+  LevelIntersectionIterator ilevelbegin() const {
+    return LevelIntersectionIteratorWrapper<GridImp>(_grid,
+                                                     _multiDomainEntityPointer->level(),
+                                                     _multiDomainEntityPointer->ilevelbegin());
+  }
+
+  LevelIntersectionIterator ilevelend() const {
+    return LevelIntersectionIteratorWrapper<GridImp>(_grid,
+                                                     _multiDomainEntityPointer->level(),
+                                                     _multiDomainEntityPointer->ilevelend());
+  }
+
+  LeafIntersectionIterator ileafbegin() const {
+    return LeafIntersectionIteratorWrapper<GridImp>(_grid,
+                                                     _multiDomainEntityPointer->ileafbegin());
+  }
+
+  LeafIntersectionIterator ileafend() const {
+    return LeafIntersectionIteratorWrapper<GridImp>(_grid,
+                                                    _multiDomainEntityPointer->ileafend());
+  }
+
+
   bool isNew() const {
     return _multiDomainEntityPointer->isNew();
   }

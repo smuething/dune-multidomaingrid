@@ -299,6 +299,22 @@ public:
     return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hend(maxLevel));
   }
 
+  LevelIntersectionIterator ilevelbegin() const {
+    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelbegin());
+  }
+
+  LevelIntersectionIterator ilevelend() const {
+    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelend());
+  }
+
+  LeafIntersectionIterator ileafbegin() const {
+    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafbegin());
+  }
+
+  LeafIntersectionIterator ileafend() const {
+    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafend());
+  }
+
   bool isNew() const {
     return _hostEntityPointer->isNew();
   }
