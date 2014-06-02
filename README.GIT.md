@@ -43,10 +43,12 @@ MAKE_FLAGS       flags passed to make
 
 An example options file might look like this:
 
+```bash
 #use this options to autogen, configure and make if no other options are given
 AUTOGEN_FLAGS="--ac=2.50 --ac=1.8" #Forces automake 2,50 and autoconf 1.8
 CONFIGURE_FLAGS="CXX=g++-3.4 --prefix=/install/path" #force g++-3.4 as compiler
 MAKE_FLAGS=install #Per default run make install instead of simply make
+```
 
 If you save this information into example.opts you can path the opts file to
 dunecontrol via the --opts option, e. g.
