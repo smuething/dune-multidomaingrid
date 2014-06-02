@@ -10,9 +10,9 @@ own right.
 Version
 -------
 
-This is version 2.3-dev of MultiDomainGrid. It is compatible with the 2.3.x release
-series of the DUNE core modules. The versioning scheme of MultiDomainGrid has
-recently been synchronized to that of the core modules to make it easier for users
+This is version 3.0-dev of MultiDomainGrid. It is compatible with the 3.0-git
+development series of the DUNE core modules. The versioning scheme of MultiDomainGrid
+has recently been synchronized to that of the core modules to make it easier for users
 to find a compatible release for their DUNE distribution.
 
 
@@ -79,14 +79,14 @@ Dependencies
 dune-multidomaingrid depends on the following software packages:
 
 * [DUNE core libraries][1] (dune-common, dune-geometry, dune-grid, dune-istl,
-  dune-localfunctions) version 2.3.x, and their respective dependencies.
+  dune-localfunctions) version 3.0-git, and their respective dependencies.
 
 * The [Boost][7] C++ libraries, in particular Boost.MPL and Boost.Fusion.
 
 * MultiDomain's compiler requirements differ slightly from the underlying DUNE
-  libraries: We require at least GCC 4.5 in C++11 mode, although we only
-  regularly test GCC versions from GCC 4.7 onward. MultiDomainGrid should also work
-  with very recent versions of ICC (icpc 14.0.3+) and current clang (3.2+).
+  libraries: We require at least GCC 4.7 in C++11 mode. MultiDomainGrid should
+  also work with very recent versions of ICC (icpc 14.0.3+) and current
+  clang (3.3+).
 
 
 License
