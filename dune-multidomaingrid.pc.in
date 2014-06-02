@@ -9,7 +9,7 @@ DEPENDENCIES=@REQUIRES@
 Name: @PACKAGE_NAME@
 Version: @VERSION@
 Description: dune-multidomaingrid module
-URL: http://dune-project.org/
+URL: http://github.com/smuething/dune-multidomaingrid
 Requires: dune-common dune-grid
 Libs: -L
 Cflags: -I
