@@ -1,16 +1,16 @@
 MultiDomainGrid
 ===============
 
-[dune-multidomaingrid](http://github.com/smuething/dune-multidomaingrid) is a meta grid
-built on top of the [DUNE](http://dune-project.org) grid interface. It can be used to
-carve out subdomains from an underlying host grid which are then available as
-fully featured DUNE grids in their own right.
+[dune-multidomaingrid][1] is a meta grid built on top of the [DUNE][2]
+grid interface. It can be used to carve out subdomains from an underlying
+host grid which are then available as fully featured DUNE grids in their
+own right.
 
 
 Version
 -------
 
-This is version 2.3.0-rc1 of MultiDomainGrid. It is compatible with the 2.3.x release
+This is version 2.3-dev of MultiDomainGrid. It is compatible with the 2.3.x release
 series of the DUNE core modules. The versioning scheme of MultiDomainGrid has
 recently been synchronized to that of the core modules to make it easier for users
 to find a compatible release for their DUNE distribution.
@@ -56,10 +56,9 @@ API documentation in doc/doxygen/html. Otherwise, you can build this documentati
 yourself by calling "make doc". Note that you need Doxygen and GraphViz available at
 configure time to be able to build the documentation.
 
-If you need help, please ask via [GitHub](http://github.com/smuething/dune-multidomaingrid).
-If you find bugs, you can also submit them to the [bugtracker](https://github.com/smuething/dune-multidomaingrid/issues).
-Even better, if you have managed to fix a problem, open a [pull request](https://github.com/smuething/dune-multidomaingrid/pulls)
-to get your patch merged into the library.
+If you need help, please ask via [GitHub][1]. If you find bugs, you can also submit
+them to the [bugtracker][3]. Even better, if you have managed to fix a problem, open
+a [pull request][4] to get your patch merged into the library.
 
 
 High-level interface for multi-domain simulations
@@ -67,11 +66,11 @@ High-level interface for multi-domain simulations
 
 While dune-multidomaingrid is a very useful tool in its own right and is used in
 a standalone fashion by a number of people, it was originally designed as a building
-block for extending the high-level DUNE-based PDE solver toolbox
-[PDELab](http://dune-project.org/pdelab/) with support for multi-physics and multi-domain
-simulations. This support is contained in the [dune-multidomain](http://github.com/smuething/dune-multidomain) library,
-which is an add-on module for PDELab that extends the latter with concepts for subproblems and couplings between
-those subproblems and uses MultiDomainGrid to provide the spatial layout of those subproblems and couplings.
+block for extending the high-level DUNE-based PDE solver toolbox [PDELab][5] with
+support for multi-physics and multi-domain simulations. This support is contained in
+the [dune-multidomain][6] library, which is an add-on module for PDELab that extends
+the latter with concepts for subproblems and couplings between those subproblems and
+uses MultiDomainGrid to provide the spatial layout of those subproblems and couplings.
 
 
 Dependencies
@@ -79,10 +78,10 @@ Dependencies
 
 dune-multidomaingrid depends on the following software packages:
 
-* DUNE core libraries (dune-common, dune-geometry, dune-grid, dune-istl,
-  dune-localfunctions) version 3.0-dev, and their respective dependencies.
+* [DUNE core libraries][1] (dune-common, dune-geometry, dune-grid, dune-istl,
+  dune-localfunctions) version 2.3.x, and their respective dependencies.
 
-* The [Boost](http://boost.org) C++ libraries, in particular Boost.MPL and Boost.Fusion.
+* The [Boost][7] C++ libraries, in particular Boost.MPL and Boost.Fusion.
 
 * MultiDomain's compiler requirements differ slightly from the underlying DUNE
   libraries: We require at least GCC 4.5 in C++11 mode, although we only
@@ -95,27 +94,31 @@ License
 
 The MultiDomainGrid library, headers and test programs are free open-source software,
 dual-licensed under version 3 or later of the GNU Lesser General Public License
-and version 2 of the GNU General Public License with a special run-time exception.
+and version 2 of the GNU General Public License with a [special run-time exception][8].
 
-See the file [COPYING.md] for full copying permissions.
+See the file [COPYING.md][9] for full copying permissions.
 
 
 Installation
 ------------
 
-Short installation instructions can be found in the file README.GIT.md.
+Short installation instructions can be found in the file [README.GIT.md][10].
 For a full explanation of the DUNE installation process please read
-the [installation notes](http://dune-project.org/doc/installation-notes.html)
-or the [build system HOWTO](http://dune-project.org/doc/buildsystem/buildsystem.pdf).
+the [installation notes][11] or the [build system HOWTO][12].
 
 
 Links
 -----
 
-* http://github.com/smuething/dune-multidomaingrid
-* http://www.dune-project.org
-* http://www.dune-project.org/pdelab/
-* http://www.dune-project.org/doc/installation-notes.html
-* http://dune-project.org/doc/buildsystem/buildsystem.pdf
-* http://gcc.gnu.org/onlinedocs/libstdc++/faq.html#faq.license
-* http://www.boost..org
+[1]:  http://github.com/smuething/dune-multidomaingrid
+[2]:  http://dune-project.org
+[3]:  https://github.com/smuething/dune-multidomaingrid/issues
+[4]:  https://github.com/smuething/dune-multidomaingrid/pulls
+[5]:  http://dune-project.org/pdelab/
+[6]:  http://github.com/smuething/dune-multidomain
+[7]:  http://boost.org
+[8]:  http://gcc.gnu.org/onlinedocs/libstdc++/faq.html#faq.license
+[9]:  COPYING.md
+[10]:  README.GIT.md
+[11]: http://dune-project.org/doc/installation-notes.html
+[12]: http://dune-project.org/doc/buildsystem/buildsystem.pdf
