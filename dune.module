@@ -7,3 +7,4 @@ Version: 0.1
 Maintainer: steffen.muething@iwr.uni-heidelberg.de
 #depending on
 Depends: dune-grid
+Whitespace-Hook: Yes
