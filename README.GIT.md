@@ -1,4 +1,5 @@
-# Preparing the Sources
+Preparing the Sources
+=====================
 
 Additional to the software mentioned in README you'll need the
 following programs installed on your system:
@@ -10,7 +11,8 @@ following programs installed on your system:
 * libtool
 
 
-## Getting started
+Getting started
+---------------
 
 If these preliminaries are met, you should run
 
@@ -62,14 +64,16 @@ dunecontrol configure --help
 after running at least `dunecontrol autogen`.
 
 
-## CMake support
+CMake support
+-------------
 
 If you have an unexplicable aversion to autotools, you can also build the library
 using [CMake](cmake.org). If you want to do so, add `--use-cmake` to any dunecontrol
 calls. Further information can be found at http://users.dune-project.org/projects/cmakedune.
 
 
-## Contributing patches
+Contributing patches
+--------------------
 
 If you have fixed a bug and would like to contribute it back to the project, we're happy
 to take your patches! Please be aware that you will have to accept our license arrangements
@@ -87,7 +91,8 @@ The easiest way to contribute changes is by opening a [pull request](https://git
 locally and generate patch files with `git format-patch` (see https://www.kernel.org/pub/software/scm/git/docs/git-format-patch.html for details). Please make sure to set a valid Git identity; that way, your name will be recorded in the Git history for stuff like copyright notices.
 
 
-## More info
+More info
+---------
 
 See
 

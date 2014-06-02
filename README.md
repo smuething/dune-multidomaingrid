@@ -1,4 +1,5 @@
-# MultiDomainGrid
+MultiDomainGrid
+===============
 
 [dune-multidomaingrid](github.com/smuething/dune-multidomaingrid)is a meta grid
 built on top of the [DUNE](dune-project.org) grid interface. It can be used to
@@ -6,7 +7,8 @@ carve out subdomains from an underlying host grid which are then available as
 fully featured DUNE grids in their own right.
 
 
-## Version
+Version
+-------
 
 This is version 2.3.0-rc1 of MultiDomainGrid. It is compatible with the 2.3.x release
 series of the DUNE core modules. The versioning scheme of MultiDomainGrid has
@@ -14,7 +16,8 @@ recently been synchronized to that of the core modules to make it easier for use
 to find a compatible release for their DUNE distribution.
 
 
-## Features
+Features
+--------
 
 * Support for arbitrary subdomain topologies, including non-contiguous domains.
 
@@ -59,7 +62,8 @@ Even better, if you have managed to fix a problem, open a [pull request](https:/
 to get your patch merged into the library.
 
 
-## High-level interface for multi-domain simulations
+High-level interface for multi-domain simulations
+-------------------------------------------------
 
 While dune-multidomaingrid is a very useful tool in its own right and is used in
 a standalone fashion by a number of people, it was originally designed as a building
@@ -70,7 +74,8 @@ for subproblems and couplings between those subproblems and uses MultiDomainGrid
 provide the spatial layout of those subproblems and couplings.
 
 
-## Dependencies
+Dependencies
+------------
 
 dune-multidomaingrid depends on the following software packages:
 
@@ -85,23 +90,27 @@ dune-multidomaingrid depends on the following software packages:
   with very recent versions of ICC (icpc 14.0.3+) and current clang (3.2+).
 
 
-## License
+License
+-------
 
 The MultiDomainGrid library, headers and test programs are free open-source software,
 dual-licensed under version 3 or later of the GNU Lesser General Public License
 and version 2 of the GNU General Public License with a special run-time exception.
 
-See the file COPYING for full copying permissions.
+See the file COPYING.md for full copying permissions.
 
 
-## Installation
+Installation
+------------
 
-Short installation instructions can be found in file INSTALL.
+Short installation instructions can be found in the file README.GIT.md.
 For a full explanation of the DUNE installation process please read
 the [installation notes](dune-project.org/doc/installation-notes.html)
 or the [build system HOWTO](dune-project.org/doc/buildsystem/buildsystem.pdf).
 
-## Links
+
+Links
+-----
 
 * http://github.com/smuething/dune-multidomaingrid
 * http://www.dune-project.org

@@ -1,7 +1,9 @@
-# Copyright and licensing information
+Copyright and licensing information
+===================================
 
 
-## Copyright holders
+Copyright holders
+-----------------
 
  Time Frame | Name
 ------------|---------------------------------
@@ -10,7 +12,8 @@
  2010       | Oliver Sander
 
 
-## License
+License
+-------
 
 The MultiDomainGrid library, headers and test programs are copyrighted free software.
 You can use, modify and/or redistribute it under the terms of either one of the two
