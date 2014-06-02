@@ -599,7 +599,7 @@ public:
 
   typename Traits::LevelIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
     assert(_subDomain == it->subDomain1() || _subDomain == it->subDomain2());
-    if (_subDomain == it.domain1())
+    if (_subDomain == it->subDomain1())
       return LevelIntersectionIteratorWrapper<const GridImp>(*this,it->firstCell()->level(),it->firstMultiDomainIntersectionIterator());
     else
       return LevelIntersectionIteratorWrapper<const GridImp>(*this,it->secondCell()->level(),it->secondMultiDomainIntersectionIterator());
