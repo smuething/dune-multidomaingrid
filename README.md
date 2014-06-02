@@ -10,7 +10,7 @@ own right.
 Version
 -------
 
-This is version 2.3.0-rc1 of MultiDomainGrid. It is compatible with the 2.3.x release
+This is version 2.3.0-rc2 of MultiDomainGrid. It is compatible with the 2.3.x release
 series of the DUNE core modules. The versioning scheme of MultiDomainGrid has
 recently been synchronized to that of the core modules to make it easier for users
 to find a compatible release for their DUNE distribution.

@@ -30,6 +30,11 @@ Changes
 
 * Release history
 
+  * `2.3.0-rc2` Fix stupid build system problems
+    * distribute documentation files
+    * make sure there is a README file; otherwise `make dist` breaks
+    * fix pkg-config info
+
   * `2.3.0-rc1` Initial release candidate
 
 
