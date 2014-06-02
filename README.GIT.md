@@ -89,7 +89,7 @@ If you call `dunecontrol all` on your module, the script will automatically inst
 commit hook that checks any commits you create locally for those guidelines. Alternatively,
 you can explicitly request installation of the hook by calling `dunecontrol vcsetup`.
 
-The easiest way to contribute changes is by opening a [pull request][4]) on GitHub, but if
+The easiest way to contribute changes is by opening a [pull request][4] on GitHub, but if
 you don't like GitHub, just create the commits locally and generate patch files with
 `git format-patch` ([details][5]). Please make sure to set a [valid Git identity][6]; that way,
 your name will be recorded in the Git history for stuff like copyright notices.
