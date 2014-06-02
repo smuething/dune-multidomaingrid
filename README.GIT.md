@@ -68,7 +68,7 @@ CMake support
 -------------
 
 If you have an unexplicable aversion to autotools, you can also build the library
-using [CMake](cmake.org). If you want to do so, add `--use-cmake` to any dunecontrol
+using [CMake](http://cmake.org). If you want to do so, add `--use-cmake` to any dunecontrol
 calls. Further information can be found at http://users.dune-project.org/projects/cmakedune.
 
 
@@ -87,8 +87,10 @@ If you call `dunecontrol all` on your module, the script will automatically inst
 commit hook that checks any commits you create locally for those guidelines. Alternatively,
 you can explicitly request installation of the hook by calling `dunecontrol vcsetup`.
 
-The easiest way to contribute changes is by opening a [pull request](https://github.com/smuething/dune-multidomaingrid/pulls) on GitHub, but if you don't like GitHub, just create the commits
-locally and generate patch files with `git format-patch` (see https://www.kernel.org/pub/software/scm/git/docs/git-format-patch.html for details). Please make sure to set a valid Git identity; that way, your name will be recorded in the Git history for stuff like copyright notices.
+The easiest way to contribute changes is by opening a [pull request](https://github.com/smuething/dune-multidomaingrid/pulls)
+on GitHub, but if you don't like GitHub, just create the commits locally and generate patch files with `git format-patch`
+(see https://www.kernel.org/pub/software/scm/git/docs/git-format-patch.html for details). Please make sure to set a valid Git
+identity; that way, your name will be recorded in the Git history for stuff like copyright notices.
 
 
 More info
@@ -103,4 +105,5 @@ dunecontrol --help
 for further options.
 
 
-The full build-system is described in dune-common/doc/buildsystem (Git version) or under share/doc/dune-common/buildsystem if you installed DUNE!
+The full build-system is described in dune-common/doc/buildsystem (Git version) or under share/doc/dune-common/buildsystem if
+you installed DUNE!

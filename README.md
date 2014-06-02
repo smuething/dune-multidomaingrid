@@ -1,8 +1,8 @@
 MultiDomainGrid
 ===============
 
-[dune-multidomaingrid](github.com/smuething/dune-multidomaingrid)is a meta grid
-built on top of the [DUNE](dune-project.org) grid interface. It can be used to
+[dune-multidomaingrid](http://github.com/smuething/dune-multidomaingrid) is a meta grid
+built on top of the [DUNE](http://dune-project.org) grid interface. It can be used to
 carve out subdomains from an underlying host grid which are then available as
 fully featured DUNE grids in their own right.
 
@@ -56,7 +56,7 @@ API documentation in doc/doxygen/html. Otherwise, you can build this documentati
 yourself by calling "make doc". Note that you need Doxygen and GraphViz available at
 configure time to be able to build the documentation.
 
-If you need help, please ask via [GitHub](github.com/smuething/dune-multidomaingrid).
+If you need help, please ask via [GitHub](http://github.com/smuething/dune-multidomaingrid).
 If you find bugs, you can also submit them to the [bugtracker](https://github.com/smuething/dune-multidomaingrid/issues).
 Even better, if you have managed to fix a problem, open a [pull request](https://github.com/smuething/dune-multidomaingrid/pulls)
 to get your patch merged into the library.
@@ -68,10 +68,10 @@ High-level interface for multi-domain simulations
 While dune-multidomaingrid is a very useful tool in its own right and is used in
 a standalone fashion by a number of people, it was originally designed as a building
 block for extending the high-level DUNE-based PDE solver toolbox
-[PDELab](dune-project.org/pdelab/) with support for multi-physics and multi-domain
-simulations. This support is contained in the [dune-multidomain](github.com/smuething/dune-multidomain) library, which is an add-on module for PDELab that extends the latter with concepts
-for subproblems and couplings between those subproblems and uses MultiDomainGrid to
-provide the spatial layout of those subproblems and couplings.
+[PDELab](http://dune-project.org/pdelab/) with support for multi-physics and multi-domain
+simulations. This support is contained in the [dune-multidomain](http://github.com/smuething/dune-multidomain) library,
+which is an add-on module for PDELab that extends the latter with concepts for subproblems and couplings between
+those subproblems and uses MultiDomainGrid to provide the spatial layout of those subproblems and couplings.
 
 
 Dependencies
@@ -82,7 +82,7 @@ dune-multidomaingrid depends on the following software packages:
 * DUNE core libraries (dune-common, dune-geometry, dune-grid, dune-istl,
   dune-localfunctions) version 3.0-dev, and their respective dependencies.
 
-* The [Boost](boost.org) C++ libraries, in particular Boost.MPL and Boost.Fusion.
+* The [Boost](http://boost.org) C++ libraries, in particular Boost.MPL and Boost.Fusion.
 
 * MultiDomain's compiler requirements differ slightly from the underlying DUNE
   libraries: We require at least GCC 4.5 in C++11 mode, although we only
@@ -97,7 +97,7 @@ The MultiDomainGrid library, headers and test programs are free open-source soft
 dual-licensed under version 3 or later of the GNU Lesser General Public License
 and version 2 of the GNU General Public License with a special run-time exception.
 
-See the file COPYING.md for full copying permissions.
+See the file [COPYING.md] for full copying permissions.
 
 
 Installation
@@ -105,8 +105,8 @@ Installation
 
 Short installation instructions can be found in the file README.GIT.md.
 For a full explanation of the DUNE installation process please read
-the [installation notes](dune-project.org/doc/installation-notes.html)
-or the [build system HOWTO](dune-project.org/doc/buildsystem/buildsystem.pdf).
+the [installation notes](http://dune-project.org/doc/installation-notes.html)
+or the [build system HOWTO](http://dune-project.org/doc/buildsystem/buildsystem.pdf).
 
 
 Links
@@ -118,3 +118,4 @@ Links
 * http://www.dune-project.org/doc/installation-notes.html
 * http://dune-project.org/doc/buildsystem/buildsystem.pdf
 * http://gcc.gnu.org/onlinedocs/libstdc++/faq.html#faq.license
+* http://www.boost..org

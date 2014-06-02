@@ -2,13 +2,13 @@ MultiDomainGrid
 ===============
 
 This is the 2.3 release of MultiDomainGrid, a meta grid build on top of the
-[DUNE](dune-project.org) grid interface. See the file README for further details
+[DUNE](http://dune-project.org) grid interface. See the file README for further details
 including license information.
 
 MultiDomainGrid 2.3 is a minor release, mainly focusing on bug fixes and keeping current
 with changes to the underlying DUNE modules.
 
-If you need help, please ask via [GitHub](github.com/smuething/dune-multidomaingrid).
+If you need help, please ask via [GitHub](http://github.com/smuething/dune-multidomaingrid).
 If you find bugs, you can also submit them to the [bugtracker](https://github.com/smuething/dune-multidomaingrid/issues).
 Even better, if you have managed to fix a problem, open a [pull request](https://github.com/smuething/dune-multidomaingrid/pulls)
 to get your patch merged into the library.
