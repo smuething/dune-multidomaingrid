@@ -15,6 +15,9 @@ development series of the DUNE core modules. The versioning scheme of MultiDomai
 has recently been synchronized to that of the core modules to make it easier for users
 to find a compatible release for their DUNE distribution.
 
+An overview of changes to the library can be found in the file
+[RELEASE_NOTES.md][13].
+
 
 Features
 --------
@@ -119,6 +122,7 @@ Links
 [7]:  http://boost.org
 [8]:  http://gcc.gnu.org/onlinedocs/libstdc++/faq.html#faq.license
 [9]:  COPYING.md
-[10]:  README.GIT.md
+[10]: README.GIT.md
 [11]: http://dune-project.org/doc/installation-notes.html
 [12]: http://dune-project.org/doc/buildsystem/buildsystem.pdf
+[13]: RELEASES_NOTES.md

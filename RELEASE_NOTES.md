@@ -33,6 +33,10 @@ Changes
 
 * Some minor bugfixes.
 
+* Release history
+
+  * `2.3.0-rc1` Initial release candidate
+
 
 Caveats
 -------
