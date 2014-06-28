@@ -193,7 +193,14 @@ public:
   template<int cc> // this is now the subentity's codim
   bool contains (SubDomainIndex subDomain, const typename GV::template Codim<0>::Entity& e, int i, IndexType& result) const
   {
-    result = this->template map<cc>(subDomain,e,i);
+    GeometryType gt = ReferenceElements<double,GV::dimension>::general(e.type()).type(i,cc);
+    // if the entity is contained in the subdomain, all of its subentities are contained as well
+    if(!_gv.indexSet().contains(subDomain,e) || !_layout.contains(gt))
+      {
+        result = 0;
+        return false;
+      }
+    result = _gv.indexSet().subIndex(subDomain,e,i,cc) + _offsets[subDomain][GlobalGeometryTypeIndex::index(gt)];
     return true;
   }
 
