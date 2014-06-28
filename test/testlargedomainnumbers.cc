@@ -9,8 +9,9 @@ int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
     typedef Dune::YaspGrid<2> GridType;
-    Dune::GridPtr<GridType> gridPtr("/Users/smuething/Documents/dune/ws/dune-grid-howto/grids/unitcube2.dgf");
-    GridType& wgrid = *gridPtr;
+    Dune::FieldVector<double,2> L(1.0);
+    std::array<int,2> n{{1,1}};
+    GridType wgrid(L,n);
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::ArrayBasedTraits<GridType::dimension,1,65536> > Grid;
     Grid grid(wgrid,false);
     //typedef Dune::mdgrid::DynamicSubDomainCountTraits<GridType::dimension,1> MDGridTraits;
