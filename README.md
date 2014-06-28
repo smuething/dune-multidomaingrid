@@ -81,8 +81,8 @@ Dependencies
 
 dune-multidomaingrid depends on the following software packages:
 
-* [DUNE core libraries][1] (dune-common, dune-geometry, dune-grid, dune-istl,
-  dune-localfunctions) version 3.0-git, and their respective dependencies.
+* [DUNE core libraries][2] (dune-common, dune-geometry, dune-grid) version 3.0-git,
+  and their respective dependencies.
 
 * The [Boost][7] C++ libraries, in particular Boost.MPL and Boost.Fusion.
 
