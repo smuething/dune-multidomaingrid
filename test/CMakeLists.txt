@@ -8,8 +8,6 @@ set(TESTS
   testlargedomainnumbers
   testparallel
   testpartitioning
-  testsubdomainset
-  testwrapper
   test_wrapper)
 
 add_executable(iterateallinterfaces EXCLUDE_FROM_ALL iterateallinterfaces.cc)
@@ -21,8 +19,6 @@ add_executable(testintersectiongeometrytypes EXCLUDE_FROM_ALL testintersectionge
 add_executable(testlargedomainnumbers EXCLUDE_FROM_ALL testlargedomainnumbers.cc)
 add_executable(testparallel EXCLUDE_FROM_ALL testparallel.cc)
 add_executable(testpartitioning EXCLUDE_FROM_ALL testpartitioning.cc)
-add_executable(testsubdomainset EXCLUDE_FROM_ALL testsubdomainset.cc)
-add_executable(testwrapper EXCLUDE_FROM_ALL testwrapper.cc)
 add_executable(test_wrapper EXCLUDE_FROM_ALL test-wrapper.cc)
 
 # We do not want want to build the tests during make all,

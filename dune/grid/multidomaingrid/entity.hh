@@ -61,6 +61,11 @@ public:
     return _hostEntitySeed;
   }
 
+  bool isValid() const
+  {
+    return _hostEntitySeed.isValid();
+  }
+
   HostEntitySeed _hostEntitySeed;
 
 };

@@ -4,15 +4,6 @@ include $(top_srcdir)/am/global-rules
 
 EXTRA_DIST = CMakeLists.txt
 
-#noinst_PROGRAMS = testwrapper
-
-#testsubdomainset_SOURCES = testsubdomainset.cc
-
-#testwrapper_SOURCES = testwrapper.cc
-#testwrapper_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
-#testwrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
-#testwrapper_LIBS = $(ALL_PKG_LIBS)
-
 check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers testadaptation profilerepartitioning iterateallinterfaces testparallel
 
 test_wrapper_SOURCES = test-wrapper.cc
