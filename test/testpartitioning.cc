@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     Dune::MPIHelper::instance(argc,argv);
     typedef Dune::YaspGrid<2> GridType;
     Dune::FieldVector<double,2> L(1.0);
-    Dune::array<int,2> N = {1,1};
+    Dune::array<int,2> N = { {1,1} };
     GridType wgrid(L,N);
     typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
     Grid grid(wgrid);

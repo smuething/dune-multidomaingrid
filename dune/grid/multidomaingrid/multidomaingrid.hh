@@ -1146,8 +1146,8 @@ private:
       typename WrappedDataHandle::DataType buffer;
     };
 
-    dune_static_assert(sizeof(WrappedDataHandle::DataType) >= sizeof(SubDomainIndex),
-                       "During load balancing, the data type has to be large enough to contain MultiDomaingrid::SubDomainIndex");
+    static_assert(sizeof(WrappedDataHandle::DataType) >= sizeof(SubDomainIndex),
+                  "During load balancing, the data type has to be large enough to contain MultiDomaingrid::SubDomainIndex");
 
     bool contains(int dim, int codim) const
     {

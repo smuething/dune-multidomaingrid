@@ -73,8 +73,7 @@ void check_grid() {
   gridcheck(grid.subDomain(1));
   checkGeometryInFather(grid.subDomain(1));
   checkIntersectionIterator(grid.subDomain(1));
-
-};
+}
 
 int main (int argc , char **argv) {
   try {
@@ -94,4 +93,4 @@ int main (int argc , char **argv) {
   }
 
   return 0;
-};
+}

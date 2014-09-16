@@ -1,17 +1,17 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINSET_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINSET_HH
 
-#include <limits>
+#include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <dune/common/static_assert.hh>
+#include <limits>
+#include <strings.h>
+#include <boost/bind.hpp>
 #include <dune/common/typetraits.hh>
 #include <dune/common/iteratorfacades.hh>
 #include <dune/common/exceptions.hh>
-#include <algorithm>
-#include <boost/bind.hpp>
-#include <cassert>
-#include <strings.h>
+
 #include <dune/grid/multidomaingrid/utility.hh>
 
 namespace Dune {
@@ -71,7 +71,7 @@ namespace sds_detail {
   template<std::size_t capacity, typename candidate>
   struct SetStorageTester {
 
-    dune_static_assert(std::numeric_limits<typename candidate::type>::is_specialized,"numeric_limits<> lacks specialization");
+    static_assert(std::numeric_limits<typename candidate::type>::is_specialized,"numeric_limits<> lacks specialization");
 
     typedef typename conditional<capacity <= static_cast<std::size_t>(std::numeric_limits<typename candidate::type>::digits),
                                  typename candidate::type,
@@ -80,7 +80,7 @@ namespace sds_detail {
                                                            >::type
                                  >::type type;
 
-    dune_static_assert((!std::is_same<type,void>::value),"unsupported maximum number of subdomains");
+    static_assert((!std::is_same<type,void>::value),"unsupported maximum number of subdomains");
 
   };
 

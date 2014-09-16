@@ -2,17 +2,16 @@
 #define DUNE_MULTIDOMAINGRID_ARRAYBASEDSET_HH
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <type_traits>
+#include <strings.h>
 
-#include <dune/common/static_assert.hh>
 #include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>
 #include <boost/integer_traits.hpp>
-#include <type_traits>
-#include <cassert>
-#include <strings.h>
 
 namespace Dune {
 
