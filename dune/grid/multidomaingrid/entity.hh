@@ -174,8 +174,12 @@ public:
   }
 
   template<int cc>
-  int count() const {
+  int count() const DUNE_DEPRECATED_MSG("Use subEntities instead") {
     return _hostEntityPointer->template count<cc>();
+  }
+
+  unsigned int subEntities(unsigned int codimSubEntitiy) const {
+    return _hostEntityPointer->subEntities(codimSubEntitiy);
   }
 
   Geometry geometry() const {
@@ -267,8 +271,12 @@ public:
   }
 
   template<int cc>
-  int count() const {
+  int count() const DUNE_DEPRECATED_MSG("Use subEntities instead")  {
     return _hostEntityPointer->template count<cc>();
+  }
+
+  unsigned int subEntities(unsigned int codim) const {
+    return _hostEntityPointer->subEntities(codim);
   }
 
   template<int cc>
