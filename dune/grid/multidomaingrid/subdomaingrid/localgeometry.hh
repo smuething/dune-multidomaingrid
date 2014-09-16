@@ -78,12 +78,12 @@ public:
     return _hostLocalGeometry.center();
   }
 
-  const JacobianTransposed&
+  const JacobianTransposed
   jacobianTransposed(const LocalCoords& local) const {
     return _hostLocalGeometry.jacobianTransposed(local);
   }
 
-  const JacobianInverseTransposed&
+  const JacobianInverseTransposed
   jacobianInverseTransposed(const LocalCoords& local) const {
     return _hostLocalGeometry.jacobianInverseTransposed(local);
   }

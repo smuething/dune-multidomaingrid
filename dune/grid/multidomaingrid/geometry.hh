@@ -79,12 +79,12 @@ public:
     return _wrappedGeometry.center();
   }
 
-  const JacobianTransposed&
+  const JacobianTransposed
   jacobianTransposed(const LocalCoords& local) const {
     return _wrappedGeometry.jacobianTransposed(local);
   }
 
-  const JacobianInverseTransposed&
+  const JacobianInverseTransposed
   jacobianInverseTransposed(const LocalCoords& local) const {
     return _wrappedGeometry.jacobianInverseTransposed(local);
   }
