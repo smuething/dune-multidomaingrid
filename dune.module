@@ -7,4 +7,5 @@ Version: 3.0-dev
 Maintainer: steffen.muething@iwr.uni-heidelberg.de
 #depending on
 Depends: dune-grid (>= 3.0)
+Suggests: dune-alugrid
 Whitespace-Hook: Yes

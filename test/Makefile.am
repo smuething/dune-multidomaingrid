@@ -23,8 +23,8 @@ testlargedomainnumbers_LIBS = $(ALL_PKG_LIBS)
 
 testadaptation_SOURCES = testadaptation.cc
 testadaptation_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)
-testadaptation_LDFLAGS = $(ALL_PKG_LDFLAGS) -lalugrid
-testadaptation_LIBS = $(ALL_PKG_LIBS) -lalugrid
+testadaptation_LDFLAGS = $(ALL_PKG_LDFLAGS)
+testadaptation_LIBS = $(ALL_PKG_LIBS)
 
 profilerepartitioning_SOURCES = profilerepartitioning.cc
 profilerepartitioning_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS) $(BOOST_CPPFLAGS)

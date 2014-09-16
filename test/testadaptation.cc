@@ -3,16 +3,22 @@
 #define ALUGRID_SIMPLEX
 
 #include <dune/common/parallel/mpihelper.hh>
+#include <dune/grid/io/file/dgfparser/gridptr.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
+
+#ifdef HAVE_DUNE_ALUGRID
+#include <dune/alugrid/dgf.hh>
+#include <dune/alugrid/grid.hh>
+#endif
 
 int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
-    typedef Dune::ALUSimplexGrid<2,2> AdaptableGridType;
-    Dune::GridPtr<GridType> gridPtr("../../dune-grid-howto/grids/unitcube2.dgf");
-    GridType& wgrid = *gridPtr;
-    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::FewSubDomainsTraits<GridType::dimension,4> > Grid;
+    typedef Dune::ALUGrid<2,2,Dune::simplex,Dune::nonconforming> AdaptableGridType;
+    Dune::GridPtr<AdaptableGridType> gridPtr("../../dune-grid-howto/grids/unitcube2.dgf");
+    AdaptableGridType& wgrid = *gridPtr;
+    typedef Dune::MultiDomainGrid<AdaptableGridType,Dune::mdgrid::FewSubDomainsTraits<AdaptableGridType::dimension,4> > Grid;
     Grid grid(wgrid);
     grid.globalRefine(5);
     typedef Grid::LeafGridView GridView;
@@ -25,8 +31,8 @@ int main(int argc, char** argv) {
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
       const Entity& e = *it;
       //IndexSet::SubDomainSet& sds = is.subDomainSet(e);
-      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(
-        Dune::ReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
+      Dune::FieldVector<AdaptableGridType::ctype,2> c = e.geometry().global(
+        Dune::ReferenceElements<AdaptableGridType::ctype,2>::general(e.type()).position(0,0));
       double x = c[0];
       double y = c[1];
       if (x > 0.2) {
@@ -54,9 +60,8 @@ int main(int argc, char** argv) {
 
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
       const Entity& e = *it;
-      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(
-        Dune::ReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
-      double x = c[0];
+      Dune::FieldVector<AdaptableGridType::ctype,2> c = e.geometry().global(
+        Dune::ReferenceElements<AdaptableGridType::ctype,2>::general(e.type()).position(0,0));
       double y = c[1];
       if (y > 0.5) {
         grid.mark(1,e);
@@ -72,9 +77,8 @@ int main(int argc, char** argv) {
 
     for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
       const Entity& e = *it;
-      Dune::FieldVector<GridType::ctype,2> c = e.geometry().global(
-        Dune::ReferenceElements<GridType::ctype,2>::general(e.type()).position(0,0));
-      double x = c[0];
+      Dune::FieldVector<AdaptableGridType::ctype,2> c = e.geometry().global(
+        Dune::ReferenceElements<AdaptableGridType::ctype,2>::general(e.type()).position(0,0));
       double y = c[1];
       if (y > 0.5) {
         grid.mark(-1,e);
