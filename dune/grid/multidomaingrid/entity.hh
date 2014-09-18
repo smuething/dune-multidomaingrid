@@ -174,7 +174,7 @@ public:
   }
 
   template<int cc>
-  int count() const DUNE_DEPRECATED_MSG("Use subEntities instead") {
+  int DUNE_DEPRECATED_MSG("Use subEntities instead") count() const {
     return _hostEntityPointer->template count<cc>();
   }
 
@@ -271,7 +271,7 @@ public:
   }
 
   template<int cc>
-  int count() const DUNE_DEPRECATED_MSG("Use subEntities instead")  {
+  int DUNE_DEPRECATED_MSG("Use subEntities instead") count() const {
     return _hostEntityPointer->template count<cc>();
   }
 
