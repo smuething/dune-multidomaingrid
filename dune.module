@@ -3,9 +3,9 @@
 
 #Name of the module
 Module: dune-multidomaingrid
-Version: 3.0-dev
+Version: 2.4-dev
 Maintainer: steffen.muething@iwr.uni-heidelberg.de
 #depending on
-Depends: dune-grid (>= 3.0)
+Depends: dune-grid (>= 2.4)
 Suggests: dune-alugrid
 Whitespace-Hook: Yes
