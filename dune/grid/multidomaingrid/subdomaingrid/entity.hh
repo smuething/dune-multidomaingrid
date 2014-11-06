@@ -315,6 +315,11 @@ public:
     return EntityPointerWrapper<cc,GridImp>(_grid,_multiDomainEntityPointer->template subEntity<cc>(i));
   }
 
+  bool equals(const EntityWrapper& other) const
+  {
+    return _multiDomainEntityPointer == other.multiDomainEntityPointer();
+  }
+
   EntityPointer father() const {
     return EntityPointerWrapper<0,GridImp>(_grid,_multiDomainEntityPointer->father());
   }
@@ -408,6 +413,10 @@ public:
     return false;
   }
 
+  const MultiDomainEntityPointer& multiDomainEntityPointer() const {
+    return _multiDomainEntityPointer;
+  }
+
 private:
 
   const GridImp& _grid;
@@ -426,10 +435,6 @@ private:
 
   void compactify() {
     _multiDomainEntityPointer.compactify();
-  }
-
-  const MultiDomainEntityPointer& multiDomainEntityPointer() const {
-    return _multiDomainEntityPointer;
   }
 
   const HostEntity& hostEntity() const {

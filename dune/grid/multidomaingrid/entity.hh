@@ -284,6 +284,11 @@ public:
     return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->template subEntity<cc>(i));
   }
 
+  bool equals(const EntityWrapper& other) const
+  {
+    return _hostEntityPointer == other.hostEntityPointer();
+  }
+
   EntityPointer father() const {
     return EntityPointerWrapper<0,GridImp>(_hostEntityPointer->father());
   }
@@ -345,6 +350,10 @@ public:
     return _hostEntityPointer->hasBoundaryIntersections();
   }
 
+  const HostEntityPointer& hostEntityPointer() const {
+    return _hostEntityPointer;
+  }
+
 private:
 
   HostEntityPointer _hostEntityPointer;
@@ -356,10 +365,6 @@ private:
 
   void compactify() {
     _hostEntityPointer.compactify();
-  }
-
-  const HostEntityPointer& hostEntityPointer() const {
-    return _hostEntityPointer;
   }
 
 };
