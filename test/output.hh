@@ -1,10 +1,11 @@
 #ifndef DUNE_MULTIDOMAINGRID_TESTS_OUTPUT_HH
 #define DUNE_MULTIDOMAINGRID_TESTS_OUTPUT_HH
 
-#include <dune/grid/io/file/vtk/vtkwriter.hh>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <dune/grid/io/file/vtk/vtkwriter.hh>
+#include <dune/grid/multidomaingrid.hh>
 
 template<int dim>
 struct AllLayout

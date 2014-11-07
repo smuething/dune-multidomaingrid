@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include <dune/grid/yaspgrid.hh>
-#include <dune/grid/sgrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 
 #include <dune/grid/test/gridcheck.cc>
@@ -16,10 +15,13 @@ int rank;
 template <int dim>
 void check_grid() {
 
-  int n[] = { 5,5,5 };
-  double h[] = { 1.0, 2.0, 3.0 };
-  typedef Dune::SGrid<dim,dim> HostGrid;
-  Dune::SGrid<dim,dim> wgrid(n,h);
+  typedef Dune::YaspGrid<dim> HostGrid;
+  Dune::FieldVector<typename HostGrid::ctype,dim> lengths(1.0);
+  for (unsigned int i = 0; i < dim; i++)
+    lengths[i] = i + 1;
+  Dune::array<int,dim> elements;
+  std::fill(elements.begin(), elements.end(), 5);
+  HostGrid wgrid(lengths, elements);
 
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
 

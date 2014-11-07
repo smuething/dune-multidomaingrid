@@ -205,7 +205,7 @@ int main(int argc, char** argv)
       std::fill(s.begin(), s.end(), atoi(argv[1]));
       std::bitset<dim> p(false);
       typedef Dune::YaspGrid<dim> HostGrid;
-      HostGrid hostgrid(Dune::MPIHelper::getCommunicator(),h,s,p,atoi(argv[2]));
+      HostGrid hostgrid(h,s,p,atoi(argv[2]));
 
       testGrid(hostgrid,"YaspGrid_2",mpihelper);
     }
