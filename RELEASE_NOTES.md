@@ -1,11 +1,11 @@
 MultiDomainGrid
 ===============
 
-This is the 2.3 release of MultiDomainGrid, a meta grid build on top of the
+This is the 2.3.1 release of MultiDomainGrid, a meta grid build on top of the
 [DUNE][1] grid interface. See the file README for further details including
 license information.
 
-MultiDomainGrid 2.3 is a minor release, mainly focusing on bug fixes and keeping
+MultiDomainGrid 2.3.1 is a minor release, mainly focusing on bug fixes and keeping
 current with changes to the underlying DUNE modules.
 
 If you need help, please ask via [GitHub][2]) If you find bugs, you can also
@@ -29,6 +29,8 @@ Changes
 * Some minor bugfixes.
 
 * Release history
+
+  * `2.3.1` Final release, compatible with DUNE 2.3.1.
 
   * `2.3.0-rc2` Fix stupid build system problems
     * distribute documentation files
