@@ -41,6 +41,8 @@ Changes
 
 * Release history
 
+  * `2.3.1` Final release, compatible with DUNE 2.3.1.
+
   * `2.3.0-rc2` Fix stupid build system problems
     * distribute documentation files
     * make sure there is a README file; otherwise `make dist` breaks
