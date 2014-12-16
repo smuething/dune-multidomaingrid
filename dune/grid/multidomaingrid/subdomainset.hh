@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <limits>
 #include <strings.h>
-#include <boost/bind.hpp>
 #include <dune/common/typetraits.hh>
 #include <dune/common/iteratorfacades.hh>
 #include <dune/common/exceptions.hh>
@@ -345,12 +344,12 @@ private:
 
 template<typename A, typename B>
 inline bool setContains(const A& a, const B& b) {
-  return std::all_of(b.begin(),b.end(),boost::bind(&A::contains,boost::ref(a),_1));
+  return std::all_of(b.begin(),b.end(),[&a](decltype(*(b.begin())) i) { return a.contains(i); });
 }
 
 template<typename A, typename B>
 inline void setAdd(A& a, const B& b) {
-  std::for_each(b.begin(),b.end(),boost::bind(&A::add,boost::ref(a),_1));
+  std::for_each(b.begin(),b.end(),[&a](decltype(*(b.begin())) i) { a.add(i); });
 }
 
 

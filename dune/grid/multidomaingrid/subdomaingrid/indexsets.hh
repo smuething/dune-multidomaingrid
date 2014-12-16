@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <type_traits>
 #include <tuple>
-#include <boost/scoped_ptr.hpp>
-#include <boost/bind.hpp>
 #include <dune/grid/common/indexidset.hh>
 #include <dune/grid/multidomaingrid/utility.hh>
 
