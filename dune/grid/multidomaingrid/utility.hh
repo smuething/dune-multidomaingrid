@@ -11,16 +11,6 @@ namespace mdgrid {
 
 namespace util {
 
-template<typename Iterator, typename Predicate>
-inline bool all_of(Iterator begin, Iterator end, Predicate pred) {
-  for ( ; begin != end; ++begin) {
-    if (!pred(*begin)) {
-      return false;
-    }
-  }
-  return true;
-}
-
 struct GeometryTypeHash {
 
   std::size_t operator()(GeometryType gt) const {

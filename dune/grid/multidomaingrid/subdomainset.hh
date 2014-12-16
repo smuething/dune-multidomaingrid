@@ -345,7 +345,7 @@ private:
 
 template<typename A, typename B>
 inline bool setContains(const A& a, const B& b) {
-  return util::all_of(b.begin(),b.end(),boost::bind(&A::contains,boost::ref(a),_1));
+  return std::all_of(b.begin(),b.end(),boost::bind(&A::contains,boost::ref(a),_1));
 }
 
 template<typename A, typename B>
