@@ -12,7 +12,6 @@
 
 #include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>
-#include <boost/integer_traits.hpp>
 
 namespace Dune {
 
@@ -47,7 +46,7 @@ public:
   typedef SubDomainIndex DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   static const std::size_t maxSize = capacity;
-  static const SubDomainIndex emptyTag = boost::integer_traits<SubDomainIndex>::const_max;
+  static const SubDomainIndex emptyTag = std::numeric_limits<SubDomainIndex>::max();
   typedef typename std::array<SubDomainIndex,maxSize>::iterator ArrayIterator;
   typedef typename std::array<SubDomainIndex,maxSize>::const_iterator Iterator;
   typedef ArrayBasedSet<SubDomainIndex,capacity> This;
