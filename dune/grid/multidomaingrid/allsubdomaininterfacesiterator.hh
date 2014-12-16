@@ -41,7 +41,6 @@ class AllInterfacesController
   friend class LevelAllSubDomainInterfacesIterator;
 
   typedef typename SubDomainSet::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   typedef typename SubDomainSet::Iterator SubDomainIterator;
 
   template<typename Iterator>

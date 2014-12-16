@@ -280,8 +280,6 @@ public:
 
   /** \brief The type used for subdomain numbers */
   typedef typename MDGrid::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   typedef MDGridType MultiDomainGrid;
 

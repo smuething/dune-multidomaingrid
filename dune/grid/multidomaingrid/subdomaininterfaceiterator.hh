@@ -59,8 +59,6 @@ private:
 public:
 
   typedef typename GridImp::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
   typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
@@ -231,16 +229,6 @@ public:
   //! Returns the index of the subdomain the second (outside) cell belongs to.
   SubDomainIndex subDomain2() const {
     return _controller.subDomain2();
-  }
-
-  //! Use subDomain1() instead.
-  SubDomainIndex domain1() const DUNE_DEPRECATED {
-    return this->subDomain1();
-  }
-
-  //! Use subDomain2() instead.
-  SubDomainIndex domain2() const DUNE_DEPRECATED {
-    return this->subDomain2();
   }
 
   /*@}*/

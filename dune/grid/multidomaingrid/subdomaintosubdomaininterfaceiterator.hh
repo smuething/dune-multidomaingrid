@@ -128,7 +128,6 @@ class LeafSubDomainInterfaceIterator :
                                      > Base;
 
   typedef typename Base::Intersection::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   LeafSubDomainInterfaceIterator(const GridImp& grid, SubDomainIndex subDomain1, SubDomainIndex subDomain2, bool end=false) :
     Base(grid.leafGridView(),grid._hostGrid.leafGridView(),Controller(subDomain1,subDomain2),end)
@@ -164,7 +163,6 @@ class LevelSubDomainInterfaceIterator :
                                      > Base;
 
   typedef typename Base::Intersection::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   LevelSubDomainInterfaceIterator(const GridImp& grid, SubDomainIndex subDomain1, SubDomainIndex subDomain2, int level, bool end=false) :
     Base(grid.levelGridView(level),grid._hostGrid.levelGridView(level),Controller(subDomain1,subDomain2),end)

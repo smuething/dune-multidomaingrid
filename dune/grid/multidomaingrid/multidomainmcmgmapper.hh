@@ -102,8 +102,6 @@ public:
 
   typedef typename GV::IndexSet::IndexType IndexType;
   typedef typename GV::Grid::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   MultiDomainMCMGMapper (const GV& gridView, const Layout<GV::dimension> layout)
     : Base(gridView,layout)

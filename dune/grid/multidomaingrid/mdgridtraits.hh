@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include <dune/common/deprecated.hh>
-
 #include <dune/grid/multidomaingrid/subdomainset.hh>
 #include <dune/grid/multidomaingrid/arraybasedset.hh>
 #include <dune/grid/multidomaingrid/singlevalueset.hh>
@@ -27,8 +25,6 @@ template<int dim, std::size_t subDomainsPerCell, std::size_t subDomainCount, tem
 struct ArrayBasedTraits {
 
   typedef int SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   static const SubDomainIndex empty = -1;
   static const int dimension = dim;
 
@@ -74,8 +70,6 @@ template<int dim, std::size_t subDomainsPerCell, template<int dim_, int codim> c
 struct DynamicSubDomainCountTraits {
 
   typedef int SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   static const SubDomainIndex empty = -1;
   static const int dimension = dim;
 
@@ -142,8 +136,6 @@ template<int dim, std::size_t maxSubDomains, template<int dim_, int codim> class
 struct FewSubDomainsTraits {
 
   typedef unsigned int SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   static const SubDomainIndex empty = ~SubDomainIndex(0); // this is not used, but has to be present to make the compiler happy
   static const int dimension = dim;
 

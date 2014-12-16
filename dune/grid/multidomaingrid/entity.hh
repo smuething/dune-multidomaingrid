@@ -1,6 +1,8 @@
 #ifndef DUNE_MULTIDOMAINGRID_ENTITY_HH
 #define DUNE_MULTIDOMAINGRID_ENTITY_HH
 
+#include <dune/common/deprecated.hh>
+
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridenums.hh>
 

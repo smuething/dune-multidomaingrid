@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>
-#include <dune/common/deprecated.hh>
 #include <type_traits>
 #include <cassert>
 #include <strings.h>
@@ -41,8 +40,6 @@ class SingleValueSet {
 public:
 
   typedef SI SubDomainIndex;
-  typedef SI SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SI DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   static const std::size_t maxSize = 1;
   static const SubDomainIndex emptyTag = ~SubDomainIndex(0);

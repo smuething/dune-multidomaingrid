@@ -42,8 +42,6 @@ class ArrayBasedSet {
 
 public:
   typedef SI SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex DomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
   static const std::size_t maxSize = capacity;
   static const SubDomainIndex emptyTag = std::numeric_limits<SubDomainIndex>::max();
