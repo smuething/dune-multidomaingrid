@@ -219,12 +219,8 @@ public:
       // Note that mapper becomes invalid when the grid is modified.
       for (int cc = 0; cc <= GV::dimension; ++cc)
         {
-          const std::vector<GeometryType>& geom_types = _gv.indexSet().geomTypes(subDomain,cc);
-          for (std::vector<GeometryType>::const_iterator it = geom_types.begin(),
-                 end_it = geom_types.end();
-               it != end_it;
-               ++it)
-            offsets[GlobalGeometryTypeIndex::index(*it) + 1] = _gv.indexSet().size(subDomain,*it);
+          for (auto gt : _gv.indexSet().types(subDomain,cc))
+            offsets[GlobalGeometryTypeIndex::index(gt) + 1] = _gv.indexSet().size(subDomain,gt);
           // convert sizes to offset
           // last entry stores total size
           std::partial_sum(offsets.begin(),offsets.end(),offsets.begin());

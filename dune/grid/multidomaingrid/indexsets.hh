@@ -774,20 +774,20 @@ private:
     void apply(Containers<codim>& c) const {
       // setup per-codim sizemap
       _traits.template setupSizeContainer<codim>(c.codimSizeMap);
-      for (std::vector<GeometryType>::const_iterator it = _his.geomTypes(codim).begin(); it != _his.geomTypes(codim).end(); ++it) {
+      for (auto gt : _his.types(codim)) {
         if (_full) {
           // resize index map
-          c.indexMap[*it].resize(_his.size(*it));
+          c.indexMap[gt].resize(_his.size(gt));
         } else if (codim > 0) {
           // clear out marked state for codim > 0 (we cannot keep the old
           // state for subentities, as doing so will leave stale entries if
           // elements are removed from a subdomain
-          for (auto& mapEntry : c.indexMap[*it])
+          for (auto& mapEntry : c.indexMap[gt])
             mapEntry.domains.clear();
         }
         // setup / reset SizeMap counter
-        _traits.template setupSizeContainer<codim>(c.sizeMap[*it]);
-        std::fill(c.sizeMap[*it].begin(),c.sizeMap[*it].end(),0);
+        _traits.template setupSizeContainer<codim>(c.sizeMap[gt]);
+        std::fill(c.sizeMap[gt].begin(),c.sizeMap[gt].end(),0);
       }
       // clear MultiIndexMap
       c.multiIndexMap.clear();
