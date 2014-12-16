@@ -13,7 +13,6 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
-#include <boost/iterator/counting_iterator.hpp>
 
 template<typename GV, typename DataVector>
 class RankTransfer
@@ -163,10 +162,8 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
       std::stringstream sstr;
       sstr << prefix << (dummy ? "_subdomain_" : "_subdomain_") << (char)('a' + s);
       Dune::VTKWriter<SDGV> vtkwriter(sdgv);
-      std::vector<int> cellIndices;
-      std::copy(boost::counting_iterator<int>(0),
-                boost::counting_iterator<int>(sdgv.indexSet().size(0)),
-                std::back_inserter(cellIndices));
+      std::vector<int> cellIndices(sdgv.indexSet().size(0));
+      std::iota(cellIndices.begin(),cellIndices.end(),int(0));
       std::cout << cellIndices.size() << " " << sdgv.indexSet().size(0) << std::endl;
       vtkwriter.addCellData(cellIndices,"cell index");
       vtkwriter.addCellData(celldata,"cell rank");
