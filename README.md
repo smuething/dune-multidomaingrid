@@ -84,7 +84,7 @@ dune-multidomaingrid depends on the following software packages:
 * [DUNE core libraries][2] (dune-common, dune-geometry, dune-grid) version 2.4-git,
   and their respective dependencies.
 
-* The [Boost][7] C++ libraries, in particular Boost.MPL and Boost.Fusion.
+* The [dune-typetree][7] library, version 2.4-git.
 
 * MultiDomain's compiler requirements differ slightly from the underlying DUNE
   libraries: We require at least GCC 4.7 in C++11 mode. MultiDomainGrid should
@@ -119,7 +119,7 @@ Links
 [4]:  https://github.com/smuething/dune-multidomaingrid/pulls
 [5]:  http://dune-project.org/pdelab/
 [6]:  http://github.com/smuething/dune-multidomain
-[7]:  http://boost.org
+[7]:  http://www.dune-project.org/pdelab/
 [8]:  http://gcc.gnu.org/onlinedocs/libstdc++/faq.html#faq.license
 [9]:  COPYING.md
 [10]: README.GIT.md

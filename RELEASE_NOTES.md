@@ -20,6 +20,12 @@ Changes
 
 * Compatiblity with DUNE 2.4-git.
 
+* New implementation of per-codim data containers on top of std::tuple.
+
+* Removed Boost dependency.
+
+* New dependency on TypeTree for tuple iteration infrastructure.
+
 
 ### MultiDomainGrid 2.3
 
