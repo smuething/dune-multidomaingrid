@@ -19,9 +19,6 @@ namespace mdgrid {
 
 namespace util {
 
-namespace mpl = boost::mpl;
-namespace fusion = boost::fusion;
-
 template<typename Iterator, typename Predicate>
 inline bool all_of(Iterator begin, Iterator end, Predicate pred) {
   for ( ; begin != end; ++begin) {
@@ -118,32 +115,6 @@ struct collect_elementwise_struct {
 template<typename binary_function, typename T>
 collect_elementwise_struct<T,binary_function> collect_elementwise(T& result, binary_function f = binary_function()) {
   return collect_elementwise_struct<T,binary_function>(result,f);
-}
-
-namespace detail {
-
-  struct swap
-  {
-    template<typename Elem>
-    struct result
-    {
-      typedef void type;
-    };
-
-    template<typename Elem>
-    void operator()(Elem const& e) const
-    {
-      front(e).swap(back(e));
-    }
-  };
-}
-
-template<typename Seq1, typename Seq2>
-typename boost::enable_if<mpl::and_<fusion::traits::is_sequence<Seq1>, fusion::traits::is_sequence<Seq2> >, void>::type
-swap(Seq1& lhs, Seq2& rhs)
-{
-  typedef fusion::vector<Seq1&, Seq2&> references;
-  for_each(fusion::zip_view<references>(references(lhs, rhs)), detail::swap());
 }
 
 } // namespace util

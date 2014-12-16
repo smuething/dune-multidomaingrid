@@ -3,10 +3,6 @@
 
 #include <vector>
 
-#include <boost/mpl/vector_c.hpp>
-#include <boost/mpl/push_back.hpp>
-#include <boost/integer_traits.hpp>
-
 #include <dune/common/deprecated.hh>
 
 #include <dune/grid/multidomaingrid/subdomainset.hh>
@@ -16,30 +12,6 @@
 namespace Dune {
 
 namespace mdgrid {
-
-namespace mpl = boost::mpl;
-namespace fusion = boost::fusion;
-
-template<typename sequence, bool val, int codim>
-struct makeBoolVectorHelper {
-
-  typedef typename makeBoolVectorHelper<typename mpl::push_front<sequence,mpl::bool_<val> >::type,val,codim-1>::type type;
-
-};
-
-template<typename sequence, bool val>
-struct makeBoolVectorHelper<sequence,val,0> {
-
-  typedef typename mpl::push_front<sequence,mpl::bool_<val> >::type type;
-
-};
-
-template<int dim, bool val>
-struct makeBoolVector {
-
-  typedef typename fusion::result_of::as_vector<typename makeBoolVectorHelper<mpl::vector_c<bool,val>,dim-1,val>::type>::type type;
-
-};
 
 template<int dim, int codim>
 struct AllCodims {

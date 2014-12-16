@@ -8,17 +8,6 @@
 #include <algorithm>
 #include <type_traits>
 #include <tuple>
-#include <boost/scoped_ptr.hpp>
-#include <boost/bind.hpp>
-#include <boost/mpl/push_back.hpp>
-#include <boost/mpl/push_front.hpp>
-#include <boost/mpl/range_c.hpp>
-#include <boost/fusion/sequence.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/mpl.hpp>
-#include <boost/fusion/algorithm/iteration.hpp>
-#include <boost/fusion/algorithm/transformation/zip.hpp>
-#include <boost/swap.hpp>
 
 #include <dune/common/shared_ptr.hh>
 #include <dune/grid/common/exceptions.hh>
@@ -27,12 +16,11 @@
 #include <dune/grid/multidomaingrid/utility.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/indexsets.hh>
 
+#include <dune/typetree/utility.hh>
+
 namespace Dune {
 
 namespace mdgrid {
-
-namespace mpl = boost::mpl;
-namespace fusion = boost::fusion;
 
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
@@ -42,21 +30,24 @@ class MultiDomainGrid;
 //! \internal
 namespace detail {
 
-//! \internal template meta program for assembling the per-codim map vector
-template<template<int> class StructForCodim, int codim>
-struct buildMap {
+template<template<int> class StructForCodim, typename Codims>
+struct _buildMap;
 
-  typedef typename mpl::push_back<typename buildMap<StructForCodim,codim-1>::type,
-                                  StructForCodim<codim>
-                                  >::type type;
+//! \internal template meta program for assembling the per-codim map vector
+template<template<int> class StructForCodim, std::size_t... codim>
+struct _buildMap<StructForCodim,TypeTree::index_pack<codim...> > {
+
+  typedef std::tuple<StructForCodim<codim>... > type;
 
 };
 
-//! \internal recursion limit for buildMap template meta program
-template<template<int> class StructForCodim>
-struct buildMap<StructForCodim,0> {
+template<template<int> class StructForCodim, int dimension>
+struct buildMap {
 
-  typedef fusion::vector<StructForCodim<0> > type;
+  typedef typename _buildMap<
+    StructForCodim,
+    decltype(TypeTree::index_range<dimension+1>())
+    >::type type;
 
 };
 
@@ -340,24 +331,16 @@ private:
     CodimSizeMap codimSizeMap;
     MultiIndexMap multiIndexMap;
 
-    // containers should not be assignable
-    const Containers& operator=(const Containers& r);
+    // containers should not be assignable...
+    Containers& operator=(const Containers&) = delete;
 
-    Containers(const Containers& r) :
-      indexMap(r.indexMap),
-      sizeMap(r.sizeMap),
-      codimSizeMap(r.codimSizeMap),
-      multiIndexMap(r.multiIndexMap) {
-    }
+    // ...but must be movable
+    Containers& operator=(Containers&&) = default;
 
-    void swap(Containers& rhs) {
-      boost::swap(indexMap,rhs.indexMap);
-      boost::swap(sizeMap,rhs.sizeMap);
-      boost::swap(codimSizeMap,rhs.codimSizeMap);
-      boost::swap(multiIndexMap,rhs.multiIndexMap);
-    }
-
-    Containers() {}
+    // make sure the compiler generates all necessary constructors...
+    Containers(const Containers&) = default;
+    Containers(Containers&&) = default;
+    Containers() = default;
 
   };
 
@@ -655,7 +638,7 @@ private:
 
   void swap(ThisType& rhs) {
     assert(&_grid == &rhs._grid);
-    util::swap(_containers,rhs._containers);
+    std::swap(_containers,rhs._containers);
   }
 
   void addToSubDomain(SubDomainIndex subDomain, const Codim0Entity& e) {
@@ -703,67 +686,69 @@ private:
   //! \tparam cc The requested codimension.
   template<int cc>
   typename Containers<cc>::IndexMap& indexMap() {
-    return fusion::at_c<cc>(_containers).indexMap;
+    return std::get<cc>(_containers).indexMap;
   }
 
   template<int cc>
   typename Containers<cc>::SizeMap& sizeMap() {
-    return fusion::at_c<cc>(_containers).sizeMap;
+    return std::get<cc>(_containers).sizeMap;
   }
 
   template<int cc>
   typename Containers<cc>::CodimSizeMap& codimSizes() {
-    return fusion::at_c<cc>(_containers).codimSizeMap;
+    return std::get<cc>(_containers).codimSizeMap;
   }
 
   template<int cc>
   typename Containers<cc>::MultiIndexMap& multiIndexMap() {
-    return fusion::at_c<cc>(_containers).multiIndexMap;
+    return std::get<cc>(_containers).multiIndexMap;
   }
 
   template<int cc>
   const typename Containers<cc>::IndexMap& indexMap() const {
-    return fusion::at_c<cc>(_containers).indexMap;
+    return std::get<cc>(_containers).indexMap;
   }
 
   template<int cc>
   const typename Containers<cc>::SizeMap& sizeMap() const {
-    return fusion::at_c<cc>(_containers).sizeMap;
+    return std::get<cc>(_containers).sizeMap;
   }
 
   template<int cc>
   const typename Containers<cc>::CodimSizeMap& codimSizes() const {
-    return fusion::at_c<cc>(_containers).codimSizeMap;
+    return std::get<cc>(_containers).codimSizeMap;
   }
 
   template<int cc>
   const typename Containers<cc>::MultiIndexMap& multiIndexMap() const {
-    return fusion::at_c<cc>(_containers).multiIndexMap;
+    return std::get<cc>(_containers).multiIndexMap;
   }
 
   template<typename Functor>
   void applyToCodims(Functor func) const {
-    fusion::for_each(fusion::zip(mpl::range_c<int,0,dimension+1>(),_containers),func);
+    TypeTree::apply_to_tuple(
+      _containers,
+      func,
+      TypeTree::apply_to_tuple_policy::pass_index()
+      );
   }
 
   template<typename Functor>
   void applyToCodims(Functor func) {
-    // we can't just use fusion::zip here as it will slap a const on the ContainerMap type,
-    // making it impossible to modify it in the called functor. So we just create the
-    // zip_view by hand... (idea lifted from fusion::swap()).
-    typedef mpl::range_c<int,0,dimension+1> CodimIndex;
-    typedef fusion::vector<CodimIndex&,ContainerMap&> References;
-    CodimIndex codimIndex;
-    fusion::for_each(fusion::zip_view<References>(References(codimIndex,_containers)),func);
+    TypeTree::apply_to_tuple(
+      _containers,
+      func,
+      TypeTree::apply_to_tuple_policy::pass_index()
+      );
   }
 
   template<typename Impl>
   struct applyToCodim {
 
-    template<typename T>
-    void operator()(T t) const {
-      typedef mpl::int_<fusion::result_of::value_at_c<T,0>::type::value> codim;
-      detail::applyIf<MDGridTraits::template Codim<codim::value>::supported,const Impl>(static_cast<const Impl&>(*this)).template apply<codim::value>(fusion::at_c<1>(t));
+    template<typename I, typename T>
+    void operator()(I i, T&& t) const {
+      const int codim = I::value;
+      detail::applyIf<MDGridTraits::template Codim<codim>::supported,const Impl>(static_cast<const Impl&>(*this)).template apply<codim>(std::forward<T>(t));
     }
 
   };
@@ -808,7 +793,7 @@ private:
     const HostIndexSet& his = _hostGridView.indexSet();
     if (full) {
       ContainerMap cm = ContainerMap();
-      util::swap(_containers,cm);
+      std::swap(_containers,cm);
     }
     applyToCodims(resetPerCodim(full,his,_grid._traits));
   }
