@@ -30,64 +30,6 @@ struct GeometryTypeHash {
 
 };
 
-template<typename T, std::size_t I>
-class TupleElementPickingIterator : public ForwardIteratorFacade<TupleElementPickingIterator<T,I>,
-								 typename std::tuple_element<I,typename T::value_type>::type,
-								 typename std::add_lvalue_reference<typename std::tuple_element<I,typename T::value_type>::type>::type,
-								 typename T::difference_type
-								 > {
-
-public:
-
-  typedef ForwardIteratorFacade<TupleElementPickingIterator<T,I>,
-				typename std::tuple_element<I,typename T::value_type>::type,
-				typename std::add_lvalue_reference<typename std::tuple_element<I,typename T::value_type>::type>::type,
-				typename T::difference_type
-				> BaseType;
-
-  typedef typename BaseType::Reference Reference;
-  typedef typename BaseType::Value Value;
-  typedef TupleElementPickingIterator<T,I> ThisType;
-
-  Reference dereference() const {
-    return std::get<I>(*_it);
-  }
-
-  bool equals(const ThisType& rhs) const {
-    return _it == rhs._it;
-  }
-
-  void increment() {
-    ++_it;
-  }
-
-private:
-
-  T _it;
-
-public:
-
-  TupleElementPickingIterator(T it) :
-    _it(it)
-  {}
-
-};
-
-template<std::size_t I, typename T>
-TupleElementPickingIterator<T,I> pick_element(T it) {
-  return TupleElementPickingIterator<T,I>(it);
-}
-
-template<typename T>
-TupleElementPickingIterator<T,1> value_iterator(T it) {
-  return TupleElementPickingIterator<T,1>(it);
-}
-
-template<typename T>
-TupleElementPickingIterator<T,0> key_iterator(T it) {
-  return TupleElementPickingIterator<T,0>(it);
-}
-
 template<typename T, typename binary_function>
 struct collect_elementwise_struct {
 
