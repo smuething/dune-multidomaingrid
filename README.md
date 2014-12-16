@@ -10,7 +10,7 @@ own right.
 Version
 -------
 
-This is version 3.0-dev of MultiDomainGrid. It is compatible with the 3.0-git
+This is version 2.4-dev of MultiDomainGrid. It is compatible with the 2.4-git
 development series of the DUNE core modules. The versioning scheme of MultiDomainGrid
 has recently been synchronized to that of the core modules to make it easier for users
 to find a compatible release for their DUNE distribution.
@@ -81,7 +81,7 @@ Dependencies
 
 dune-multidomaingrid depends on the following software packages:
 
-* [DUNE core libraries][2] (dune-common, dune-geometry, dune-grid) version 3.0-git,
+* [DUNE core libraries][2] (dune-common, dune-geometry, dune-grid) version 2.4-git,
   and their respective dependencies.
 
 * The [Boost][7] C++ libraries, in particular Boost.MPL and Boost.Fusion.

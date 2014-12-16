@@ -1,7 +1,7 @@
 MultiDomainGrid
 ===============
 
-This is the 3.0-dev branch of MultiDomainGrid, a meta grid build on top of the
+This is the 2.4-dev branch of MultiDomainGrid, a meta grid build on top of the
 [DUNE][1] grid interface. See the file README for further details including
 license information.
 
@@ -14,11 +14,11 @@ Changes
 -------
 
 
-### MultiDomainGrid 3.0
+### MultiDomainGrid 2.4
 
 * Bump compiler requirements to GCC 4.7.
 
-* Compatiblity with DUNE 3.0-git.
+* Compatiblity with DUNE 2.4-git.
 
 
 ### MultiDomainGrid 2.3
