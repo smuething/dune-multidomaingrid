@@ -270,8 +270,6 @@ public:
   typedef typename remove_const<GridImp>::type::MDGridTraits MDGridTraits;
   typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
   typedef typename MDGridTraits::SubDomainIndex SubDomainIndex;
-  typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
-  typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
 
 
   typedef typename HostIndexSet::IndexType IndexType;
