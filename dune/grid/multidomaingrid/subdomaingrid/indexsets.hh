@@ -25,7 +25,8 @@ class SubDomainGrid;
 template<typename GridImp, typename MDIndexSet>
 class IndexSetWrapper :
     public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,MDIndexSet>,
-                          typename MDIndexSet::IndexType>
+                          typename MDIndexSet::IndexType,
+                          typename MDIndexSet::Types>
 {
 
   template<typename, typename>
@@ -51,6 +52,8 @@ class IndexSetWrapper :
   typedef typename remove_const<GridImp>::type::ctype ctype;
 
 public:
+
+  typedef typename MDIndexSet::Types Types;
 
   //typedef typename remove_const<GridImp>::type::SubDomainSet SubDomainSet;
   typedef typename remove_const<GridImp>::type::SubDomainIndex SubDomainIndex;
@@ -86,6 +89,10 @@ public:
 
   const std::vector<GeometryType>& geomTypes(int codim) const {
     return _mdIndexSet.geomTypesForSubDomain(_grid.domain(),codim);
+  }
+
+  Types types(int codim) const {
+    return _mdIndexSet.types(_grid.domain(),codim);
   }
 
   IndexType size(GeometryType type) const {

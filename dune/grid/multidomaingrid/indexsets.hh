@@ -237,7 +237,8 @@ T& rw(const T& t) {
 template<typename GridImp, typename HostGridViewType>
 class IndexSetWrapper :
     public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,HostGridViewType>,
-                          typename HostGridViewType::IndexSet::IndexType>
+                          typename HostGridViewType::IndexSet::IndexType,
+                          typename HostGridViewType::IndexSet::Types>
 {
 
   template<typename, typename>
@@ -265,7 +266,19 @@ class IndexSetWrapper :
   typedef typename HostGridView::IndexSet HostIndexSet;
   typedef typename remove_const<GridImp>::type::ctype ctype;
 
+  typedef Dune::IndexSet<
+    GridImp,
+    IndexSetWrapper<
+      GridImp,
+      HostGridViewType
+      >,
+    typename HostGridViewType::IndexSet::IndexType,
+    typename HostGridViewType::IndexSet::Types
+    > BaseT;
+
 public:
+
+  typedef typename BaseT::Types Types;
 
   typedef typename remove_const<GridImp>::type::MDGridTraits MDGridTraits;
   typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
@@ -383,8 +396,13 @@ public:
   }
 
   //! Returns a list of all geometry types with codimension codim contained in the grid.
-  const std::vector<GeometryType>& geomTypes(int codim) const {
+  const std::vector<GeometryType>& DUNE_DEPRECATED_MSG("Use types() instead") geomTypes(int codim) const {
     return _hostGridView.indexSet().geomTypes(codim);
+  }
+
+    //! Returns a list of all geometry types with codimension codim contained in the grid.
+  Types types(int codim) const {
+    return _hostGridView.indexSet().types(codim);
   }
 
   //! Returns the number of entities with GeometryType type in the grid.
@@ -526,8 +544,14 @@ private:
                                    *this).dispatch(codim);
   }
 
-  const std::vector<GeometryType>& geomTypesForSubDomain(SubDomainIndex subDomain, int codim) const {
+  const std::vector<GeometryType>&
+  DUNE_DEPRECATED_MSG("Use typesForSubDomain() instead")
+  geomTypesForSubDomain(SubDomainIndex subDomain, int codim) const {
     return geomTypes(codim);
+  }
+
+  Types typesForSubDomain(SubDomainIndex subDomain, int codim) const {
+    return types(codim);
   }
 
   struct getGeometryTypeSizeForSubDomain : public dispatchToCodim<getGeometryTypeSizeForSubDomain,IndexType,true,true> {
@@ -598,8 +622,12 @@ public:
     return subIndexForSubDomain(subDomain,_grid.hostEntity(e),i,codim);
   }
 
-  const std::vector<GeometryType>& geomTypes(SubDomainIndex subDomain, int codim) const {
+  const std::vector<GeometryType>& DUNE_DEPRECATED_MSG("Use types() instead") geomTypes(SubDomainIndex subDomain, int codim) const {
     return geomTypes(codim);
+  }
+
+  Types types(SubDomainIndex subDomain, int codim) const {
+    return types(codim);
   }
 
   IndexType size(SubDomainIndex subDomain, GeometryType type) const {
