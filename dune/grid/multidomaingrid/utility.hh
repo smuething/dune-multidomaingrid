@@ -1,6 +1,7 @@
 #ifndef DUNE_MULTIDOMAINGRID_UTILITY_HH
 #define DUNE_MULTIDOMAINGRID_UTILITY_HH
 
+#include <algorithm>
 #include <tuple>
 #include <dune/geometry/type.hh>
 #include <dune/common/iteratorfacades.hh>
