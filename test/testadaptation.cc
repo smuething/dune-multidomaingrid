@@ -7,12 +7,13 @@
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 
-#ifdef HAVE_DUNE_ALUGRID
+#if HAVE_DUNE_ALUGRID
 #include <dune/alugrid/dgf.hh>
 #include <dune/alugrid/grid.hh>
 #endif
 
 int main(int argc, char** argv) {
+#if HAVE_DUNE_ALUGRID
   try {
     Dune::MPIHelper::instance(argc,argv);
     typedef Dune::ALUGrid<2,2,Dune::simplex,Dune::nonconforming> AdaptableGridType;
@@ -96,4 +97,8 @@ int main(int argc, char** argv) {
     std::cout << e << std::endl;
   }
   return 0;
+#else
+  std::cerr << "You need dune-ALUGrid to run this test." << std::endl;
+  return 77;
+#endif // HAVE_DUNE_ALUGRID
 }
