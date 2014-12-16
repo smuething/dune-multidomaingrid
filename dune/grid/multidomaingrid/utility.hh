@@ -4,14 +4,6 @@
 #include <tuple>
 #include <dune/geometry/type.hh>
 #include <dune/common/iteratorfacades.hh>
-#include <boost/swap.hpp>
-#include <boost/fusion/support/is_sequence.hpp>
-#include <boost/fusion/view/zip_view.hpp>
-#include <boost/fusion/algorithm/iteration/for_each.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/fusion/sequence/intrinsic/front.hpp>
-#include <boost/fusion/sequence/intrinsic/back.hpp>
-#include <boost/mpl/and.hpp>
 
 namespace Dune {
 
