@@ -77,7 +77,7 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
 
   MDGrid grid(hostgrid,true);
   typedef typename MDGrid::LeafGridView MDGV;
-  typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
+  typedef typename MDGrid::SubDomainIndex SubDomainIndex;
   MDGV mdgv = grid.leafGridView();
 
   grid.startSubDomainMarking();
@@ -86,7 +86,7 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
     {
       if (it->partitionType() != Dune::InteriorEntity)
         continue;
-      SubDomainIndexType subdomain = 0;
+      SubDomainIndex subdomain = 0;
       if (it->geometry().center()[0] > 0.5)
         subdomain += 1;
       if (it->geometry().center()[1] > 0.5)
@@ -127,7 +127,7 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
       std::cout << std::endl;
     }
 
-  for (SubDomainIndexType s = 0; s < 8; ++s)
+  for (SubDomainIndex s = 0; s < 8; ++s)
     {
       typedef typename MDGrid::SubDomainGrid SDGrid;
       typedef typename SDGrid::LeafGridView SDGV;

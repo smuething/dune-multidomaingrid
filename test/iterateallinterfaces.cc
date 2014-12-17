@@ -16,19 +16,19 @@ void iterate(MDGV mdgv)
   typedef typename MDGV::template Codim<0>::Iterator Iterator;
   typedef typename MDGV::template Codim<0>::EntityPointer EP;
   typedef typename MDGV::IntersectionIterator IIterator;
-  typedef typename MDGV::IndexSet::SubDomainIndexType SubDomainIndexType;
+  typedef typename MDGV::IndexSet::SubDomainIndex SubDomainIndex;
   const typename MDGV::IndexSet& is = mdgv.indexSet();
 
   for (Iterator it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
     {
       // this assumes that subdomains form a partition of the host grid
-      const SubDomainIndexType insideSubDomain = *is.subDomains(*it).begin();
+      const SubDomainIndex insideSubDomain = *is.subDomains(*it).begin();
       for (IIterator iit = mdgv.ibegin(*it); iit != mdgv.iend(*it); ++iit)
         {
           if (!iit->neighbor())
             continue;
           const EP outside = iit->outside();
-          const SubDomainIndexType outsideSubDomain = *is.subDomains(*outside).begin();
+          const SubDomainIndex outsideSubDomain = *is.subDomains(*outside).begin();
           if (insideSubDomain != outsideSubDomain)
             assembleLocalInterfaceTerm(insideSubDomain,*it,outsideSubDomain,*outside);
         }
@@ -61,7 +61,7 @@ void driver(MDGrid& mdgrid)
 {
   typedef typename MDGrid::LeafGridView MDGV;
   typedef typename MDGV::template Codim<0>::Iterator Iterator;
-  typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
+  typedef typename MDGrid::SubDomainIndex SubDomainIndex;
 
   MDGV mdgv = mdgrid.leafGridView();
 
@@ -69,7 +69,7 @@ void driver(MDGrid& mdgrid)
 
   for(Iterator it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
     {
-      SubDomainIndexType subdomain = 0;
+      SubDomainIndex subdomain = 0;
       if (it->geometry().center()[0] > 0.5)
         subdomain += 1;
       if (it->geometry().center()[1] > 0.5)

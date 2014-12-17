@@ -16,7 +16,6 @@ void run_test(HostGrid& hostgrid)
 
   typedef typename MDGrid::LeafGridView MDGV;
   typedef typename MDGV::template Codim<0>::Iterator Iterator;
-  typedef typename MDGrid::SubDomainIndexType SubDomainIndexType;
 
   MDGV mdgv = mdgrid.leafGridView();
 
