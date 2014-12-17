@@ -1,6 +1,10 @@
 #include "config.h"
 
 #include <dune/common/parallel/mpihelper.hh>
+#include <dune/grid/yaspgrid.hh>
+#include <dune/grid/io/file/dgfparser/gridptr.hh>
+#include <dune/grid/io/file/dgfparser/dgfgridfactory.hh>
+
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 
