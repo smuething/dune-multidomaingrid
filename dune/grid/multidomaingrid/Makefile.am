@@ -13,8 +13,7 @@ multidomaingrid_HEADER = \
     indexsets.hh \
     intersection.hh \
     intersectioniterator.hh \
-    leafiterator.hh \
-    leveliterator.hh \
+    iterator.hh \
     localgeometry.hh \
     mdgridtraits.hh \
     multidomaingrid.hh \
