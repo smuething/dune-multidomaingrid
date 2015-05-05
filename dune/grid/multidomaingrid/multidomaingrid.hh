@@ -445,9 +445,18 @@ public:
   //! Reconstruct EntityPointer from EntitySeed
   template<typename EntitySeed>
   typename Traits::template Codim<EntitySeed::codimension>::EntityPointer
+  DUNE_DEPRECATED_MSG("entityPointer() is deprecated and will be removed after the release of dune-grid 2.4. Use entity() instead to directly obtain an Entity object.")
   entityPointer(const EntitySeed& entitySeed) const
   {
-    return EntityPointerWrapper<EntitySeed::codimension,const GridImp>(_hostGrid.entityPointer(entitySeed.hostEntitySeed()));
+    return {EntityPointerWrapper<EntitySeed::codimension,const GridImp>(_hostGrid.entity(entitySeed.hostEntitySeed()))};
+  }
+
+
+  template<typename EntitySeed>
+  typename Traits::template Codim<EntitySeed::codimension>::Entity
+  entity(const EntitySeed& entitySeed) const
+  {
+    return {EntityWrapper<EntitySeed::codimension,dimension,const GridImp>(_hostGrid.entity(entitySeed.hostEntitySeed()))};
   }
 
   //! The current maximum level of the grid.
