@@ -247,9 +247,6 @@ class MultiDomainGrid :
   template<int codim, int dim, typename GridImp>
   friend class EntityWrapper;
 
-  template<int codim, int dim, typename GridImp>
-  friend class MakeableEntityWrapper;
-
   template<int codim, typename GridImp>
   friend class EntityPointerWrapper;
 
