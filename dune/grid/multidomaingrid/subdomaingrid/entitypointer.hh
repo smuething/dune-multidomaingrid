@@ -3,19 +3,14 @@
 
 #include <dune/grid/common/gridenums.hh>
 
-#include <dune/grid/multidomaingrid/entity.hh>
-
 namespace Dune {
 
 namespace mdgrid {
 
-template<int,PartitionIteratorType,typename>
-class LeafIteratorWrapper;
-
-template<int,PartitionIteratorType,typename>
-class LevelIteratorWrapper;
-
 namespace subdomain {
+
+template<int, int, typename>
+class EntityWrapper;
 
 template<int codim, typename GridImp>
 class EntityPointerWrapper
@@ -23,64 +18,53 @@ class EntityPointerWrapper
 
   static const int dim = GridImp::dimension;
 
-  struct Invalid {};
+  template<int, int, typename>
+  friend class subdomain::EntityWrapper;
 
 public:
 
-  typedef EntityPointerWrapper EntityPointerImp;
-
   static const int codimension = codim;
 
-  typedef typename GridImp::Traits::template Codim<codim>::Entity Entity;
-  typedef EntityPointerWrapper<codim,GridImp> Base;
+  using Entity                   = typename GridImp::template Codim<codim>::Entity;
+  using EntityWrapper            = Dune::mdgrid::subdomain::EntityWrapper<codim,dim,GridImp>;
+  using MultiDomainEntityPointer = typename GridImp::MultiDomainGrid::Traits::template Codim<codim>::EntityPointer;
+  using MultiDomainEntity        = typename GridImp::MultiDomainGrid::Traits::template Codim<codim>::Entity;
 
-  typedef typename GridImp::MDGridType::Traits::template Codim<codim>::EntityPointer MultiDomainEntityPointer;
-  typedef typename GridImp::MDGridType::Traits::HierarchicIterator MultiDomainHierarchicIterator;
-
-  EntityPointerWrapper(const GridImp& grid, const MultiDomainEntityPointer& multiDomainEntityPointer) :
-    _entityWrapper(grid,multiDomainEntityPointer)
+  EntityPointerWrapper()
+    : _grid(nullptr)
   {}
 
-  template<PartitionIteratorType pitype>
-  EntityPointerWrapper(const GridImp& grid,
-                       const EntityIterator<codim,const typename GridImp::MDGridType,Dune::mdgrid::LeafIteratorWrapper<codim,pitype,const typename GridImp::MDGridType> >& multiDomainEntityPointer) :
-    _entityWrapper(grid,multiDomainEntityPointer)
+  explicit EntityPointerWrapper(const Entity& e)
+    : _grid(&GridImp::getRealImplementation(e).grid())
+    , _multiDomainEntityPointer(GridImp::getRealImplementation(e).multiDomainEntity())
   {}
 
-  template<PartitionIteratorType pitype>
-  EntityPointerWrapper(const GridImp& grid,
-                       const EntityIterator<codim,const typename GridImp::MDGridType,Dune::mdgrid::LevelIteratorWrapper<codim,pitype,const typename GridImp::MDGridType> >& multiDomainEntityPointer) :
-    _entityWrapper(grid,multiDomainEntityPointer)
+  EntityPointerWrapper(const GridImp* grid, const MultiDomainEntityPointer& multiDomainEntityPointer)
+    : _grid(grid)
+    , _multiDomainEntityPointer(multiDomainEntityPointer)
   {}
 
-  EntityPointerWrapper(const GridImp& grid,
-                       typename conditional<codim==0,const MultiDomainHierarchicIterator&,Invalid>::type multiDomainEntityPointer) :
-    _entityWrapper(grid,multiDomainEntityPointer)
+  explicit EntityPointerWrapper(const GridImp* grid, const MultiDomainEntity& multiDomainEntity)
+    : _grid(grid)
+    , _multiDomainEntityPointer(multiDomainEntity)
   {}
 
-  EntityPointerWrapper(const EntityWrapper<codim,dim,GridImp>& entity) :
-    _entityWrapper(entity._grid,entity._multiDomainEntityPointer)
-  {}
-
-  bool equals(const EntityPointerWrapper<codim,GridImp>& rhs) const {
-    return _entityWrapper.multiDomainEntityPointer() == rhs._entityWrapper.multiDomainEntityPointer();
+  bool equals(const EntityPointerWrapper& rhs) const {
+    return _grid == rhs._grid && _multiDomainEntityPointer == rhs._multiDomainEntityPointer;
   }
 
-  Entity& dereference() const {
-    return _entityWrapper;
-  }
-
-  void compactify() {
-    _entityWrapper.compactify();
+  Entity dereference() const {
+    return {EntityWrapper(_grid,*_multiDomainEntityPointer)};
   }
 
   int level() const {
-    return _entityWrapper.level();
+    return _multiDomainEntityPointer.level();
   }
 
-protected:
+private:
 
-  mutable MakeableEntityWrapper<codim,dim,GridImp> _entityWrapper;
+  const GridImp* _grid;
+  MultiDomainEntityPointer _multiDomainEntityPointer;
 
 };
 
