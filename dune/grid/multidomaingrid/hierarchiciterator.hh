@@ -1,39 +1,68 @@
 #ifndef DUNE_MULTIDOMAINGRID_HIERARCHICITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_HIERARCHICITERATOR_HH
 
-#include "entity.hh"
-
 namespace Dune {
 
 namespace mdgrid {
 
+template<int codim, int dim, typename GridImp>
+class EntityWrapper;
+
+template<int codim, typename GridImp>
+class EntityPointerWrapper;
+
 template<typename GridImp>
-class HierarchicIteratorWrapper :
-    public EntityPointerWrapper<0,GridImp>
+class HierarchicIteratorWrapper
 {
 
-  template< int cd, class Grid, class IteratorImp >
-  friend class ::Dune::EntityIterator;
+public:
 
-  template<int, int, typename>
-  friend class MakeableEntityWrapper;
+  using Entity               = typename GridImp::template Codim<0>::Entity;
+  using EntityWrapper        = Dune::mdgrid::EntityWrapper<0,GridImp::dimension,GridImp>;
+  using EntityPointerWrapper = Dune::mdgrid::EntityPointerWrapper<0,GridImp>;
+  using EntityPointer        = typename GridImp::template Codim<0>::EntityPointer;
+  using HostIterator         = typename GridImp::HostGridType::HierarchicIterator;
 
-  template<int, int, typename>
-  friend class EntityWrapper;
+  HierarchicIteratorWrapper() = default;
 
-  typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity::HierarchicIterator HostHierarchicIterator;
-
-  explicit HierarchicIteratorWrapper(const HostHierarchicIterator& hostIterator) :
-    EntityPointerWrapper<0,GridImp>(hostIterator),
-    _hostIterator(hostIterator)
+  explicit HierarchicIteratorWrapper(const HostIterator& hostIterator)
+    : _hostIterator(hostIterator)
   {}
 
   void increment() {
     ++_hostIterator;
-    this->_entityWrapper.reset(_hostIterator);
   }
 
-  HostHierarchicIterator _hostIterator;
+  bool equals(const HierarchicIteratorWrapper& r) const
+  {
+    return _hostIterator == r._hostIterator;
+  }
+
+  Entity dereference() const
+  {
+    return {EntityWrapper(*_hostIterator)};
+  }
+
+  int level() const
+  {
+    return _hostIterator.level();
+  }
+
+    // TODO: Remove after 2.4
+  operator EntityPointer() const
+  {
+    return {dereference()};
+  }
+
+  // TODO: Remove after 2.4
+  bool equals(const EntityPointerWrapper& r) const
+  {
+    return _hostIterator == r._hostEntityPointer;
+  }
+
+private:
+
+  HostIterator _hostIterator;
 
 };
 

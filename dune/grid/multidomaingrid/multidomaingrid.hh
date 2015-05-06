@@ -57,8 +57,13 @@ struct MultiDomainGridFamily {
     typedef Dune::IntersectionIterator<const GridImp, LevelIntersectionIteratorImp<const GridImp>, LevelIntersectionImp<const GridImp> > LevelIntersectionIterator;
 
     /** \brief The type of the  hierarchic iterator. */
-    typedef Dune::EntityIterator< 0, const GridImp, HierarchicIteratorImp< const GridImp > > HierarchicIterator;
-
+    using HierarchicIterator = Dune::EntityIterator<
+      0,
+      const GridImp,
+      HierarchicIteratorWrapper<
+        const GridImp
+        >
+      >;
     /**
      * \brief Traits associated with a specific codim.
      * \tparam cd The codimension.
