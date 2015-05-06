@@ -829,8 +829,7 @@ private:
     HostEntityIterator end = _hostGridView.template end<0>();
     typename Containers<0>::IndexMap& im = indexMap<0>();
     typename Containers<0>::SizeMap& sm = sizeMap<0>();
-    for (HostEntityIterator it  = _hostGridView.template begin<0>(); it != end; ++it) {
-      const HostEntity& he = *it;
+    for (const auto& he : elements(_hostGridView)) {
       const GeometryType hgt = he.type();
       const auto hgt_index = LocalGeometryTypeIndex::index(hgt);
       IndexType hostIndex = his.index(he);
@@ -862,8 +861,7 @@ private:
 
     communicateSubDomainSelection();
 
-    for (HostEntityIterator it  = _hostGridView.template begin<0>(); it != end; ++it) {
-      const HostEntity& he = *it;
+    for (const auto& he : elements(_hostGridView)) {
       const GeometryType hgt = he.type();
       const auto hgt_index = LocalGeometryTypeIndex::index(hgt);
       IndexType hostIndex = his.index(he);
