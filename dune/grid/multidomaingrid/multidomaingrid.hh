@@ -48,9 +48,21 @@ struct MultiDomainGridFamily {
     typedef GridImp Grid;
 
     /** \brief The type of the intersection at the leafs of the grid. */
-    typedef Dune::Intersection<const GridImp, LeafIntersectionImp<const GridImp> >  LeafIntersection;
+    using LeafIntersection = Dune::Intersection<
+      const GridImp,
+      IntersectionWrapper<
+        const GridImp,
+        typename HostGrid::LeafGridView::Intersection
+        >
+      >;
     /** \brief The type of the intersection at the levels of the grid. */
-    typedef Dune::Intersection<const GridImp, LevelIntersectionImp<const GridImp> > LevelIntersection;
+    using LevelIntersection = Dune::Intersection<
+      const GridImp,
+      IntersectionWrapper<
+        const GridImp,
+        typename HostGrid::LevelGridView::Intersection
+        >
+      >;
     /** \brief The type of the intersection iterator at the leafs of the grid. */
     typedef Dune::IntersectionIterator<const GridImp, LeafIntersectionIteratorImp<const GridImp>, LeafIntersectionImp<const GridImp> >   LeafIntersectionIterator;
     /** \brief The type of the intersection iterator at the levels of the grid. */
@@ -255,13 +267,10 @@ class MultiDomainGrid :
   friend class LeafIntersectionIteratorWrapper;
 
   template<typename GridImp>
-  friend class LeafIntersectionWrapper;
-
-  template<typename GridImp>
   friend class LevelIntersectionIteratorWrapper;
 
-  template<typename GridImp>
-  friend class LevelIntersectionWrapper;
+  template<typename,typename>
+  friend class IntersectionWrapper;
 
   template<typename>
   friend class subdomain::SubDomainGrid;
