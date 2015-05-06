@@ -265,7 +265,7 @@ public:
 
   HierarchicIterator hbegin(int maxLevel) const {
     return HierarchicIteratorWrapper<GridImp>(
-      grid(),
+      &grid(),
       multiDomainEntity().hbegin(maxLevel),
       multiDomainEntity().hend(maxLevel)
       );
