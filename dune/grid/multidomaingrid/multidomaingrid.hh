@@ -255,13 +255,7 @@ class MultiDomainGrid :
   friend class GeometryWrapper;
 
   template<int mydim, int coorddim, typename GridImp>
-  friend class MakeableGeometryWrapper;
-
-  template<int mydim, int coorddim, typename GridImp>
   friend class LocalGeometryWrapper;
-
-  template<int mydim, int coorddim, typename GridImp>
-  friend class MakeableLocalGeometryWrapper;
 
   template<typename GridImp, typename WrappedIndexSet>
   friend class IndexSetWrapper;
