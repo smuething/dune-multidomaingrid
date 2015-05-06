@@ -838,7 +838,7 @@ private:
 
       if (_grid.supportLevelIndexSets()) {
         levelIndexSets[he.level()]->template indexMap<0>()[hgt_index][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains.addAll(me.domains);
-        markAncestors(levelIndexSets,HostEntityPointer(he),me.domains);
+        markAncestors(levelIndexSets,he,me.domains);
       }
       updateMapEntry(me,sm[hgt_index],multiIndexMap<0>());
       applyToCodims(markSubIndices(he,me.domains,his,ReferenceElements<ctype,dimension>::general(hgt)));
@@ -897,11 +897,11 @@ private:
   }
 
   template<typename SubDomainSet>
-  void markAncestors(LevelIndexSets& levelIndexSets, HostEntityPointer he, const SubDomainSet& domains) {
-    while (he->level() > 0) {
-      he = he->father();
+  void markAncestors(LevelIndexSets& levelIndexSets, HostEntity he, const SubDomainSet& domains) {
+    while (he.level() > 0) {
+      he = he.father();
       SubDomainSet& fatherDomains =
-        levelIndexSets[he->level()]->template indexMap<0>()[LocalGeometryTypeIndex::index(he->type())][levelIndexSets[he->level()]->_hostGridView.indexSet().index(*he)].domains;
+        levelIndexSets[he.level()]->template indexMap<0>()[LocalGeometryTypeIndex::index(he.type())][levelIndexSets[he.level()]->_hostGridView.indexSet().index(he)].domains;
       if (fatherDomains.containsAll(domains))
         break;
       fatherDomains.addAll(domains);
