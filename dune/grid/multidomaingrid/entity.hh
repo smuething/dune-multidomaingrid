@@ -241,19 +241,39 @@ public:
   }
 
   LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(hostEntity().ilevelbegin());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LevelGridView::IntersectionIterator
+      >(
+        hostEntity().ilevelbegin()
+        );
   }
 
   LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(hostEntity().ilevelend());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LevelGridView::IntersectionIterator
+      >(
+        hostEntity().ilevelend()
+        );
   }
 
   LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(hostEntity().ileafbegin());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LeafGridView::IntersectionIterator
+      >(
+        hostEntity().ileafbegin()
+        );
   }
 
   LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(hostEntity().ileafend());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LeafGridView::IntersectionIterator
+      >(
+        hostEntity().ileafend()
+        );
   }
 
   bool isNew() const {
