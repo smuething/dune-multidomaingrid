@@ -1113,14 +1113,14 @@ private:
   }
 
   template<typename Entity>
-  typename Traits::template Codim<Entity::codimension>::EntityPointer wrapHostEntity(const Entity& e) const {
+  typename Traits::template Codim<Entity::codimension>::Entity wrapHostEntity(const Entity& e) const {
     return wrapHostEntity<Entity::codimension>(e);
   }
 
   template<int codim>
-  typename Traits::template Codim<codim>::EntityPointer wrapHostEntity(const typename HostGrid::template Codim<codim>::Entity& e) const
+  typename Traits::template Codim<codim>::Entity wrapHostEntity(const typename HostGrid::template Codim<codim>::Entity& e) const
   {
-    return EntityPointerWrapper<codim,const GridImp>(e);
+    return {EntityWrapper<codim,dimension,const GridImp>(e)};
   }
 
 
@@ -1144,19 +1144,19 @@ private:
     template<typename Entity>
     std::size_t size(const Entity& e) const
     {
-      return _impl.size(*_grid.wrapHostEntity(e));
+      return _impl.size(_grid.wrapHostEntity(e));
     }
 
     template<typename MessageBufferImp, typename Entity>
     void gather(MessageBufferImp& buf, const Entity& e) const
     {
-      _impl.gather(buf,*_grid.wrapHostEntity(e));
+      _impl.gather(buf,_grid.wrapHostEntity(e));
     }
 
     template<typename MessageBufferImp, typename Entity>
     void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
     {
-      _impl.scatter(buf,*_grid.wrapHostEntity(e),n);
+      _impl.scatter(buf,_grid.wrapHostEntity(e),n);
     }
 
     DataHandleWrapper(Impl& impl, const MultiDomainGrid<HostGrid,MDGridTraitsType>& grid)
