@@ -672,6 +672,10 @@ private:
     indexMap<0>()[LocalGeometryTypeIndex::index(gt)][hostIndex].domains.addAll(subDomains);
   }
 
+public:
+
+  // just make these public for std::make_shared() access
+
   IndexSetWrapper(const GridImp& grid, HostGridView hostGridView) :
     _grid(grid),
     _hostGridView(hostGridView)
@@ -682,6 +686,8 @@ private:
     _hostGridView(rhs._hostGridView),
     _containers(rhs._containers)
     {}
+
+private:
 
   //! Returns the index map for the given codimension.
   //! \tparam cc The requested codimension.

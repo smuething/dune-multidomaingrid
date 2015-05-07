@@ -110,15 +110,15 @@ public:
     return (_grid == rhs._grid && &_mdIndexSet == &rhs._mdIndexSet);
   }
 
-private:
-
-  const GridImp& _grid;
-  const MDIndexSet& _mdIndexSet;
-
   IndexSetWrapper(const GridImp& grid, const MDIndexSet& mdIndexSet) :
     _grid(grid),
     _mdIndexSet(mdIndexSet)
   {}
+
+private:
+
+  const GridImp& _grid;
+  const MDIndexSet& _mdIndexSet;
 
   template<typename EntityType>
   bool containsHostEntity(const EntityType& he) const {

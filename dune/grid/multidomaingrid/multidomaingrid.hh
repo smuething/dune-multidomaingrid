@@ -2,7 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_MULTIDOMAINGRID_HH
 
 #include <string>
-#include <dune/common/shared_ptr.hh>
+#include <memory>
 
 #include <dune/grid/common/grid.hh>
 
@@ -31,11 +31,6 @@
 namespace Dune {
 
 namespace mdgrid {
-
-template<typename T>
-shared_ptr<T> make_shared_ptr(T* ptr) {
-  return shared_ptr<T>(ptr);
-}
 
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
@@ -827,7 +822,7 @@ public:
     assert(_state == stateMarking && _adaptState == stateFixed);
     if (_supportLevelIndexSets) {
       for (unsigned int l = 0; l <= maxLevel(); ++l) {
-        _tmpLevelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelGridView(l))));
+        _tmpLevelIndexSets.push_back(std::make_shared<LevelIndexSetImp>(*this,_hostGrid.levelGridView(l)));
       }
     }
     _tmpLeafIndexSet->update(_tmpLevelIndexSets,true);
@@ -896,7 +891,7 @@ public:
   /*@{*/
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   const SubDomainGrid& subDomain(SubDomainIndex subDomain) const {
-    shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
+    std::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(const_cast<MultiDomainGrid&>(*this),subDomain));
       // subGridPointer->update();
@@ -906,7 +901,7 @@ public:
 
   //! Returns a reference to the SubDomainGrid associated with the given subdomain.
   SubDomainGrid& subDomain(SubDomainIndex subDomain) {
-    shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
+    std::shared_ptr<SubDomainGrid>& subGridPointer = _subDomainGrids[subDomain];
     if (!subGridPointer) {
       subGridPointer.reset(new SubDomainGrid(*this,subDomain));
       // subGridPointer->update();
@@ -978,10 +973,10 @@ private:
   HostGrid& _hostGrid;
   const MDGridTraitsType _traits;
 
-  std::vector<shared_ptr<LevelIndexSetImp> > _levelIndexSets;
+  std::vector<std::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
   LeafIndexSetImp _leafIndexSet;
 
-  std::vector<shared_ptr<LevelIndexSetImp> > _tmpLevelIndexSets;
+  std::vector<std::shared_ptr<LevelIndexSetImp> > _tmpLevelIndexSets;
   std::unique_ptr<LeafIndexSetImp> _tmpLeafIndexSet;
 
   GlobalIdSetImp _globalIdSet;
@@ -991,7 +986,7 @@ private:
   State _adaptState;
   const bool _supportLevelIndexSets;
 
-  mutable std::map<SubDomainIndex,shared_ptr<SubDomainGrid> > _subDomainGrids;
+  mutable std::map<SubDomainIndex,std::shared_ptr<SubDomainGrid> > _subDomainGrids;
   SubDomainIndex _maxAssignedSubDomainIndex;
 
   AdaptationStateMap _adaptationStateMap;
@@ -1001,7 +996,7 @@ private:
     // make sure we have enough LevelIndexSets
     if (_supportLevelIndexSets) {
       while (_levelIndexSets.size() <= maxLevel()) {
-        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_hostGrid.levelGridView(_levelIndexSets.size()))));
+        _levelIndexSets.push_back(std::make_shared<LevelIndexSetImp>(*this,_hostGrid.levelGridView(_levelIndexSets.size())));
       }
       // and make sure we don't have too many...
       if (_levelIndexSets.size() > maxLevel() + 1)

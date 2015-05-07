@@ -533,7 +533,7 @@ public:
   void update() const {
     if (_grid.supportLevelIndexSets()) {
       while (_levelIndexSets.size() <= static_cast<std::size_t>(maxLevel())) {
-        _levelIndexSets.push_back(make_shared_ptr(new LevelIndexSetImp(*this,_grid.levelIndexSet(_levelIndexSets.size()))));
+        _levelIndexSets.push_back(std::make_shared<LevelIndexSetImp>(*this,_grid.levelIndexSet(_levelIndexSets.size())));
       }
     }
   }
