@@ -31,9 +31,16 @@ class IteratorWrapper
   static const int codimension = codim;
 
   using HostIterator  = typename HostGridView::template Codim<codim>::template Partition<pitype>::Iterator;
+
+public:
+
+  // Entity must be public for iterator traits
   using Entity        = typename GridImp::template Codim<codim>::Entity;
-  using EntityPointer = typename GridImp::template Codim<codim>::EntityPointer;
-  using EntityWrapper = Dune::mdGrid::EntityWrapper<cd,GridImp::dimension,GridImp>;
+
+private:
+  using EntityPointerWrapper = Dune::mdgrid::EntityPointerWrapper<codim,GridImp>;
+  using EntityPointer        = typename GridImp::template Codim<codim>::EntityPointer;
+  using EntityWrapper        = Dune::mdgrid::EntityWrapper<codim,GridImp::dimension,GridImp>;
 
   IteratorWrapper() = default;
 

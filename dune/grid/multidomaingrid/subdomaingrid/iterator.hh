@@ -40,9 +40,17 @@ class IteratorWrapper
   static const int codimension = codim;
 
   using IndexSet      = typename GridView::IndexSet;
+
+public:
+
+  // Entity has to be public for iterator traits
   using Entity        = typename GridImp::template Codim<codim>::Entity;
-  using EntityPointer = typename GridImp::template Codim<codim>::EntityPointer;
-  using EntityWrapper = Dune::mdGrid::EntityWrapper<cd,GridImp::dimension,GridImp>;
+
+private:
+
+  using EntityPointerWrapper = Dune::mdgrid::subdomain::EntityPointerWrapper<codim,GridImp>;
+  using EntityPointer        = typename GridImp::template Codim<codim>::EntityPointer;
+  using EntityWrapper        = Dune::mdgrid::subdomain::EntityWrapper<codim,GridImp::dimension,GridImp>;
 
   IteratorWrapper()
     : _grid(nullptr)
