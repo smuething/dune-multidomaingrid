@@ -3,18 +3,19 @@
 
 #include <dune/grid/common/intersection.hh>
 
-#include <dune/grid/multidomaingrid/subdomaingrid/entitypointer.hh>
-
 namespace Dune {
 
 namespace mdgrid {
 
 namespace subdomain {
 
+template<int codim, int dim, typename GridImp>
+class EntityWrapper;
+
 template<typename GridImp,
-	 typename WrapperImp,
          typename IndexSet,
-	 typename MultiDomainIntersectionType>
+         typename MultiDomainIntersection
+         >
 class IntersectionWrapper {
 
   template<class, class, class>
@@ -29,62 +30,59 @@ class IntersectionWrapper {
   template<typename MDGrid>
   friend class SubDomainGrid;
 
-  typedef MultiDomainIntersectionType MultiDomainIntersection;
+  using EntityPointer    = typename GridImp::Traits::template Codim<0>::EntityPointer;
+  using Entity           = typename GridImp::Traits::template Codim<0>::Entity;
+  using Geometry         = typename GridImp::Traits::template Codim<1>::Geometry;
+  using LocalGeometry    = typename GridImp::Traits::template Codim<1>::LocalGeometry;
+  using EntityWrapper    = Dune::mdgrid::subdomain::EntityWrapper<0,GridImp::dimension,GridImp>;
 
-  typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
-  typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
-  typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
-  typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
-
-  typedef typename GridImp::ctype ctype;
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;
 
-  typedef FieldVector<ctype,dimensionworld> GlobalCoords;
-  typedef FieldVector<ctype,dimension - 1> LocalCoords;
+  using ctype            = typename GridImp::ctype;
+  using GlobalCoords     = FieldVector<ctype,dimensionworld>;
+  using LocalCoords      = FieldVector<ctype,dimension - 1>;
 
-protected:
-
-  IntersectionWrapper(const IndexSet& indexSet, const MultiDomainIntersection* multiDomainIntersection) :
-    _indexSet(indexSet),
-    _multiDomainIntersection(multiDomainIntersection),
-    _intersectionTypeTested(false)
+  IntersectionWrapper()
+    : _indexSet(nullptr)
+    , _intersectionTypeTested(false)
   {}
 
-  // copy constructor is required to make sure the wrapper does not pick up a pointer to the wrapped
-  // intersection of a foreign IntersectionIterator
-  IntersectionWrapper(const IntersectionWrapper& rhs) :
-    _indexSet(rhs._indexSet),
-    _multiDomainIntersection(NULL),
-    _intersectionTypeTested(false)
+  IntersectionWrapper(const IndexSet* indexSet, const MultiDomainIntersection& multiDomainIntersection)
+    : _indexSet(indexSet)
+    , _multiDomainIntersection(multiDomainIntersection)
+    , _intersectionTypeTested(false)
   {}
-
-  const IntersectionWrapper& operator=(const IntersectionWrapper& rhs);
 
 private:
 
-  const typename GridImp::MultiDomainGrid::template ReturnImplementationType<MultiDomainIntersection>::ImplementationType::HostIntersection& hostIntersection() const {
-    return GridImp::MultiDomainGrid::getRealImplementation(*_multiDomainIntersection).hostIntersection();
+  const typename GridImp
+    ::MultiDomainGrid
+    ::template ReturnImplementationType<MultiDomainIntersection>
+    ::ImplementationType
+    ::HostIntersection&
+  hostIntersection() const {
+    return GridImp::MultiDomainGrid::getRealImplementation(_multiDomainIntersection).hostIntersection();
   }
 
 
-  bool equals(const WrapperImp& rhs) const {
-    return *_multiDomainIntersection == *(rhs._multiDomainIntersection);
+  bool equals(const IntersectionWrapper& rhs) const {
+    return _indexSet == rhs._indexSet && _multiDomainIntersection == rhs._multiDomainIntersection;
   }
 
   void checkIntersectionType() const {
     if (!_intersectionTypeTested) {
-      if (_multiDomainIntersection->boundary()) {
+      if (_multiDomainIntersection.boundary()) {
         _intersectionType = GridImp::boundary;
         _intersectionTypeTested = true;
         return;
       }
-      if (!_multiDomainIntersection->neighbor()) {
+      if (!_multiDomainIntersection.neighbor()) {
         _intersectionType = GridImp::processor;
         _intersectionTypeTested = true;
         return;
       }
-      if (_indexSet.containsMultiDomainEntity(*(_multiDomainIntersection->outside()))) {
+      if (_indexSet->containsMultiDomainEntity(_multiDomainIntersection.outside())) {
         _intersectionType = GridImp::neighbor;
         _intersectionTypeTested = true;
         return;
@@ -105,14 +103,14 @@ private:
   }
 
   int boundaryId() const {
-    return _multiDomainIntersection->boundaryId();
+    return _multiDomainIntersection.boundaryId();
   }
 
   std::size_t boundarySegmentIndex() const {
     checkIntersectionType();
     // FIXME: We need to do something about subdomain boundaries in the interior of
     //        the MultiDomainGrid
-    return _intersectionType == GridImp::boundary ? _multiDomainIntersection->boundarySegmentIndex() : 0;
+    return _intersectionType == GridImp::boundary ? _multiDomainIntersection.boundarySegmentIndex() : 0;
   }
 
   bool neighbor() const {
@@ -120,18 +118,18 @@ private:
     return _intersectionType == GridImp::neighbor;
   }
 
-  EntityPointer inside() const {
-    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIntersection->inside());
+  Entity inside() const {
+    return {EntityWrapper(&_indexSet->_grid,_multiDomainIntersection.inside())};
   }
 
-  EntityPointer outside() const {
+  Entity outside() const {
     checkIntersectionType();
     assert(_intersectionType == GridImp::neighbor);
-    return EntityPointerWrapper<0,GridImp>(_indexSet._grid,_multiDomainIntersection->outside());
+    return {EntityWrapper(&_indexSet->_grid,_multiDomainIntersection.outside())};
   }
 
   bool conforming() const {
-    return _multiDomainIntersection->conforming();
+    return _multiDomainIntersection.conforming();
   }
 
   LocalGeometry geometryInInside() const {
@@ -149,33 +147,33 @@ private:
   }
 
   GeometryType type() const {
-    return _multiDomainIntersection->type();
+    return _multiDomainIntersection.type();
   }
 
   int indexInInside() const {
-    return _multiDomainIntersection->indexInInside();
+    return _multiDomainIntersection.indexInInside();
   }
 
   int indexInOutside() const {
     checkIntersectionType();
     assert(_intersectionType == GridImp::neighbor);
-    return _multiDomainIntersection->indexInOutside();
+    return _multiDomainIntersection.indexInOutside();
   }
 
   GlobalCoords outerNormal(const LocalCoords& local) const {
-    return _multiDomainIntersection->outerNormal(local);
+    return _multiDomainIntersection.outerNormal(local);
   }
 
   GlobalCoords integrationOuterNormal(const LocalCoords& local) const {
-    return _multiDomainIntersection->integrationOuterNormal(local);
+    return _multiDomainIntersection.integrationOuterNormal(local);
   }
 
   GlobalCoords unitOuterNormal(const LocalCoords& local) const {
-    return _multiDomainIntersection->unitOuterNormal(local);
+    return _multiDomainIntersection.unitOuterNormal(local);
   }
 
   GlobalCoords centerUnitOuterNormal() const {
-    return _multiDomainIntersection->centerUnitOuterNormal();
+    return _multiDomainIntersection.centerUnitOuterNormal();
   }
 
   typename GridImp::IntersectionType intersectionType() const {
@@ -185,94 +183,15 @@ private:
 
   const MultiDomainIntersection& multiDomainIntersection() const
   {
-    return *_multiDomainIntersection;
+    return _multiDomainIntersection;
   }
 
 private:
 
-  bool isSet() const {
-    return _multiDomainIntersection != NULL;
-  }
-
-  void clear() {
-    _multiDomainIntersection = NULL;
-    _intersectionTypeTested = false;
-  }
-
-  void reset(const MultiDomainIntersection& multiDomainIntersection) {
-    if (isSet()) {
-      clear();
-    }
-    _multiDomainIntersection = &multiDomainIntersection;
-  }
-
-  const IndexSet& _indexSet;
-  const MultiDomainIntersection* _multiDomainIntersection;
+  const IndexSet* _indexSet;
+  MultiDomainIntersection _multiDomainIntersection;
   mutable bool _intersectionTypeTested;
   mutable typename GridImp::IntersectionType _intersectionType;
-
-};
-
-template<typename GridImp>
-class LeafIntersectionWrapper :
-    public IntersectionWrapper<GridImp,
-                               LeafIntersectionWrapper<GridImp>,
-                               typename GridImp::Traits::LeafIndexSet,
-                               typename GridImp::MultiDomainGrid::Traits::LeafIntersection>
-{
-
-  template<typename, typename, typename, typename, typename>
-  friend class IntersectionIteratorWrapper;
-
-  template<int, int, typename>
-  friend class EntityWrapper;
-
-  template<typename>
-  friend class SubDomainGrid;
-
-  typedef typename GridImp::MultiDomainGrid::Traits::LeafIntersection MultiDomainIntersection;
-  typedef typename GridImp::Traits::LeafIndexSet IndexSet;
-
-  typedef IntersectionWrapper<GridImp,
-                              LeafIntersectionWrapper<GridImp>,
-                              IndexSet,
-                              MultiDomainIntersection> Base;
-
-  LeafIntersectionWrapper(const IndexSet& indexSet, const MultiDomainIntersection* multiDomainIntersection) :
-    Base(indexSet,multiDomainIntersection)
-  {}
-
-};
-
-
-template<typename GridImp>
-class LevelIntersectionWrapper :
-    public IntersectionWrapper<GridImp,
-                               LevelIntersectionWrapper<GridImp>,
-                               typename GridImp::Traits::LevelIndexSet,
-                               typename GridImp::MultiDomainGrid::Traits::LevelIntersection>
-{
-
-  template<typename, typename, typename, typename, typename>
-  friend class IntersectionIteratorWrapper;
-
-  template<int, int, typename>
-  friend class EntityWrapper;
-
-  template<typename>
-  friend class SubDomainGrid;
-
-  typedef typename GridImp::MultiDomainGrid::Traits::LevelIntersection MultiDomainIntersection;
-  typedef typename GridImp::Traits::LevelIndexSet IndexSet;
-
-  typedef IntersectionWrapper<GridImp,
-                              LevelIntersectionWrapper<GridImp>,
-                              IndexSet,
-                              MultiDomainIntersection> Base;
-
-  LevelIntersectionWrapper(const IndexSet& indexSet, const MultiDomainIntersection* multiDomainIntersection) :
-    Base(indexSet,multiDomainIntersection)
-  {}
 
 };
 
