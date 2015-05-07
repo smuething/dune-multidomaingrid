@@ -10,6 +10,8 @@
 #include <dune/grid/common/indexidset.hh>
 #include <dune/grid/multidomaingrid/utility.hh>
 
+#include <type_traits>
+
 namespace Dune {
 
 namespace mdgrid {
