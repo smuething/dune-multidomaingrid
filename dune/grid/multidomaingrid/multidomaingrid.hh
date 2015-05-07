@@ -232,18 +232,35 @@ namespace {
  * \tparam MDGridTraitsType     A traits type for customizing how the MultiDomainGrid manages the partitioning information.
  */
 
-template<typename HostGrid, typename MDGridTraitsType>
-class MultiDomainGrid :
-    public GridDefaultImplementation<HostGrid::dimension,
-				     HostGrid::dimensionworld,
-				     typename HostGrid::ctype,
-				     MultiDomainGridFamily<HostGrid,MDGridTraitsType> >,
-    public MaxSubDomainIndexProvider<MultiDomainGrid<HostGrid,MDGridTraitsType>,
+template<
+  typename HostGrid_,
+  typename MDGridTraitsType
+  >
+class MultiDomainGrid
+  : public GridDefaultImplementation<HostGrid_::dimension,
+                                     HostGrid_::dimensionworld,
+                                     typename HostGrid_::ctype,
+                                     MultiDomainGridFamily<
+                                       HostGrid_,
+                                       MDGridTraitsType
+                                       >
+                                     >,
+    public MaxSubDomainIndexProvider<MultiDomainGrid<
+                                       HostGrid_,
+                                       MDGridTraitsType
+                                       >,
                                      typename MDGridTraitsType::SubDomainIndex,
                                      MDGridTraitsType::maxSubDomainIndexIsStatic()
                                      >
-
 {
+
+public:
+
+  using HostGrid = HostGrid_;
+
+  using HostGridType DUNE_DEPRECATED_MSG("Deprecated in 2.4, use HostGrid instead") = HostGrid;
+
+private:
 
 
   template<int codim, int dim, typename GridImp>
@@ -325,7 +342,6 @@ class MultiDomainGrid :
                                     > BaseT;
 
   typedef MultiDomainGrid<HostGrid,MDGridTraitsType> GridImp;
-  typedef HostGrid HostGridType;
 
   typedef IndexSetWrapper<const GridImp, typename HostGrid::LevelGridView> LevelIndexSetImp;
 
@@ -1036,6 +1052,16 @@ public:
   }
 
 private:
+
+  const HostGrid& hostGrid() const
+  {
+    return _hostGrid;
+  }
+
+  HostGrid& hostGrid()
+  {
+    return _hostGrid;
+  }
 
   HostGrid& _hostGrid;
   const MDGridTraitsType _traits;
