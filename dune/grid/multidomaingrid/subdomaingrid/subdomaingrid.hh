@@ -305,6 +305,7 @@ public:
   //! Reconstruct EntityPointer from EntitySeed
   template<typename EntitySeed>
   typename Traits::template Codim<EntitySeed::codimension>::EntityPointer
+  DUNE_DEPRECATED_MSG("entityPointer() is deprecated and will be removed after the release of dune-grid 2.4. Use entity() instead to directly obtain an Entity object.")
   entityPointer(const EntitySeed& entitySeed) const
   {
     return
@@ -312,6 +313,19 @@ public:
         this,
         typename MDGrid::template Codim<EntitySeed::codimension>::EntityPointer(
           _grid.entityPointer(entitySeed)
+        )
+      );
+  }
+
+  template<typename EntitySeed>
+  typename Traits::template Codim<EntitySeed::codimension>::Entity
+  entity(const EntitySeed& entitySeed) const
+  {
+    return
+      EntityWrapper<EntitySeed::codimension,dimension,const GridImp>(
+        this,
+        typename MDGrid::template Codim<EntitySeed::codimension>::Entity(
+          _grid.entity(entitySeed)
         )
       );
   }
