@@ -1015,29 +1015,36 @@ public:
   //! Returns a reference to the corresponding host entity.
   /**
    * \warning The returned reference will only be valid as long as the passed-in reference to the
-   * MultiDomainGrid entity! If you need a persistent reference to the host entity, use
-   * hostEntityPointer() instead.
+   * MultiDomainGrid entity! If you need a persistent host entity object , copy the returned reference.
    */
   template<typename EntityType>
-  static const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e) {
-    return *(MultiDomainGrid::getRealImplementation(e).hostEntityPointer());
+  static const typename HostEntity<EntityType>::type& hostEntity(const EntityType& e)
+  {
+    return MultiDomainGrid::getRealImplementation(e).hostEntity();
   }
 
   //! Returns an EntityPointer to the corresponding host entity.
   template<typename EntityType>
-  static const typename HostEntityPointer<EntityType>::type hostEntityPointer(const EntityType& e) {
-    return MultiDomainGrid::getRealImplementation(e).hostEntityPointer();
+  static const typename HostEntityPointer<EntityType>::type
+  DUNE_DEPRECATED_MSG("Deprecated in 2.4, use hostEntity() instead")
+  hostEntityPointer(const EntityType& e)
+  {
+    return {MultiDomainGrid::getRealImplementation(e).hostEntity()};
   }
 
   template<typename EntityType>
-  static const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) {
-    return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
+  static const typename MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e)
+  {
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntity();
   }
 
   //! Returns an EntityPointer to the corresponding MultiDomain entity.
   template<typename EntityType>
-  const typename MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) const {
-    return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
+  const typename MultiDomainEntityPointer<EntityType>::type
+  DUNE_DEPRECATED_MSG("Deprecated in 2.4, use multiDomainEntity() instead")
+  multiDomainEntityPointer(const EntityType& e) const
+  {
+    return {SubDomainGrid::getRealImplementation(e).multiDomainEntity()};
   }
 
   template<typename IntersectionType>
