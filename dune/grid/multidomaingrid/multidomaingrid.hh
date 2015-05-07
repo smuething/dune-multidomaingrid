@@ -1059,18 +1059,15 @@ private:
   void saveMultiDomainState() {
     typedef typename ThisType::LeafGridView GV;
     GV gv = this->leafGridView();
-    typedef typename GV::template Codim<0>::Iterator Iterator;
-    typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
     typedef typename GV::template Codim<0>::Entity Entity;
     typedef typename MDGridTraits::template Codim<0>::SubDomainSet SubDomainSet;
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
-      const Entity& e = *it;
+    for (const auto& e : elements(gv)) {
       const SubDomainSet& subDomains = gv.indexSet().subDomains(e);
       _adaptationStateMap[localIdSet().id(e)] = subDomains;
-      EntityPointer ep(e);
-      while (ep->mightVanish()) {
-        ep = ep->father();
-        typename Traits::LocalIdSet::IdType id = localIdSet().id(*ep);
+      Entity he(e);
+      while (he.mightVanish()) {
+        he = he.father();
+        typename Traits::LocalIdSet::IdType id = localIdSet().id(he);
         // if the entity has not been added to the set, create a new entry
         // (entity returns false and does not change the map if there is already an entry for "id")
         if (!_adaptationStateMap.insert(typename AdaptationStateMap::value_type(id,subDomains)).second) {
@@ -1084,22 +1081,21 @@ private:
   void restoreMultiDomainState() {
     typedef typename ThisType::LeafGridView GV;
     GV gv = this->leafGridView();
-    typedef typename GV::template Codim<0>::Iterator Iterator;
-    typedef typename GV::template Codim<0>::EntityPointer EntityPointer;
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
-      EntityPointer ep(it);
+    typedef typename GV::template Codim<0>::Entity Entity;
+    for (const auto& e : elements(gv)) {
+      Entity he(e);
       // First try to exploit the information in the underlying grid
-      while (ep->isNew()) {
-        ep = ep->father();
+      while (he.isNew()) {
+        he = he.father();
       }
       // This might not work, as there are no isNew() marks for globalrefine()
       // We thus have to look up the former leaf entity in our adaptation map
-      typename AdaptationStateMap::iterator asmit = _adaptationStateMap.find(localIdSet().id(*ep));
+      typename AdaptationStateMap::iterator asmit = _adaptationStateMap.find(localIdSet().id(he));
       while(asmit == _adaptationStateMap.end()) {
-        ep = ep->father();
-        asmit = _adaptationStateMap.find(localIdSet().id(*ep));
+        he = he.father();
+        asmit = _adaptationStateMap.find(localIdSet().id(he));
       }
-      _leafIndexSet.addToSubDomains(asmit->second, *it);
+      _leafIndexSet.addToSubDomains(asmit->second, e);
     }
     _leafIndexSet.update(_levelIndexSets,false);
     _adaptationStateMap.clear();
