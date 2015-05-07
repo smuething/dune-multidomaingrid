@@ -212,6 +212,9 @@ class SubDomainGrid :
   friend class ::Dune::mdgrid::MultiDomainGrid;
 
   template<int codim, int dim, typename GridImp>
+  friend class EntityWrapperBase;
+
+  template<int codim, int dim, typename GridImp>
   friend class EntityWrapper;
 
   template<int codim, typename GridImp>
@@ -227,13 +230,7 @@ class SubDomainGrid :
   friend class GeometryWrapper;
 
   template<int mydim, int coorddim, typename GridImp>
-  friend class MakeableGeometryWrapper;
-
-  template<int mydim, int coorddim, typename GridImp>
   friend class LocalGeometryWrapper;
-
-  template<int mydim, int coorddim, typename GridImp>
-  friend class MakeableLocalGeometryWrapper;
 
   template<typename GridImp, typename WrappedIndexSet>
   friend class IndexSetWrapper;
@@ -244,20 +241,11 @@ class SubDomainGrid :
   template<typename GridImp>
   friend struct ::Dune::mdgrid::detail::HostGridAccessor;
 
-  template<typename,typename,typename,typename,typename>
+  template<typename,typename,typename>
   friend class IntersectionIteratorWrapper;
 
-  template<typename GridImp>
-  friend class LeafIntersectionIteratorWrapper;
-
-  template<typename GridImp>
-  friend class LeafIntersectionWrapper;
-
-  template<typename GridImp>
-  friend class LevelIntersectionIteratorWrapper;
-
-  template<typename GridImp>
-  friend class LevelIntersectionWrapper;
+  template<typename,typename,typename>
+  friend class IntersectionWrapper;
 
   template<typename, PartitionIteratorType>
   friend class LevelGridView;

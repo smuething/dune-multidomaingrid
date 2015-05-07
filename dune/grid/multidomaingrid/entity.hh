@@ -25,6 +25,9 @@ class LevelIntersectionIteratorWrapper;
 template<typename GridImp>
 class HierarchicIteratorWrapper;
 
+template<typename, typename>
+class IntersectionIteratorWrapper;
+
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 

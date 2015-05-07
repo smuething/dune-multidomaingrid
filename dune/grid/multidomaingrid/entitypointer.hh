@@ -10,6 +10,12 @@ namespace Dune {
 
 namespace mdgrid {
 
+template<typename>
+class HierarchicIteratorWrapper;
+
+template<typename,int,PartitionIteratorType,typename>
+class IteratorWrapper;
+
 template<int codim, typename GridImp>
 class EntityPointerWrapper
 {
@@ -18,6 +24,12 @@ class EntityPointerWrapper
 
   template<int, int, typename>
   friend class subdomain::EntityWrapper;
+
+  template<typename,int,PartitionIteratorType,typename>
+  friend class IteratorWrapper;
+
+  template<typename>
+  friend class HierarchicIteratorWrapper;
 
 public:
 

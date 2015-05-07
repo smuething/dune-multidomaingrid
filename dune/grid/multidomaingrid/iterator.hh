@@ -9,9 +9,6 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename HostGrid, typename MDGridTraits>
-class MultiDomainGrid;
-
 template<int codim, int dim, typename GridImp>
 class EntityWrapper;
 
@@ -28,6 +25,8 @@ class IteratorWrapper
   template< int cd, class Grid, class IteratorImp >
   friend class Dune::EntityIterator;
 
+  template< class Grid, class IteratorImp >
+  friend class Dune::EntityPointer;
   using HostIterator  = typename HostGridView::template Codim<codim>::template Partition<pitype>::Iterator;
   using Entity        = typename GridImp::template Codim<codim>::Entity;
   using EntityPointer = typename GridImp::template Codim<codim>::EntityPointer;

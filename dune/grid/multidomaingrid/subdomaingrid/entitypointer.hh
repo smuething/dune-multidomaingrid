@@ -12,6 +12,12 @@ namespace subdomain {
 template<int, int, typename>
 class EntityWrapper;
 
+template<typename, typename, int, PartitionIteratorType, typename>
+class IteratorWrapper;
+
+template<typename>
+class HierarchicIteratorWrapper;
+
 template<int codim, typename GridImp>
 class EntityPointerWrapper
 {
@@ -20,6 +26,12 @@ class EntityPointerWrapper
 
   template<int, int, typename>
   friend class subdomain::EntityWrapper;
+
+  template<typename, typename, int, PartitionIteratorType, typename>
+  friend class IteratorWrapper;
+
+  template<typename>
+  friend class HierarchicIteratorWrapper;
 
 public:
 

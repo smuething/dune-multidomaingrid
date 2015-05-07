@@ -21,7 +21,7 @@ class IntersectionWrapper {
   template<class, class, class>
   friend class Dune::IntersectionIterator;
 
-  template<class,class,class,class,class>
+  template<class,class,class>
   friend class IntersectionIteratorWrapper;
 
   template<class, class>

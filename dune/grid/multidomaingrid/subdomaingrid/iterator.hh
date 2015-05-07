@@ -12,6 +12,12 @@ namespace subdomain {
 template<typename MDGrid>
 class SubDomainGrid;
 
+template<int,typename>
+class EntityPointerWrapper;
+
+template<int,int,typename>
+class EntityWrapper;
+
 template<
   typename GridView,
   typename MultiDomainIterator,
@@ -27,6 +33,9 @@ class IteratorWrapper
 
   template< int cd, class Grid, class IteratorImp >
   friend class Dune::EntityIterator;
+
+  template<typename, typename>
+  friend class Dune::EntityPointer;
 
   using IndexSet      = typename GridView::IndexSet;
   using Entity        = typename GridImp::template Codim<codim>::Entity;

@@ -7,6 +7,12 @@ namespace mdgrid {
 
 namespace subdomain {
 
+template<int,int,typename>
+class EntityWrapper;
+
+template<int,typename>
+class EntityPointerWrapper;
+
 template<typename GridImp>
 class HierarchicIteratorWrapper
 {
@@ -16,6 +22,12 @@ class HierarchicIteratorWrapper
 
   template<int, int, typename>
   friend class EntityWrapper;
+
+  template<int, int, typename>
+  friend class EntityWrapper;
+
+  template<typename, typename>
+  friend class Dune::EntityPointer;
 
   using MultiDomainIterator = typename GridImp::MultiDomainGrid::template Codim<0>::Entity::HierarchicIterator;
 

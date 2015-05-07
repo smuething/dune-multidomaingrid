@@ -10,11 +10,8 @@ namespace mdgrid {
 
 namespace subdomain {
 
-template<typename>
-class LevelIntersectionIteratorWrapper;
-
-template<typename>
-class LeafIntersectionIteratorWrapper;
+template<typename,typename,typename>
+class IntersectionIteratorWrapper;
 
 template<typename GridImp, PartitionIteratorType pitype>
 class LevelGridView

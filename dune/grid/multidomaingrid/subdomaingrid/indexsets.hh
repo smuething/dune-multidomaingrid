@@ -33,14 +33,11 @@ class IndexSetWrapper :
   template<typename MDGrid>
   friend class SubDomainGrid;
 
-  template<int, PartitionIteratorType, typename>
-  friend class LeafIteratorWrapper;
-
-  template<int, PartitionIteratorType, typename>
-  friend class LevelIteratorWrapper;
-
-  template<typename, typename, typename, typename>
+  template<typename, typename, typename>
   friend class IntersectionWrapper;
+
+  template<typename, typename, int, PartitionIteratorType, typename>
+  friend class IteratorWrapper;
 
   typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 

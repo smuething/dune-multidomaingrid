@@ -279,6 +279,9 @@ class MultiDomainGrid :
   friend struct subdomain::SubDomainGridFamily;
 
   template<int,int,typename>
+  friend class subdomain::EntityWrapperBase;
+
+  template<int,int,typename>
   friend class subdomain::EntityWrapper;
 
   template <typename>

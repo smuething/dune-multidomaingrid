@@ -21,11 +21,8 @@ class EntityWrapper;
 template<int codim, typename GridImp>
 class EntityPointerWrapper;
 
-template<typename GridImp>
-class LeafIntersectionIteratorWrapper;
-
-template<typename GridImp>
-class LevelIntersectionIteratorWrapper;
+template<typename,typename,typename>
+class IntersectionIteratorWrapper;
 
 template<typename GridImp>
 class HierarchicIteratorWrapper;

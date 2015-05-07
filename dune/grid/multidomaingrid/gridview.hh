@@ -8,12 +8,8 @@ namespace Dune {
 
 namespace mdgrid {
 
-template<typename>
-class LevelIntersectionIteratorWrapper;
-
-template<typename>
-class LeafIntersectionIteratorWrapper;
-
+template<typename,typename>
+class IntersectionIteratorWrapper;
 
 template<typename GridImp, PartitionIteratorType pitype>
 class LevelGridView

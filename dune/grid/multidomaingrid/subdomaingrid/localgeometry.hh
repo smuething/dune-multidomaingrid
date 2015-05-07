@@ -16,7 +16,7 @@ class LocalGeometryWrapper
   template<int,int,typename>
   friend class EntityWrapper;
 
-  template<typename,typename,typename,typename>
+  template<typename,typename,typename>
   friend class IntersectionWrapper;
 
 public:
