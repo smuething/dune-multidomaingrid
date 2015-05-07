@@ -263,10 +263,17 @@ class SubDomainGrid :
                                     SubDomainGridFamily<MDGrid>
                                     > BaseT;
 
-  typedef SubDomainGrid<MDGrid> GridImp;
-  typedef MDGrid MDGridType;
+  using GridImp = SubDomainGrid<MDGrid>;
 
-  typedef typename MDGrid::HostGridType HostGridType;
+public:
+
+  using MultiDomainGrid = MDGrid;
+  using MDGridType DUNE_DEPRECATED_MSG("Deprecated in 2.4, Use MultiDomainGrid instead") = MultiDomainGrid;
+
+  using HostGrid = typename MDGrid::HostGrid;
+  using HostGridType DUNE_DEPRECATED_MSG("Deprecated in 2.4, Use HostGrid instead") = HostGrid;
+
+private:
 
   typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp> LevelIndexSetImp;
 
@@ -287,11 +294,10 @@ public:
   /** \brief The type used for subdomain numbers */
   typedef typename MDGrid::SubDomainIndex SubDomainIndex;
 
-  typedef MDGridType MultiDomainGrid;
-
   enum IntersectionType { neighbor, foreign, boundary, processor };
 
-public:
+  using BaseT::dimension;
+  using BaseT::dimensionworld;
 
   /** @name Dune grid interface methods */
   /*@{*/

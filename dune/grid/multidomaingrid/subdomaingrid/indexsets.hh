@@ -43,10 +43,10 @@ class IndexSetWrapper :
 
   typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 
-  typedef typename remove_const<GridImp>::type::HostGridType HostGrid;
-  typedef typename remove_const<GridImp>::type::MDGridType MDGrid;
+  typedef typename std::remove_const<GridImp>::type::HostGridType HostGrid;
+  typedef typename std::remove_const<GridImp>::type::MDGridType MDGrid;
 
-  typedef typename remove_const<GridImp>::type::ctype ctype;
+  typedef typename std::remove_const<GridImp>::type::ctype ctype;
 
 public:
 
