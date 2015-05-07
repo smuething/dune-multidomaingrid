@@ -42,148 +42,155 @@ class MultiDomainGrid;
 template<typename HostGrid, typename MDGridTraits>
 struct MultiDomainGridFamily {
 
+private:
+
+  static const int dim  = HostGrid::dimension;
+  static const int dimw = HostGrid::dimensionworld;
+
+public:
+
   struct Traits
   {
     /** \brief The type that implementing the grid. */
-    typedef GridImp Grid;
+    using Grid = MultiDomainGrid<HostGrid,MDGridTraits>;
 
-    /** \brief The type of the intersection at the leafs of the grid. */
+
     using LeafIntersection = Dune::Intersection<
-      const GridImp,
+      const Grid,
       IntersectionWrapper<
-        const GridImp,
+        const Grid,
         typename HostGrid::LeafGridView::Intersection
         >
       >;
-    /** \brief The type of the intersection at the levels of the grid. */
+
     using LevelIntersection = Dune::Intersection<
-      const GridImp,
+      const Grid,
       IntersectionWrapper<
-        const GridImp,
+        const Grid,
         typename HostGrid::LevelGridView::Intersection
         >
       >;
-    /** \brief The type of the intersection iterator at the leafs of the grid. */
+
     using LeafIntersectionIterator = Dune::IntersectionIterator<
-      const GridImp,
+      const Grid,
       IntersectionIteratorWrapper<
-        const GridImp,
+        const Grid,
         typename HostGrid::LeafGridView::IntersectionIterator
-        >
-      >;
-    /** \brief The type of the intersection iterator at the levels of the grid. */
-    using LevelIntersectionIterator = Dune::IntersectionIterator<
-      const GridImp,
-      IntersectionIteratorWrapper<
-        const GridImp,
-        typename HostGrid::LevelGridView::IntersectionIterator
+        >,
+      IntersectionWrapper<
+        const Grid,
+        typename HostGrid::LeafGridView::Intersection
         >
       >;
 
-    /** \brief The type of the  hierarchic iterator. */
-    using HierarchicIterator = Dune::EntityIterator<
-      0,
-      const GridImp,
-      HierarchicIteratorWrapper<
-        const GridImp
+    using LevelIntersectionIterator = Dune::IntersectionIterator<
+      const Grid,
+      IntersectionIteratorWrapper<
+        const Grid,
+        typename HostGrid::LevelGridView::IntersectionIterator
+        >,
+      IntersectionWrapper<
+        const Grid,
+        typename HostGrid::LevelGridView::Intersection
         >
       >;
-    /**
-     * \brief Traits associated with a specific codim.
-     * \tparam cd The codimension.
-     */
+
+
+    using HierarchicIterator = Dune::EntityIterator<
+      0,
+      const Grid,
+      HierarchicIteratorWrapper<
+        const Grid
+        >
+      >;
+
+
     template <int cd>
     struct Codim
     {
-      //! IMPORTANT: Codim<codim>::Geometry == Geometry<dim-codim,dimw>
-      /** \brief The type of the geometry associated with the entity.*/
-      typedef Dune::Geometry<dim-cd, dimw, const GridImp, GeometryImp> Geometry;
-      /** \brief The type of the local geometry associated with the entity.*/
-      typedef Dune::Geometry<dim-cd, dim, const GridImp, LocalGeometryImp> LocalGeometry;
-      /** \brief The type of the entity. */
-      // we could - if needed - introduce another struct for dimglobal of Geometry
-      typedef Dune::Entity<cd, dim, const GridImp, EntityImp> Entity;
 
-      /** \brief The type of the entity pointer for entities of this codim.*/
-      typedef Dune::EntityPointer<const GridImp,EntityPointerImp<cd,const GridImp> > EntityPointer;
+      using Geometry      = Dune::Geometry<dim-cd, dimw, const Grid, GeometryWrapper>;
+      using LocalGeometry = Dune::Geometry<dim-cd, dimw, const Grid, LocalGeometryWrapper>;
 
-      typedef EntitySeedWrapper<typename HostGrid::template Codim<cd>::EntitySeed> EntitySeed;
+      using Entity        = Dune::Entity<cd, dim, const Grid, EntityWrapper>;
+      using EntityPointer = Dune::EntityPointer<const Grid, EntityPointerWrapper<cd,const Grid> >;
 
-      /**
-       * \brief Traits associated with a specific grid partition type.
-       * \tparam pitype The type of the grid partition.
-       */
+      using EntitySeed    = EntitySeedWrapper<typename HostGrid::template Codim<cd>::EntitySeed>;
+
       template <PartitionIteratorType pitype>
       struct Partition
       {
-        /** \brief The type of the iterator over the level entities of this codim on this partition. */
+
         using LevelIterator = Dune::EntityIterator<
           cd,
-          const GridImp,
+          const Grid,
           IteratorWrapper<
             typename HostGrid::LevelGridView,
             cd,
             pitype,
-            const GridImp
+            const Grid
             >
           >;
-        /** \brief The type of the iterator over the leaf entities of this codim on this partition. */
+
         using LeafIterator = Dune::EntityIterator<
           cd,
-          const GridImp,
+          const Grid,
           IteratorWrapper<
             typename HostGrid::LeafGridView,
             cd,
             pitype,
-            const GridImp
+            const Grid
             >
           >;
       };
 
-      /** \brief The type of the iterator over all leaf entities of this codim. */
-      typedef typename Partition< All_Partition >::LeafIterator LeafIterator;
-
-      /** \brief The type of the entity pointer for entities of this codim.*/
-      typedef typename Partition< All_Partition >::LevelIterator LevelIterator;
+      using LeafIterator  = typename Partition< All_Partition >::LeafIterator;
+      using LevelIterator = typename Partition< All_Partition >::LevelIterator;
 
     private:
-      friend class Dune::Entity<cd, dim, const GridImp, EntityImp>;
-      typedef EntityPointerImp<cd,const GridImp> EntityPointerImpl;
+      friend class Dune::Entity<cd, dim, const Grid, EntityWrapper>;
     };
 
-    /**
-     * \brief Traits associated with a specific grid partition type.
-     * \tparam pitype The type of the grid partition.
-     */
+
     template <PartitionIteratorType pitype>
     struct Partition
     {
-      /** \brief The type of the level grid view associated with this partition type. */
-      typedef Dune::GridView<LevelGridViewTraits<const GridImp,pitype> >
-      LevelGridView;
 
-      /** \brief The type of the leaf grid view associated with this partition type. */
-      typedef Dune::GridView<LeafGridViewTraits<const GridImp,pitype> >
-      LeafGridView;
+      using LevelGridView = Dune::GridView<LevelGridViewTraits<const Grid,pitype> >;
+
+      using LeafGridView = Dune::GridView<LeafGridViewTraits<const Grid,pitype> >;
+
     };
 
-    /** \brief The type of the level index set. */
-    typedef LevelIndexSetImp LevelIndexSet;
-    /** \brief The type of the leaf index set. */
-    typedef LeafIndexSetImp LeafIndexSet;
-    /** \brief The type of the global id set. */
-    typedef IdSet<const GridImp,GlobalIdSetImp,GIDType> GlobalIdSet;
-    /** \brief The type of the local id set. */
-    typedef IdSet<const GridImp,LocalIdSetImp,LIDType> LocalIdSet;
+    using LevelIndexSet = IndexSetWrapper<const Grid, typename HostGrid::LevelGridView>;
+    using LeafIndexSet  = IndexSetWrapper<const Grid, typename HostGrid::LeafGridView>;
 
-    /** \brief The type of the collective communication. */
-    typedef CCType CollectiveCommunication;
+    using GlobalIdSet = IdSet<
+      const Grid,
+      IdSetWrapper<
+        const Grid,
+        typename HostGrid::Traits::GlobalIdSet
+        >,
+      typename HostGrid::Traits::GlobalIdSet::IdType
+      >;
 
-    typedef LeafSubDomainInterfaceIteratorImp<const GridImp> LeafSubDomainInterfaceIterator;
-    typedef LevelSubDomainInterfaceIteratorImp<const GridImp> LevelSubDomainInterfaceIterator;
+    using LocalIdSet = IdSet<
+      const Grid,
+      IdSetWrapper<
+        const Grid,
+        typename HostGrid::Traits::LocalIdSet
+        >,
+      typename HostGrid::Traits::LocalIdSet::IdType
+      >;
 
-    typedef LeafAllSubDomainInterfacesIteratorImp<const GridImp> LeafAllSubDomainInterfacesIterator;
-    typedef LevelAllSubDomainInterfacesIteratorImp<const GridImp> LevelAllSubDomainInterfacesIterator;
+    using CollectiveCommunication = typename HostGrid::CollectiveCommunication;
+
+    using LeafSubDomainInterfaceIterator  = Dune::mdgrid::LeafSubDomainInterfaceIterator<const Grid>;
+    using LevelSubDomainInterfaceIterator = Dune::mdgrid::LevelSubDomainInterfaceIterator<const Grid>;
+
+    using LeafAllSubDomainInterfacesIterator  = Dune::mdgrid::LeafAllSubDomainInterfacesIterator<const Grid>;
+    using LevelAllSubDomainInterfacesIterator = Dune::mdgrid::LevelAllSubDomainInterfacesIterator<const Grid>;
+
   };
 
 };
