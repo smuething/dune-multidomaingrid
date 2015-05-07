@@ -79,6 +79,13 @@ public:
     incrementToNextValidPosition();
   }
 
+public:
+
+  // TODO: Remove after 2.4
+  operator EntityPointerWrapper() const
+  {
+    return EntityPointerWrapper(dereference());
+  }
 
   // TODO: Remove after 2.4
   operator EntityPointer() const

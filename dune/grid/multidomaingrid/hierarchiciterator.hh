@@ -50,7 +50,15 @@ public:
     return _hostIterator.level();
   }
 
-    // TODO: Remove after 2.4
+public:
+
+  // TODO: Remove after 2.4
+  operator EntityPointerWrapper() const
+  {
+    return EntityPointerWrapper(dereference());
+  }
+
+  // TODO: Remove after 2.4
   operator EntityPointer() const
   {
     return {dereference()};

@@ -64,6 +64,8 @@ class IteratorWrapper
     return _hostIterator.level();
   }
 
+public:
+
   // TODO: Remove after 2.4
   operator EntityPointer() const
   {
@@ -71,10 +73,18 @@ class IteratorWrapper
   }
 
   // TODO: Remove after 2.4
-  bool equals(const EntityPointerWrapper<codim,GridImp>& r) const
+  operator EntityPointerWrapper() const
+  {
+    return EntityPointerWrapper(dereference());
+  }
+
+  // TODO: Remove after 2.4
+  bool equals(const EntityPointerWrapper& r) const
   {
     return _hostIterator == r._hostEntityPointer;
   }
+
+private:
 
   HostIterator _hostIterator;
 
