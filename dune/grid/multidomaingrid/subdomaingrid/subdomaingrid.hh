@@ -646,12 +646,12 @@ public:
 
   template<typename EntityType>
   static const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) {
-    return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntity();
   }
 
   template<typename EntityType>
   static typename MDGrid::template MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) {
-    return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntity();
   }
 
   template<typename EntityType>
@@ -680,17 +680,45 @@ public:
   typename Traits::LeafIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
     assert(_subDomain == it->subDomain1() || _subDomain == it->subDomain2());
     if (_subDomain == it->subDomain1())
-      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it->firstMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LeafGridView::IndexSet,
+        typename MDGrid::LeafGridView::IntersectionIterator
+        >(
+          &this->leafGridView().indexSet(),
+          it->firstMultiDomainIntersectionIterator()
+          );
     else
-      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it->secondMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LeafGridView::IndexSet,
+        typename MDGrid::LeafGridView::IntersectionIterator
+        >(
+          &this->leaGridView().indexSet(),
+          it->secondMultiDomainIntersectionIterator()
+          );
   }
 
   typename Traits::LevelIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
     assert(_subDomain == it->subDomain1() || _subDomain == it->subDomain2());
     if (_subDomain == it->subDomain1())
-      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it->firstCell()->level(),it->firstMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LevelGridView::IndexSet,
+        typename MDGrid::LevelGridView::IntersectionIterator
+        >(
+          &this->levelGridView(it->firstMultiDomainIntersectionIterator()->inside().level()).indexSet(),
+          it->firstMultiDomainIntersectionIterator()
+          );
     else
-      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it->secondCell()->level(),it->secondMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LevelGridView::IndexSet,
+        typename MDGrid::LevelGridView::IntersectionIterator
+        >(
+          &this->levelGridView(it->secondMultiDomainIntersectionIterator()->inside().level()).indexSet(),
+          it->secondMultiDomainIntersectionIterator()
+          );
   }
 
   template<typename Intersection>
