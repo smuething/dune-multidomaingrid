@@ -37,6 +37,8 @@ class IteratorWrapper
   template<typename, typename>
   friend class Dune::EntityPointer;
 
+  static const int codimension = codim;
+
   using IndexSet      = typename GridView::IndexSet;
   using Entity        = typename GridImp::template Codim<codim>::Entity;
   using EntityPointer = typename GridImp::template Codim<codim>::EntityPointer;

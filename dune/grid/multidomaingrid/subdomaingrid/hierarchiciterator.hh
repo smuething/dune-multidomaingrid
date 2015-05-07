@@ -33,6 +33,8 @@ class HierarchicIteratorWrapper
 
 public:
 
+  static const int codimension = 0;
+
   using EntityWrapper        = Dune::mdgrid::subdomain::EntityWrapper<0,GridImp::dimension,GridImp>;
   using Entity               = typename GridImp::template Codim<0>::Entity;
   using EntityPointerWrapper = Dune::mdgrid::subdomain::EntityPointerWrapper<0,GridImp>;
