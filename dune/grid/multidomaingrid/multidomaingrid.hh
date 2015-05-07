@@ -339,7 +339,20 @@ class MultiDomainGrid :
 
   typedef GridImp ThisType;
 
+  using Base = GridDefaultImplementation<
+    HostGrid::dimension,
+    HostGrid::dimensionworld,
+    typename HostGrid::ctype,
+    MultiDomainGridFamily<
+      HostGrid,
+      MDGridTraitsType
+      >
+    >;
+
 public:
+
+  using Base::dimension;
+  using Base::dimensionworld;
 
   typedef MultiDomainGridFamily<HostGrid,MDGridTraitsType> GridFamily;
   typedef typename GridFamily::Traits Traits;
