@@ -280,33 +280,47 @@ public:
   }
 
   LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(
-      grid(),
-      multiDomainEntity.level(),
-      multiDomainEntity.ilevelbegin()
-      );
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::LevelGridView::IndexSet,
+      typename GridImp::MultiDomainGrid::LevelGridView::IntersectionIterator
+      >(
+        grid().levelGridView(this->level()).indexSet(),
+        grid()._grid.levelGridView(this->level()).ibegin(multiDomainEntity())
+        );
   }
 
   LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(
-      grid(),
-      multiDomainEntity.level(),
-      multiDomainEntity.ilevelend()
-      );
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::LevelGridView::IndexSet,
+      typename GridImp::MultiDomainGrid::LevelGridView::IntersectionIterator
+      >(
+        grid().levelGridView(this->level()).indexSet(),
+        grid()._grid.levelGridView(this->level()).iend(multiDomainEntity())
+        );
   }
 
   LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(
-      grid(),
-      multiDomainEntity.ileafbegin()
-      );
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::LeafGridView::IndexSet,
+      typename GridImp::MultiDomainGrid::LeafGridView::IntersectionIterator
+      >(
+        grid().leafGridView().indexSet(),
+        grid()._grid.leafGridView().ibegin(multiDomainEntity())
+        );
   }
 
   LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(
-      grid(),
-      multiDomainEntity.ileafend()
-      );
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::LeafGridView::IndexSet,
+      typename GridImp::MultiDomainGrid::LeafGridView::IntersectionIterator
+      >(
+        grid().leafGridView().indexSet(),
+        grid()._grid.leafGridView().iend(multiDomainEntity())
+        );
   }
 
   bool isNew() const {
