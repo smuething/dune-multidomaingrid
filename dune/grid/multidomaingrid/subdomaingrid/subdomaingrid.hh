@@ -645,6 +645,11 @@ public:
   }
 
   template<typename EntityType>
+  typename Traits::template Codim<EntityType::codimension>::Entity subDomainEntity(const EntityType& mdEntity) const {
+    return EntityWrapper<EntityType::codimension,dimension,const GridImp>(this,mdEntity);
+  }
+
+  template<typename EntityType>
   static const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) {
     return SubDomainGrid::getRealImplementation(e).multiDomainEntity();
   }
