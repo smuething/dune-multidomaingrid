@@ -8,6 +8,9 @@ const int dim = 2;
 
 int main (int argc, char *argv[])
 {
+  try {
+    Dune::MPIHelper::instance(argc,argv);
+
     // set up grid
     typedef Dune::YaspGrid<dim> GridType;
     Dune::FieldVector<double,dim> upperRight(1);
@@ -42,5 +45,12 @@ int main (int argc, char *argv[])
 
     for (; it!=endIt; ++it)
         std::cout << "bar" << std::endl;
-  return 0;
+    return 0;
+  } catch (Dune::Exception& e) {
+    std::cout << e << std::endl;
+    return 1;
+  } catch (...) {
+    std::cout << "generic exception" << std::endl;
+    return 2;
+  }
 }
