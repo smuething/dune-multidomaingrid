@@ -10,7 +10,6 @@
 #include <dune/grid/test/checkgeometryinfather.hh>
 #include <dune/grid/test/checkintersectionit.hh>
 
-int rank;
 
 template <int dim>
 void check_grid() {
