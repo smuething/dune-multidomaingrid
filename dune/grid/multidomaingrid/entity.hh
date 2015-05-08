@@ -25,6 +25,9 @@ class LevelIntersectionIteratorWrapper;
 template<typename GridImp>
 class HierarchicIteratorWrapper;
 
+template<typename, typename>
+class IntersectionIteratorWrapper;
+
 template<typename HostGrid, typename MDGridTraits>
 class MultiDomainGrid;
 
@@ -72,78 +75,20 @@ public:
 
 };
 
-template<int codim, int dim, typename GridImp>
-class MakeableEntityWrapper :
-    public GridImp::template Codim<codim>::Entity
-{
-
-  template<int, typename>
-  friend class EntityPointerWrapper;
-
-  template<int, PartitionIteratorType, typename>
-  friend class LeafIteratorWrapper;
-
-  template<int, PartitionIteratorType, typename>
-  friend class LevelIteratorWrapper;
-
-  template<typename,typename>
-  friend class MultiDomainGrid;
-
-  template<typename>
-  friend class HierarchicIteratorWrapper;
-
-  template<typename, PartitionIteratorType>
-  friend class LevelGridView;
-
-  template<typename, PartitionIteratorType>
-  friend class LeafGridView;
-
-
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
-
-  template<typename HostIteratorOrEntityPointer>
-  explicit MakeableEntityWrapper(const HostIteratorOrEntityPointer& hostEntityPointer) :
-    GridImp::template Codim<codim>::Entity(EntityWrapper<codim,dim,const GridImp>(hostEntityPointer))
-  {}
-
-  MakeableEntityWrapper& operator=(const MakeableEntityWrapper& rhs)
-  {
-    reset(rhs.hostEntityPointer());
-    return *this;
-  }
-
-  template<typename HostIteratorOrEntityPointer>
-  void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
-    GridImp::getRealImplementation(*this).reset(hostEntityPointer);
-  }
-
-  void compactify() {
-    GridImp::getRealImplementation(*this).compactify();
-  }
-
-  const HostEntityPointer& hostEntityPointer() const {
-    return GridImp::getRealImplementation(*this).hostEntityPointer();
-  }
-
-};
-
 
 template<int codim, int dim, typename GridImp>
-class EntityWrapper :
+class EntityWrapperBase :
     public EntityDefaultImplementation<codim,dim,GridImp,EntityWrapper>
 {
 
-  template<int, int, typename>
-  friend class MakeableEntityWrapper;
-
   template<int, typename>
   friend class EntityPointerWrapper;
 
   template<typename,typename>
   friend class MultiDomainGrid;
 
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
-  typedef typename GridImp::HostGridType::Traits::template Codim<codim>::Entity HostEntity;
+  typedef typename GridImp::HostGrid::Traits::template Codim<codim>::EntityPointer HostEntityPointer;
+  typedef typename GridImp::HostGrid::Traits::template Codim<codim>::Entity HostEntity;
 
 public:
 
@@ -151,74 +96,86 @@ public:
 
   typedef EntitySeedWrapper<typename HostEntity::EntitySeed> EntitySeed;
 
-  template<typename HostIteratorOrEntityPointer>
-  explicit EntityWrapper(const HostIteratorOrEntityPointer& e) :
-    _hostEntityPointer(e)
+  EntityWrapperBase()
   {}
 
-  explicit EntityWrapper(const HostEntity& e) :
-    _hostEntityPointer(e)
+  explicit EntityWrapperBase(const HostEntity& e)
+    : _hostEntity(e)
   {}
 
-  // copy constructor. The default constructor does not work correctly here,
-  // as it will initialise the geometry with a pointer to the host geometry
-  // of rhs, causing geometry access to fail if rhs gets destructed.
-  EntityWrapper(const EntityWrapper& rhs) :
-    _hostEntityPointer(rhs._hostEntityPointer)
+  explicit EntityWrapperBase(HostEntity&& e)
+    : _hostEntity(std::move(e))
   {}
 
   int level() const {
-    return _hostEntityPointer->level();
+    return _hostEntity.level();
   }
 
   PartitionType partitionType() const {
-    return _hostEntityPointer->partitionType();
+    return _hostEntity.partitionType();
   }
 
   template<int cc>
   int DUNE_DEPRECATED_MSG("Use subEntities instead") count() const {
-    return _hostEntityPointer->template count<cc>();
+    return _hostEntity.template count<cc>();
   }
 
   unsigned int subEntities(unsigned int codimSubEntitiy) const {
-    return _hostEntityPointer->subEntities(codimSubEntitiy);
+    return _hostEntity.subEntities(codimSubEntitiy);
   }
 
   Geometry geometry() const {
-    return Geometry(_hostEntityPointer->geometry());
+    return Geometry(_hostEntity.geometry());
   }
 
   EntitySeed seed() const {
-    return EntitySeed(_hostEntityPointer->seed());
+    return EntitySeed(_hostEntity.seed());
   }
 
-  private:
-
-  HostEntityPointer _hostEntityPointer;
-
-  template<typename HostIteratorOrEntityPointer>
-  void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
-    _hostEntityPointer = hostEntityPointer;
+  bool equals(const EntityWrapperBase& other) const
+  {
+    return hostEntity() == other.hostEntity();
   }
 
-  void compactify() {
-    _hostEntityPointer.compactify();
-  }
+private:
 
-  const HostEntityPointer& hostEntityPointer() const {
-    return _hostEntityPointer;
+  HostEntity _hostEntity;
+
+protected:
+
+  const HostEntity& hostEntity() const {
+    return _hostEntity;
   }
 
 };
 
 
-template<int dim, typename GridImp>
-class EntityWrapper<0,dim,GridImp> :
-    public EntityDefaultImplementation<0,dim,GridImp,EntityWrapper>
+template<int codim, int dim, typename GridImp>
+class EntityWrapper :
+    public EntityWrapperBase<codim,dim,GridImp>
 {
 
-  template<int, int, typename>
-  friend class MakeableEntityWrapper;
+  using Base = EntityWrapperBase<codim,dim,GridImp>;
+
+  template<int, typename>
+  friend class EntityPointerWrapper;
+
+  template<typename,typename>
+  friend class MultiDomainGrid;
+
+public:
+
+  // inherit constructors
+  using Base::Base;
+
+};
+
+template<int dim, typename GridImp>
+class EntityWrapper<0,dim,GridImp> :
+    public EntityWrapperBase<0,dim,GridImp>
+{
+
+  using Base = EntityWrapperBase<0,dim,GridImp>;
 
   template<int, typename>
   friend class EntityPointerWrapper;
@@ -232,141 +189,107 @@ class EntityWrapper<0,dim,GridImp> :
   template<typename, PartitionIteratorType>
   friend class LeafGridView;
 
-
-  typedef typename GridImp::HostGridType::Traits::template Codim<0>::EntityPointer HostEntityPointer;
-  typedef typename GridImp::HostGridType::Traits::template Codim<0>::Entity HostEntity;
+  using Base::hostEntity;
 
 public:
 
-  typedef typename GridImp::template Codim<0>::Geometry Geometry;
-  typedef typename GridImp::template Codim<0>::LocalGeometry LocalGeometry;
-  typedef typename GridImp::Traits::LeafIntersectionIterator LeafIntersectionIterator;
-  typedef typename GridImp::Traits::LevelIntersectionIterator LevelIntersectionIterator;
-  typedef typename GridImp::Traits::HierarchicIterator HierarchicIterator;
-  typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
+  using LocalGeometry = typename GridImp::template Codim<0>::LocalGeometry;
+  using LeafIntersectionIterator = typename GridImp::Traits::LeafIntersectionIterator;
+  using LevelIntersectionIterator = typename GridImp::Traits::LevelIntersectionIterator;
+  using HierarchicIterator = typename GridImp::Traits::HierarchicIterator;
 
-  typedef EntitySeedWrapper<typename HostEntity::EntitySeed> EntitySeed;
-
-
-  template<typename HostIteratorOrEntityPointer>
-  explicit EntityWrapper(const HostIteratorOrEntityPointer& e) :
-    _hostEntityPointer(e)
-  {}
-
-  // copy constructor. The default constructor does not work correctly here,
-  // as it will initialise the geometry with a pointer to the host geometry
-  // of rhs, causing geometry access to fail if rhs gets destructed.
-  EntityWrapper(const EntityWrapper& rhs) :
-    _hostEntityPointer(rhs._hostEntityPointer)
-  {}
-
-  int level() const {
-    return _hostEntityPointer->level();
-  }
-
-  PartitionType partitionType() const {
-    return _hostEntityPointer->partitionType();
-  }
-
-  Geometry geometry() const {
-    return Geometry(_hostEntityPointer->geometry());
-  }
+  // inherit constructors
+  using Base::Base;
 
   template<int cc>
   int DUNE_DEPRECATED_MSG("Use subEntities instead") count() const {
-    return _hostEntityPointer->template count<cc>();
+    return hostEntity().template count<cc>();
   }
 
   unsigned int subEntities(unsigned int codim) const {
-    return _hostEntityPointer->subEntities(codim);
+    return hostEntity().subEntities(codim);
   }
 
   template<int cc>
-  typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {
-    return EntityPointerWrapper<cc,GridImp>(_hostEntityPointer->template subEntity<cc>(i));
+  typename GridImp::template Codim<cc>::Entity subEntity(int i) const {
+    return {EntityWrapper<cc,dim,GridImp>(hostEntity().template subEntity<cc>(i))};
   }
 
-  bool equals(const EntityWrapper& other) const
-  {
-    return _hostEntityPointer == other.hostEntityPointer();
-  }
-
-  EntityPointer father() const {
-    return EntityPointerWrapper<0,GridImp>(_hostEntityPointer->father());
+  typename GridImp::template Codim<0>::Entity father() const {
+    return {EntityWrapper(hostEntity().father())};
   }
 
   bool hasFather() const {
-    return _hostEntityPointer->hasFather();
+    return hostEntity().hasFather();
   }
 
   bool isLeaf() const {
-    return _hostEntityPointer->isLeaf();
+    return hostEntity().isLeaf();
   }
 
   bool isRegular() const {
-    return _hostEntityPointer->isRegular();
+    return hostEntity().isRegular();
   }
 
   LocalGeometry geometryInFather() const {
-    return LocalGeometry(_hostEntityPointer->geometryInFather());
+    return LocalGeometry(hostEntity().geometryInFather());
   }
 
   HierarchicIterator hbegin(int maxLevel) const {
-    return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hbegin(maxLevel));
+    return HierarchicIteratorWrapper<GridImp>(hostEntity().hbegin(maxLevel));
   }
 
   HierarchicIterator hend(int maxLevel) const {
-    return HierarchicIteratorWrapper<GridImp>(_hostEntityPointer->hend(maxLevel));
+    return HierarchicIteratorWrapper<GridImp>(hostEntity().hend(maxLevel));
   }
 
   LevelIntersectionIterator ilevelbegin() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelbegin());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LevelGridView::IntersectionIterator
+      >(
+        hostEntity().ilevelbegin()
+        );
   }
 
   LevelIntersectionIterator ilevelend() const {
-    return LevelIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ilevelend());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LevelGridView::IntersectionIterator
+      >(
+        hostEntity().ilevelend()
+        );
   }
 
   LeafIntersectionIterator ileafbegin() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafbegin());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LeafGridView::IntersectionIterator
+      >(
+        hostEntity().ileafbegin()
+        );
   }
 
   LeafIntersectionIterator ileafend() const {
-    return LeafIntersectionIteratorWrapper<GridImp>(_hostEntityPointer->ileafend());
+    return IntersectionIteratorWrapper<
+      GridImp,
+      typename GridImp::HostGridType::LeafGridView::IntersectionIterator
+      >(
+        hostEntity().ileafend()
+        );
   }
 
   bool isNew() const {
-    return _hostEntityPointer->isNew();
+    return hostEntity().isNew();
   }
 
   bool mightVanish() const {
-    return _hostEntityPointer->mightVanish();
-  }
-
-  EntitySeed seed() const {
-    return EntitySeed(_hostEntityPointer->seed());
+    return hostEntity().mightVanish();
   }
 
   bool hasBoundaryIntersections () const
   {
-    return _hostEntityPointer->hasBoundaryIntersections();
-  }
-
-  const HostEntityPointer& hostEntityPointer() const {
-    return _hostEntityPointer;
-  }
-
-private:
-
-  HostEntityPointer _hostEntityPointer;
-
-  template<typename HostIteratorOrEntityPointer>
-  void reset(const HostIteratorOrEntityPointer& hostEntityPointer) {
-    _hostEntityPointer = hostEntityPointer;
-  }
-
-  void compactify() {
-    _hostEntityPointer.compactify();
+    return hostEntity().hasBoundaryIntersections();
   }
 
 };

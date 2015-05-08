@@ -9,8 +9,7 @@ install(FILES
     indexsets.hh
     intersection.hh
     intersectioniterator.hh
-    leafiterator.hh
-    leveliterator.hh
+    iterator.hh
     localgeometry.hh
     subdomaingrid.hh
   DESTINATION include/dune/grid/multidomaingrid/subdomaingrid)

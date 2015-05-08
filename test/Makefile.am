@@ -10,7 +10,6 @@ check_PROGRAMS = \
   testpartitioning \
   testlargedomainnumbers \
   testadaptation \
-  profilerepartitioning \
   iterateallinterfaces \
   testparallel
 
@@ -48,11 +47,6 @@ testadaptation_SOURCES = testadaptation.cc
 testadaptation_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS)
 testadaptation_LDFLAGS = $(ALL_PKG_LDFLAGS)
 testadaptation_LIBS = $(ALL_PKG_LIBS)
-
-profilerepartitioning_SOURCES = profilerepartitioning.cc
-profilerepartitioning_CXXFLAGS = $(AM_CXXFLAGS) -DGRIDDIM=2 -DYASPGRID $(ALL_PKG_CPPFLAGS)
-profilerepartitioning_LDFLAGS = $(ALL_PKG_LDFLAGS)
-profilerepartitioning_LIBS = $(ALL_PKG_LIBS)
 
 iterateallinterfaces_SOURCES = iterateallinterfaces.cc
 

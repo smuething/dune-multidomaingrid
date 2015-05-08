@@ -55,7 +55,8 @@ class SubDomainToSubDomainController
   void incrementToNextValidPosition(Iterator& it) {
     for (;;) {
       while(it._hostIntersectionIterator != it._hostIntersectionEnd) {
-        if (it._hostIntersectionIterator->neighbor() && it._gridView.indexSet().containsForSubDomain(_subDomain2,*it._hostIntersectionIterator->outside())) {
+        const auto& hostIntersection = *it._hostIntersectionIterator;
+        if (hostIntersection.neighbor() && it._gridView.indexSet().containsForSubDomain(_subDomain2,hostIntersection.outside())) {
           return;
         }
         ++it._hostIntersectionIterator;

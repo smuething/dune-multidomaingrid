@@ -13,8 +13,7 @@
 #include <dune/grid/multidomaingrid/subdomaingrid/localgeometry.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/entity.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/entitypointer.hh>
-#include <dune/grid/multidomaingrid/subdomaingrid/leafiterator.hh>
-#include <dune/grid/multidomaingrid/subdomaingrid/leveliterator.hh>
+#include <dune/grid/multidomaingrid/subdomaingrid/iterator.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/hierarchiciterator.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/intersection.hh>
 #include <dune/grid/multidomaingrid/subdomaingrid/intersectioniterator.hh>
@@ -40,143 +39,168 @@ class SubDomainGrid;
 template<typename MDGrid>
 struct SubDomainGridFamily {
 
-  template <int dim, int dimw, class GridImp,
-            template<int,int,class> class GeometryImp,
-            template<int,int,class> class LocalGeometryImp,
-            template<int,int,class> class EntityImp,
-            template<int,class> class EntityPointerImp,
-            template<int,PartitionIteratorType,class> class LevelIteratorImp,
-            template<class> class LeafIntersectionImp,
-            template<class> class LevelIntersectionImp,
-            template<class> class LeafIntersectionIteratorImp,
-            template<class> class LevelIntersectionIteratorImp,
-            template<class> class HierarchicIteratorImp,
-            template<int,PartitionIteratorType,class> class LeafIteratorImp,
-            class LevelIndexSetImp, class LeafIndexSetImp,
-            class GlobalIdSetImp, class GIDType, class LocalIdSetImp, class LIDType, class CCType,
-            template<class,PartitionIteratorType> class LevelGridViewTraits,
-            template<class,PartitionIteratorType> class LeafGridViewTraits
-            >
-  struct SubDomainGridTraits
+private:
+
+  static const int dim  = MDGrid::dimension;
+  static const int dimw = MDGrid::dimensionworld;
+
+public:
+
+  struct Traits
   {
     /** \brief The type that is implementing the grid. */
-    typedef GridImp Grid;
-
-    /** \brief The type of the intersection at the leafs of the grid. */
-    typedef Dune::Intersection<const GridImp, LeafIntersectionImp<const GridImp> >  LeafIntersection;
-    /** \brief The type of the intersection at the levels of the grid. */
-    typedef Dune::Intersection<const GridImp, LevelIntersectionImp<const GridImp> > LevelIntersection;
-    /** \brief The type of the intersection iterator at the leafs of the grid. */
-    typedef Dune::IntersectionIterator<const GridImp, LeafIntersectionIteratorImp<const GridImp>, LeafIntersectionImp<const GridImp> >   LeafIntersectionIterator;
-    /** \brief The type of the intersection iterator at the levels of the grid. */
-    typedef Dune::IntersectionIterator<const GridImp, LevelIntersectionIteratorImp<const GridImp>, LevelIntersectionImp<const GridImp> > LevelIntersectionIterator;
-
-    /** \brief The type of the  hierarchic iterator. */
-    typedef Dune::EntityIterator< 0, const GridImp, HierarchicIteratorImp< const GridImp > > HierarchicIterator;
-
-    /**
-     * \brief Traits associated with a specific codimension.
-     * \tparam cd The codimension.
-     */
-    template <int cd>
-    struct Codim
-    {
-      //! IMPORTANT: Codim<codim>::Geometry == Geometry<dim-codim,dimw>
-      /** \brief The type of the geometry associated with the entity.*/
-      typedef Dune::Geometry<dim-cd, dimw, const GridImp, GeometryImp> Geometry;
-      /** \brief The type of the local geometry associated with the entity.*/
-      typedef Dune::Geometry<dim-cd, dim, const GridImp, LocalGeometryImp> LocalGeometry;
-      /** \brief The type of the entity. */
-      // we could - if needed - introduce another struct for dimglobal of Geometry
-      typedef Dune::Entity<cd, dim, const GridImp, EntityImp> Entity;
-
-      /** \brief The type of the entity pointer for entities of this codim.*/
-      typedef Dune::EntityPointer<const GridImp,EntityPointerImp<cd,const GridImp> > EntityPointer;
-
-      typedef EntitySeedWrapper<typename MDGrid::HostGridType::template Codim<cd>::EntitySeed> EntitySeed;
-
-      /**
-       * \brief Traits associated with a specific grid partition type.
-       * \tparam pitype The type of the grid partition.
-       */
-      template <PartitionIteratorType pitype>
-      struct Partition
-      {
-        /** \brief The type of the iterator over the level entities of this codim on this partition. */
-        typedef Dune::EntityIterator< cd, const GridImp, LevelIteratorImp< cd, pitype, const GridImp > > LevelIterator;
-        /** \brief The type of the iterator over the leaf entities of this codim on this partition. */
-        typedef Dune::EntityIterator< cd, const GridImp, LeafIteratorImp< cd, pitype, const GridImp > > LeafIterator;
-      };
-
-      /** \brief The type of the iterator over all leaf entities of this codim. */
-      typedef typename Partition< All_Partition >::LeafIterator LeafIterator;
-
-      /** \brief The type of the entity pointer for entities of this codim.*/
-      typedef typename Partition< All_Partition >::LevelIterator LevelIterator;
-
-    private:
-      friend class Dune::Entity<cd, dim, const GridImp, EntityImp>;
+    using Grid = SubDomainGrid<MDGrid>;
 
 
+    using LeafIntersection = Dune::Intersection<
+      const Grid,
+      IntersectionWrapper<
+        const Grid,
+        IndexSetWrapper<
+          const Grid,
+          typename MDGrid::LeafIndexSetImp
+          >,
+        typename MDGrid::LeafGridView::Intersection
+        >
+      >;
+
+    using LevelIntersection = Dune::Intersection<
+      const Grid,
+      IntersectionWrapper<
+        const Grid,
+        IndexSetWrapper<
+          const Grid,
+          typename MDGrid::LevelIndexSetImp
+          >,
+        typename MDGrid::LevelGridView::Intersection
+        >
+      >;
+
+    using LeafIntersectionIterator = Dune::IntersectionIterator<
+      const Grid,
+      IntersectionIteratorWrapper<
+        const Grid,
+        IndexSetWrapper<
+          const Grid,
+          typename MDGrid::LeafIndexSetImp
+          >,
+        typename MDGrid::LeafGridView::IntersectionIterator
+        >,
+      IntersectionWrapper<
+        const Grid,
+        IndexSetWrapper<
+          const Grid,
+          typename MDGrid::LeafIndexSetImp
+          >,
+        typename MDGrid::LeafGridView::Intersection
+        >
+      >;
+
+    using LevelIntersectionIterator = Dune::IntersectionIterator<
+      const Grid,
+      IntersectionIteratorWrapper<
+        const Grid,
+        IndexSetWrapper<
+          const Grid,
+          typename MDGrid::LevelIndexSetImp
+          >,
+        typename MDGrid::LevelGridView::IntersectionIterator
+        >,
+      IntersectionWrapper<
+        const Grid,
+        IndexSetWrapper<
+          const Grid,
+          typename MDGrid::LevelIndexSetImp
+          >,
+        typename MDGrid::LevelGridView::Intersection
+        >
+      >;
+
+    using HierarchicIterator = Dune::EntityIterator< 0, const Grid, HierarchicIteratorWrapper< const Grid > >;
 
 
-      typedef EntityPointerImp<cd,const GridImp> EntityPointerImpl;
-    };
-
-    /**
-     * \brief Traits associated with a specific grid partition type.
-     * \tparam pitype The type of the grid partition.
-     */
     template <PartitionIteratorType pitype>
     struct Partition
     {
-      /** \brief The type of the level grid view associated with this partition type. */
-      typedef Dune::GridView<LevelGridViewTraits<const GridImp,pitype> >
-      LevelGridView;
 
-      /** \brief The type of the leaf grid view associated with this partition type. */
-      typedef Dune::GridView<LeafGridViewTraits<const GridImp,pitype> >
-      LeafGridView;
+      using LevelGridView = Dune::GridView<LevelGridViewTraits<const Grid,pitype> >;
+
+      using LeafGridView = Dune::GridView<LeafGridViewTraits<const Grid,pitype> >;
+
     };
 
-    /** \brief The type of the level index set. */
-    typedef LevelIndexSetImp LevelIndexSet;
-    /** \brief The type of the leaf index set. */
-    typedef LeafIndexSetImp LeafIndexSet;
-    /** \brief The type of the global id set. */
-    typedef IdSet<const GridImp,GlobalIdSetImp,GIDType> GlobalIdSet;
-    /** \brief The type of the local id set. */
-    typedef IdSet<const GridImp,LocalIdSetImp,LIDType> LocalIdSet;
+    template <int cd>
+    struct Codim
+    {
 
-    /** \brief The type of the collective communication. */
-    typedef CCType CollectiveCommunication;
+      using Geometry      = Dune::Geometry<dim-cd, dimw, const Grid, GeometryWrapper>;
+      using LocalGeometry = Dune::Geometry<dim-cd, dim, const Grid, LocalGeometryWrapper>;
+
+      using Entity        = Dune::Entity<cd, dim, const Grid, EntityWrapper>;
+      using EntityPointer = Dune::EntityPointer<const Grid, EntityPointerWrapper<cd,const Grid> >;
+
+      using EntitySeed    = EntitySeedWrapper<typename MDGrid::HostGridType::template Codim<cd>::EntitySeed>;
+
+      template <PartitionIteratorType pitype>
+      struct Partition
+      {
+
+        using LevelIterator = Dune::EntityIterator<
+          cd,
+          const Grid,
+          IteratorWrapper<
+            typename Traits::template Partition<pitype>::LevelGridView,
+            typename MDGrid::LevelGridView::template Codim<cd>::template Partition<pitype>::Iterator,
+            cd,
+            pitype,
+            const Grid
+            >
+          >;
+
+        using LeafIterator = Dune::EntityIterator<
+          cd,
+          const Grid,
+          IteratorWrapper<
+            typename Traits::template Partition<pitype>::LeafGridView,
+            typename MDGrid::LeafGridView::template Codim<cd>::template Partition<pitype>::Iterator,
+            cd,
+            pitype,
+            const Grid
+            >
+          >;
+      };
+
+      using LeafIterator  = typename Partition< All_Partition >::LeafIterator;
+      using LevelIterator = typename Partition< All_Partition >::LevelIterator;
+
+    private:
+      friend class Dune::Entity<cd, dim, const Grid, EntityWrapper>;
+
+    };
+
+    using LevelIndexSet = IndexSetWrapper<const Grid, typename MDGrid::LevelIndexSetImp>;
+    using LeafIndexSet  = IndexSetWrapper<const Grid, typename MDGrid::LeafIndexSetImp>;
+
+    using GlobalIdSet = IdSet<
+      const Grid,
+      IdSetWrapper<
+        const Grid,
+        typename MDGrid::HostGridType::Traits::GlobalIdSet
+        >,
+      typename MDGrid::HostGridType::Traits::GlobalIdSet::IdType
+      >;
+
+    using LocalIdSet = IdSet<
+      const Grid,
+      IdSetWrapper<
+        const Grid,
+        typename MDGrid::HostGridType::Traits::LocalIdSet
+        >,
+      typename MDGrid::HostGridType::Traits::LocalIdSet::IdType
+      >;
+
+    using CollectiveCommunication = typename MDGrid::CollectiveCommunication;
   };
-
-  typedef SubDomainGridTraits<
-    MDGrid::dimension,
-    MDGrid::dimensionworld,
-    SubDomainGrid<MDGrid>,
-    GeometryWrapper,
-    LocalGeometryWrapper,
-    EntityWrapper,
-    EntityPointerWrapper,
-    LevelIteratorWrapper,
-    LeafIntersectionWrapper, // leaf intersection
-    LevelIntersectionWrapper, // level intersection
-    LeafIntersectionIteratorWrapper, // leaf intersection iterator
-    LevelIntersectionIteratorWrapper, // level intersection iterator
-    HierarchicIteratorWrapper,
-    LeafIteratorWrapper,
-    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp>,
-    IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp>,
-    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::GlobalIdSet>,
-    typename MDGrid::Traits::GlobalIdSet::IdType,
-    IdSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::HostGridType::Traits::LocalIdSet>,
-    typename MDGrid::Traits::LocalIdSet::IdType,
-    typename MDGrid::HostGridType::CollectiveCommunication,
-    LevelGridViewTraits,
-    LeafGridViewTraits
-    > Traits;
 
 };
 
@@ -192,19 +216,16 @@ class SubDomainGrid :
   friend class ::Dune::mdgrid::MultiDomainGrid;
 
   template<int codim, int dim, typename GridImp>
-  friend class EntityWrapper;
+  friend class EntityWrapperBase;
 
   template<int codim, int dim, typename GridImp>
-  friend class MakeableEntityWrapper;
+  friend class EntityWrapper;
 
   template<int codim, typename GridImp>
   friend class EntityPointerWrapper;
 
-  template<int codim, PartitionIteratorType pitype, typename GridImp>
-  friend class LeafIteratorWrapper;
-
-  template<int codim, PartitionIteratorType pitype, typename GridImp>
-  friend class LevelIteratorWrapper;
+  template<typename, typename, int codim, PartitionIteratorType pitype, typename GridImp>
+  friend class IteratorWrapper;
 
   template<typename GridImp>
   friend class HierarchicIteratorWrapper;
@@ -213,13 +234,7 @@ class SubDomainGrid :
   friend class GeometryWrapper;
 
   template<int mydim, int coorddim, typename GridImp>
-  friend class MakeableGeometryWrapper;
-
-  template<int mydim, int coorddim, typename GridImp>
   friend class LocalGeometryWrapper;
-
-  template<int mydim, int coorddim, typename GridImp>
-  friend class MakeableLocalGeometryWrapper;
 
   template<typename GridImp, typename WrappedIndexSet>
   friend class IndexSetWrapper;
@@ -230,20 +245,11 @@ class SubDomainGrid :
   template<typename GridImp>
   friend struct ::Dune::mdgrid::detail::HostGridAccessor;
 
-  template<typename,typename,typename,typename,typename>
+  template<typename,typename,typename>
   friend class IntersectionIteratorWrapper;
 
-  template<typename GridImp>
-  friend class LeafIntersectionIteratorWrapper;
-
-  template<typename GridImp>
-  friend class LeafIntersectionWrapper;
-
-  template<typename GridImp>
-  friend class LevelIntersectionIteratorWrapper;
-
-  template<typename GridImp>
-  friend class LevelIntersectionWrapper;
+  template<typename,typename,typename>
+  friend class IntersectionWrapper;
 
   template<typename, PartitionIteratorType>
   friend class LevelGridView;
@@ -257,10 +263,17 @@ class SubDomainGrid :
                                     SubDomainGridFamily<MDGrid>
                                     > BaseT;
 
-  typedef SubDomainGrid<MDGrid> GridImp;
-  typedef MDGrid MDGridType;
+  using GridImp = SubDomainGrid<MDGrid>;
 
-  typedef typename MDGrid::HostGridType HostGridType;
+public:
+
+  using MultiDomainGrid = MDGrid;
+  using MDGridType DUNE_DEPRECATED_MSG("Deprecated in 2.4, Use MultiDomainGrid instead") = MultiDomainGrid;
+
+  using HostGrid = typename MDGrid::HostGrid;
+  using HostGridType DUNE_DEPRECATED_MSG("Deprecated in 2.4, Use HostGrid instead") = HostGrid;
+
+private:
 
   typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LevelIndexSetImp> LevelIndexSetImp;
 
@@ -281,11 +294,10 @@ public:
   /** \brief The type used for subdomain numbers */
   typedef typename MDGrid::SubDomainIndex SubDomainIndex;
 
-  typedef MDGridType MultiDomainGrid;
-
   enum IntersectionType { neighbor, foreign, boundary, processor };
 
-public:
+  using BaseT::dimension;
+  using BaseT::dimensionworld;
 
   /** @name Dune grid interface methods */
   /*@{*/
@@ -293,13 +305,27 @@ public:
   //! Reconstruct EntityPointer from EntitySeed
   template<typename EntitySeed>
   typename Traits::template Codim<EntitySeed::codimension>::EntityPointer
+  DUNE_DEPRECATED_MSG("entityPointer() is deprecated and will be removed after the release of dune-grid 2.4. Use entity() instead to directly obtain an Entity object.")
   entityPointer(const EntitySeed& entitySeed) const
   {
     return
       EntityPointerWrapper<EntitySeed::codimension,const GridImp>(
-        *this,
+        this,
         typename MDGrid::template Codim<EntitySeed::codimension>::EntityPointer(
           _grid.entityPointer(entitySeed)
+        )
+      );
+  }
+
+  template<typename EntitySeed>
+  typename Traits::template Codim<EntitySeed::codimension>::Entity
+  entity(const EntitySeed& entitySeed) const
+  {
+    return
+      EntityWrapper<EntitySeed::codimension,dimension,const GridImp>(
+        this,
+        typename MDGrid::template Codim<EntitySeed::codimension>::Entity(
+          _grid.entity(entitySeed)
         )
       );
   }
@@ -310,58 +336,122 @@ public:
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(levelIndexSet(level),
-                                                                   _grid.template lbegin<codim>(level),
-                                                                   _grid.template lend<codim>(level));
+    return IteratorWrapper<
+      typename Traits::template Partition<All_Partition>::LevelGridView,
+      typename MultiDomainGrid::LevelGridView::template Codim<codim>::template Partition<All_Partition>::Iterator,
+      codim,
+      All_Partition,
+      const GridImp>(
+                     this,
+                     &this->levelGridView(level).indexSet(),
+                     _grid.levelGridView(level).template begin<codim>(),
+                     _grid.levelGridView(level).template end<codim>()
+                     );
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,All_Partition,const GridImp>(levelIndexSet(level),
-                                                                   _grid.template lend<codim>(level),
-                                                                   _grid.template lend<codim>(level));
+    return IteratorWrapper<
+      typename Traits::template Partition<All_Partition>::LevelGridView,
+      typename MultiDomainGrid::LevelGridView::template Codim<codim>::template Partition<All_Partition>::Iterator,
+      codim,
+      All_Partition,
+      const GridImp>(
+                     this,
+                     &this->levelGridView(level).indexSet(),
+                     _grid.levelGridView(level).template end<codim>(),
+                     _grid.levelGridView(level).template end<codim>()
+                     );
   }
 
-  template<int codim, PartitionIteratorType PiType>
-  typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lbegin(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(levelIndexSet(level),
-                                                            _grid.template lbegin<codim,PiType>(level),
-                                                            _grid.template lend<codim,PiType>(level));
+  template<int codim, PartitionIteratorType pitype>
+  typename Traits::template Codim<codim>::template Partition<pitype>::LevelIterator lbegin(int level) const {
+    return IteratorWrapper<
+      typename Traits::template Partition<pitype>::LevelGridView,
+      typename MultiDomainGrid::LevelGridView::template Codim<codim>::template Partition<pitype>::Iterator,
+      codim,
+      pitype,
+      const GridImp>(
+                     this,
+                     &this->levelGridView(level).indexSet(),
+                     _grid.levelGridView(level).template begin<codim,pitype>(),
+                     _grid.levelGridView(level).template end<codim,pitype>()
+                     );
   }
 
-  template<int codim, PartitionIteratorType PiType>
-  typename Traits::template Codim<codim>::template Partition<PiType>::LevelIterator lend(int level) const {
-    return LevelIteratorWrapper<codim,PiType,const GridImp>(levelIndexSet(level),
-                                                            _grid.template lend<codim,PiType>(level),
-                                                            _grid.template lend<codim,PiType>(level));
+  template<int codim, PartitionIteratorType pitype>
+  typename Traits::template Codim<codim>::template Partition<pitype>::LevelIterator lend(int level) const {
+    return IteratorWrapper<
+      typename Traits::template Partition<pitype>::LevelGridView,
+      typename MultiDomainGrid::LevelGridView::template Codim<codim>::template Partition<pitype>::Iterator,
+      codim,
+      pitype,
+      const GridImp>(
+                     this,
+                     &this->levelGridView(level).indexSet(),
+                     _grid.levelGridView(level).template end<codim,pitype>(),
+                     _grid.levelGridView(level).template end<codim,pitype>()
+                     );
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
-                                                                  _grid.template leafbegin<codim>(),
-                                                                  _grid.template leafend<codim>());
+    return IteratorWrapper<
+      typename Traits::template Partition<All_Partition>::LeafGridView,
+      typename MultiDomainGrid::LeafGridView::template Codim<codim>::template Partition<All_Partition>::Iterator,
+      codim,
+      All_Partition,
+      const GridImp>(
+                     this,
+                     &this->leafGridView().indexSet(),
+                     _grid.leafGridView().template begin<codim>(),
+                     _grid.leafGridView().template end<codim>()
+                     );
   }
 
   template<int codim>
   typename Traits::template Codim<codim>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,All_Partition,const GridImp>(_leafIndexSet,
-                                                                  _grid.template leafend<codim>(),
-                                                                  _grid.template leafend<codim>());
+    return IteratorWrapper<
+      typename Traits::template Partition<All_Partition>::LeafGridView,
+      typename MultiDomainGrid::LeafGridView::template Codim<codim>::template Partition<All_Partition>::Iterator,
+      codim,
+      All_Partition,
+      const GridImp>(
+                     this,
+                     &this->leafGridView().indexSet(),
+                     _grid.leafGridView().template end<codim>(),
+                     _grid.leafGridView().template end<codim>()
+                     );
   }
 
-  template<int codim, PartitionIteratorType PiType>
-  typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafbegin() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
-                                                           _grid.template leafbegin<codim,PiType>(),
-                                                           _grid.template leafend<codim,PiType>());
+  template<int codim, PartitionIteratorType pitype>
+  typename Traits::template Codim<codim>::template Partition<pitype>::LeafIterator leafbegin() const {
+    return IteratorWrapper<
+      typename Traits::template Partition<pitype>::LeafGridView,
+      typename MultiDomainGrid::LeafGridView::template Codim<codim>::template Partition<pitype>::Iterator,
+      codim,
+      pitype,
+      const GridImp>(
+                     this,
+                     &this->leafGridView().indexSet(),
+                     _grid.leafGridView().template begin<codim,pitype>(),
+                     _grid.leafGridView().template end<codim,pitype>()
+                     );
   }
 
-  template<int codim, PartitionIteratorType PiType>
-  typename Traits::template Codim<codim>::template Partition<PiType>::LeafIterator leafend() const {
-    return LeafIteratorWrapper<codim,PiType,const GridImp>(_leafIndexSet,
-                                                           _grid.template leafend<codim,PiType>(),
-                                                           _grid.template leafend<codim,PiType>());
+  template<int codim, PartitionIteratorType pitype>
+  typename Traits::template Codim<codim>::template Partition<pitype>::LeafIterator leafend() const {
+    return IteratorWrapper<
+      typename Traits::template Partition<pitype>::LeafGridView,
+      typename MultiDomainGrid::LeafGridView::template Codim<codim>::template Partition<pitype>::Iterator,
+      codim,
+      pitype,
+      const GridImp>(
+                     this,
+                     &this->leafGridView().indexSet(),
+                     _grid.leafGridView().template end<codim,pitype>(),
+                     _grid.leafGridView().template end<codim,pitype>()
+                     );
   }
 
   int size(int level, int codim) const {
@@ -555,13 +645,18 @@ public:
   }
 
   template<typename EntityType>
+  typename Traits::template Codim<EntityType::codimension>::Entity subDomainEntity(const EntityType& mdEntity) const {
+    return EntityWrapper<EntityType::codimension,dimension,const GridImp>(this,mdEntity);
+  }
+
+  template<typename EntityType>
   static const typename MDGrid::template MultiDomainEntity<EntityType>::type& multiDomainEntity(const EntityType& e) {
-    return *(SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer());
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntity();
   }
 
   template<typename EntityType>
   static typename MDGrid::template MultiDomainEntityPointer<EntityType>::type multiDomainEntityPointer(const EntityType& e) {
-    return SubDomainGrid::getRealImplementation(e).multiDomainEntityPointer();
+    return SubDomainGrid::getRealImplementation(e).multiDomainEntity();
   }
 
   template<typename EntityType>
@@ -590,17 +685,45 @@ public:
   typename Traits::LeafIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LeafSubDomainInterfaceIterator it) const {
     assert(_subDomain == it->subDomain1() || _subDomain == it->subDomain2());
     if (_subDomain == it->subDomain1())
-      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it->firstMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LeafGridView::IndexSet,
+        typename MDGrid::LeafGridView::IntersectionIterator
+        >(
+          &this->leafGridView().indexSet(),
+          it->firstMultiDomainIntersectionIterator()
+          );
     else
-      return LeafIntersectionIteratorWrapper<const GridImp>(*this,it->secondMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LeafGridView::IndexSet,
+        typename MDGrid::LeafGridView::IntersectionIterator
+        >(
+          &this->leafGridView().indexSet(),
+          it->secondMultiDomainIntersectionIterator()
+          );
   }
 
   typename Traits::LevelIntersectionIterator subDomainIntersectionIterator(const typename MDGrid::LevelSubDomainInterfaceIterator it) const {
     assert(_subDomain == it->subDomain1() || _subDomain == it->subDomain2());
     if (_subDomain == it->subDomain1())
-      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it->firstCell()->level(),it->firstMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LevelGridView::IndexSet,
+        typename MDGrid::LevelGridView::IntersectionIterator
+        >(
+          &this->levelGridView(it->firstMultiDomainIntersectionIterator()->inside().level()).indexSet(),
+          it->firstMultiDomainIntersectionIterator()
+          );
     else
-      return LevelIntersectionIteratorWrapper<const GridImp>(*this,it->secondCell()->level(),it->secondMultiDomainIntersectionIterator());
+      return IntersectionIteratorWrapper<
+        const GridImp,
+        typename GridImp::LevelGridView::IndexSet,
+        typename MDGrid::LevelGridView::IntersectionIterator
+        >(
+          &this->levelGridView(it->secondMultiDomainIntersectionIterator()->inside().level()).indexSet(),
+          it->secondMultiDomainIntersectionIterator()
+          );
   }
 
   template<typename Intersection>
@@ -669,7 +792,7 @@ private:
     std::size_t size(const Entity& e) const
     {
       if (_grid.containsHostEntity(e))
-        return _impl.size(*_grid.subDomainEntityPointer(*_grid._grid.wrapHostEntity(e)));
+        return _impl.size(_grid.subDomainEntity(_grid._grid.wrapHostEntity(e)));
       else
         return 0;
     }
@@ -678,14 +801,14 @@ private:
     void gather(MessageBufferImp& buf, const Entity& e) const
     {
       if (_grid.containsHostEntity(e))
-        _impl.gather(buf,*_grid.subDomainEntityPointer(*_grid._grid.wrapHostEntity(e)));
+        _impl.gather(buf,_grid.subDomainEntity(_grid._grid.wrapHostEntity(e)));
     }
 
     template<typename MessageBufferImp, typename Entity>
     void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
     {
       if (_grid.containsHostEntity(e))
-        _impl.scatter(buf,*_grid.subDomainEntityPointer(*_grid._grid.wrapHostEntity(e)),n);
+        _impl.scatter(buf,_grid.subDomainEntity(_grid._grid.wrapHostEntity(e)),n);
     }
 
     DataHandleWrapper(Impl& impl, const SubDomainGrid<MDGrid>& grid)

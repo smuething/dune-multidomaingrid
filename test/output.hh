@@ -20,34 +20,32 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
 
     Dune::MultiDomainMCMGMapper<GridView,AllLayout> mapper(gv);
 
-    typedef typename GridView::template Codim<0>::Iterator Iterator;
-    typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> hcid(gv.indexSet().size(0),0);
     std::vector<int> sdc0(gv.indexSet().size(0),0);
 
     std::vector<int> sdc1(gv.indexSet().size(0),0);
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::MDGridTraits::template Codim<0>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
+    for (const auto & cell : elements(gv)) {
+      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(cell);
+      const typename GridView::Grid::MDGridTraits::template Codim<0>::SubDomainSet& sds = gv.indexSet().subDomains(cell);
       hcid[idx] = idx;
-      sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
-      sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
+      sdc0[idx] = sds.contains(0) ? gv.indexSet().index(0,cell) : -1;
+      sdc1[idx] = sds.contains(1) ? gv.indexSet().index(1,cell) : -1;
       typename GridView::IndexSet::IndexType tmp;
-      assert((sdc0[idx] > -1) == mapper.contains(0,*it,tmp));
-      assert((sdc1[idx] > -1) == mapper.contains(1,*it,tmp));
+      assert((sdc0[idx] > -1) == mapper.contains(0,cell,tmp));
+      assert((sdc1[idx] > -1) == mapper.contains(1,cell,tmp));
     }
     std::vector<int> hvid(gv.indexSet().size(2),0);
     std::vector<int> sdv0(gv.indexSet().size(2),0);
     std::vector<int> sdv1(gv.indexSet().size(2),0);
-    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
-      const typename GridView::Grid::MDGridTraits::template Codim<2>::SubDomainSet& sds = gv.indexSet().subDomains(*it);
+    for (const auto& vertex : vertices(gv)) {
+      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(vertex);
+      const typename GridView::Grid::MDGridTraits::template Codim<2>::SubDomainSet& sds = gv.indexSet().subDomains(vertex);
       hvid[idx] = idx;
-      sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,*it) : -1;
-      sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,*it) : -1;
+      sdv0[idx] = sds.contains(0) ? gv.indexSet().index(0,vertex) : -1;
+      sdv1[idx] = sds.contains(1) ? gv.indexSet().index(1,vertex) : -1;
       typename GridView::IndexSet::IndexType tmp;
-      assert((sdv0[idx] > -1) == mapper.contains(0,*it,tmp));
-      assert((sdv1[idx] > -1) == mapper.contains(1,*it,tmp));
+      assert((sdv0[idx] > -1) == mapper.contains(0,vertex,tmp));
+      assert((sdv1[idx] > -1) == mapper.contains(1,vertex,tmp));
     }
 
     std::vector<int> borderCells(gv.indexSet().size(0),0);
@@ -55,8 +53,8 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
 
     for(; iit != iend; ++iit) {
       gv.grid().subDomain(0).subDomainIntersectionIterator(iit);
-      borderCells[gv.indexSet().index(*iit->firstCell())] = 1;
-      borderCells[gv.indexSet().index(*iit->secondCell())] = 2;
+      borderCells[gv.indexSet().index(iit->firstCell())] = 1;
+      borderCells[gv.indexSet().index(iit->secondCell())] = 2;
     }
 
     Dune::VTKWriter<GridView> vtkWriter(gv);
@@ -72,16 +70,14 @@ void vtkOut(GridView gv,std::string filename, InterfaceIterator iit, InterfaceIt
 
 template<typename GridView>
 void vtkOut2(GridView gv,std::string filename) {
-    typedef typename GridView::template Codim<0>::Iterator Iterator;
-    typedef typename GridView::template Codim<2>::Iterator VIterator;
     std::vector<int> cid(gv.indexSet().size(0),0);
-    for (Iterator it = gv.template begin<0>(); it != gv.template end<0>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
+    for (const auto& cell : elements(gv)) {
+      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(cell);
       cid[idx] = idx;
     }
     std::vector<int> vid(gv.indexSet().size(2),0);
-    for (VIterator it = gv.template begin<2>(); it != gv.template end<2>(); ++it) {
-      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(*it);
+    for (const auto& vertex : vertices(gv)) {
+      typename GridView::IndexSet::IndexType idx = gv.indexSet().index(vertex);
       vid[idx] = idx;
     }
     Dune::VTKWriter<GridView> vtkWriter(gv);

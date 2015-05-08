@@ -3,47 +3,53 @@
 #define ALUGRID_SIMPLEX
 
 #include <dune/common/parallel/mpihelper.hh>
-#include <dune/grid/io/file/dgfparser/gridptr.hh>
+#include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 
-#if HAVE_DUNE_ALUGRID
-#include <dune/alugrid/dgf.hh>
-#include <dune/alugrid/grid.hh>
+#if HAVE_UG
+#include <dune/grid/uggrid.hh>
 #endif
 
 int main(int argc, char** argv) {
-#if HAVE_DUNE_ALUGRID
+#if HAVE_UG
   try {
     Dune::MPIHelper::instance(argc,argv);
-    typedef Dune::ALUGrid<2,2,Dune::simplex,Dune::nonconforming> AdaptableGridType;
-    Dune::GridPtr<AdaptableGridType> gridPtr("../../dune-grid-howto/grids/unitcube2.dgf");
-    AdaptableGridType& wgrid = *gridPtr;
-    typedef Dune::MultiDomainGrid<AdaptableGridType,Dune::mdgrid::FewSubDomainsTraits<AdaptableGridType::dimension,4> > Grid;
+    typedef Dune::UGGrid<2> AdaptableGrid;
+    Dune::FieldVector<double,2> lower_left(0.0);
+    Dune::FieldVector<double,2> upper_right(1.0);
+    std::array<unsigned int,2> N = {{16,16}};
+    std::shared_ptr<AdaptableGrid> gridPtr = Dune::StructuredGridFactory<AdaptableGrid>::createCubeGrid(
+      lower_left,
+      upper_right,
+      N
+      );
+    AdaptableGrid& wgrid = *gridPtr;
+    typedef Dune::MultiDomainGrid<
+      AdaptableGrid,
+      Dune::mdgrid::FewSubDomainsTraits<
+        AdaptableGrid::dimension,
+        4
+        >
+      > Grid;
     Grid grid(wgrid);
-    grid.globalRefine(5);
     typedef Grid::LeafGridView GridView;
     GridView gv = grid.leafGridView();
-    typedef GridView::Codim<0>::Iterator Iterator;
-    typedef GridView::Codim<2>::Iterator VIterator;
-    typedef GridView::Codim<0>::Entity Entity;
-    typedef GridView::Codim<0>::Geometry Geometry;
+
     grid.startSubDomainMarking();
-    for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
-      const Entity& e = *it;
-      //IndexSet::SubDomainSet& sds = is.subDomainSet(e);
-      Dune::FieldVector<AdaptableGridType::ctype,2> c = e.geometry().global(
-        Dune::ReferenceElements<AdaptableGridType::ctype,2>::general(e.type()).position(0,0));
+    for (const auto& cell : elements(gv)) {
+      Dune::FieldVector<AdaptableGrid::ctype,2> c = cell.geometry().global(
+        Dune::ReferenceElements<AdaptableGrid::ctype,2>::general(cell.type()).position(0,0));
       double x = c[0];
       double y = c[1];
       if (x > 0.2) {
         if (y > 0.3 && y < 0.7) {
           if (x < 0.8)
-            grid.addToSubDomain(1,e);
+            grid.addToSubDomain(1,cell);
           else // if (x > 0.6)
-            grid.addToSubDomain(0,e);
+            grid.addToSubDomain(0,cell);
         } else {
-            grid.addToSubDomain(0,e);
+            grid.addToSubDomain(0,cell);
         }
       }
     }
@@ -59,15 +65,14 @@ int main(int argc, char** argv) {
 
     printStatus(grid,"adaptation",counter++);
 
-    for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
-      const Entity& e = *it;
-      Dune::FieldVector<AdaptableGridType::ctype,2> c = e.geometry().global(
-        Dune::ReferenceElements<AdaptableGridType::ctype,2>::general(e.type()).position(0,0));
+    for (const auto& cell : elements(gv)) {
+      Dune::FieldVector<AdaptableGrid::ctype,2> c = cell.geometry().global(
+        Dune::ReferenceElements<AdaptableGrid::ctype,2>::general(cell.type()).position(0,0));
       double y = c[1];
       if (y > 0.5) {
-        grid.mark(1,e);
+        grid.mark(1,cell);
       } else {
-        grid.mark(-1,e);
+        grid.mark(-1,cell);
       }
     }
     grid.preAdapt();
@@ -76,15 +81,14 @@ int main(int argc, char** argv) {
 
     printStatus(grid,"adaptation",counter++);
 
-    for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it) {
-      const Entity& e = *it;
-      Dune::FieldVector<AdaptableGridType::ctype,2> c = e.geometry().global(
-        Dune::ReferenceElements<AdaptableGridType::ctype,2>::general(e.type()).position(0,0));
+    for (const auto& cell : elements(gv)) {
+      Dune::FieldVector<AdaptableGrid::ctype,2> c = cell.geometry().global(
+        Dune::ReferenceElements<AdaptableGrid::ctype,2>::general(cell.type()).position(0,0));
       double y = c[1];
       if (y > 0.5) {
-        grid.mark(-1,e);
+        grid.mark(-1,cell);
       } else {
-        grid.mark(1,e);
+        grid.mark(1,cell);
       }
     }
     grid.preAdapt();
@@ -93,10 +97,20 @@ int main(int argc, char** argv) {
 
     printStatus(grid,"adaptation",counter++);
 
-  } catch (Dune::Exception& e) {
-    std::cout << e << std::endl;
+    return 0;
+
+  } catch (Dune::Exception &e){
+    std::cerr << "Dune reported error: " << e << std::endl;
+    return 1;
   }
-  return 0;
+  catch (std::exception &e){
+    std::cerr << "std reported error: " << e.what() << std::endl;
+    return 2;
+  }
+  catch (...){
+    std::cerr << "Unknown exception thrown!" << std::endl;
+    return 3;
+  }
 #else
   std::cerr << "You need dune-ALUGrid to run this test." << std::endl;
   return 77;

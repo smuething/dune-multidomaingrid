@@ -9,18 +9,11 @@ namespace mdgrid {
 
 namespace subdomain {
 
-template<typename, PartitionIteratorType>
-class LevelGridView;
-
-template<typename, PartitionIteratorType>
-class LeafGridView;
-
-
-template<typename GridImp,
-	 typename WrapperImp,
-         typename IndexSet,
-	 typename MultiDomainIntersectionIteratorType,
-	 typename IntersectionType>
+template<
+  typename GridImp,
+  typename IndexSet,
+  typename MultiDomainIntersectionIterator
+  >
 class IntersectionIteratorWrapper {
 
   template<class, class, class>
@@ -29,147 +22,49 @@ class IntersectionIteratorWrapper {
   template<class, class>
   friend class Dune::Intersection;
 
-  typedef MultiDomainIntersectionIteratorType MultiDomainIntersectionIterator;
-  typedef IntersectionType Intersection;
+  using MultiDomainIntersection = typename MultiDomainIntersectionIterator::Intersection;
+  using IntersectionWrapper     = Dune::mdgrid::subdomain::IntersectionWrapper<
+    GridImp,
+    IndexSet,
+    MultiDomainIntersection
+    >;
 
-  typedef typename GridImp::Traits::template Codim<0>::EntityPointer EntityPointer;
-  typedef typename GridImp::Traits::template Codim<0>::Entity Entity;
-  typedef typename GridImp::Traits::template Codim<1>::Geometry Geometry;
-  typedef typename GridImp::Traits::template Codim<1>::LocalGeometry LocalGeometry;
+public:
 
-  typedef typename GridImp::ctype ctype;
-  static const int dimension = GridImp::dimension;
-  static const int dimensionworld = GridImp::dimensionworld;
+  using Intersection            = Dune::Intersection<GridImp,IntersectionWrapper>;
 
-  typedef FieldVector<ctype,dimensionworld> GlobalCoords;
-  typedef FieldVector<ctype,dimension - 1> LocalCoords;
-
-protected:
-
-  IntersectionIteratorWrapper(const IndexSet& indexSet, const MultiDomainIntersectionIterator& multiDomainIterator) :
-    _multiDomainIterator(multiDomainIterator),
-    _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(indexSet,NULL))
+  IntersectionIteratorWrapper()
+    : _indexSet(nullptr)
   {}
 
-  IntersectionIteratorWrapper(const IntersectionIteratorWrapper& rhs)
-    : _multiDomainIterator(rhs._multiDomainIterator)
-    , _intersection(typename GridImp::template ReturnImplementationType<IntersectionType>::ImplementationType(GridImp::getRealImplementation(rhs._intersection)))
-  {
-    // make sure we do not point at data from rhs
-    GridImp::getRealImplementation(_intersection).clear();
-  }
-
-  const IntersectionIteratorWrapper& operator=(const IntersectionIteratorWrapper& rhs) {
-    assert(GridImp::getRealImplementation(_intersection)._indexSet == GridImp::getRealImplementation(rhs._intersection)._indexSet);
-    _multiDomainIterator = rhs._multiDomainIterator;
-    GridImp::getRealImplementation(_intersection).reset(*_multiDomainIterator);
-    return *this;
-  }
-
-private:
+  IntersectionIteratorWrapper(const IndexSet* indexSet, const MultiDomainIntersectionIterator& multiDomainIterator)
+    : _indexSet(indexSet)
+    , _multiDomainIterator(multiDomainIterator)
+  {}
 
   const typename GridImp::MultiDomainGrid::template ReturnImplementationType<MultiDomainIntersectionIterator>::ImplementationType::HostIntersectionIterator& hostIntersectionIterator() const {
     return GridImp::MultiDomainGrid::getRealImplementation(_multiDomainIterator).hostIntersectionIterator();
   }
 
-  bool equals(const WrapperImp& rhs) const {
-    return _multiDomainIterator == rhs._multiDomainIterator;
+  bool equals(const IntersectionIteratorWrapper& rhs) const {
+    return _indexSet == rhs._indexSet && _multiDomainIterator == rhs._multiDomainIterator;
   }
 
   void increment() {
-    GridImp::getRealImplementation(_intersection).clear();
     ++_multiDomainIterator;
   }
 
-  const Intersection& dereference() const {
-    if (!GridImp::getRealImplementation(_intersection).isSet()) {
-      GridImp::getRealImplementation(_intersection).reset(*_multiDomainIterator);
-    }
-    return _intersection;
+  Intersection dereference() const {
+    return {IntersectionWrapper(_indexSet,*_multiDomainIterator)};
   }
 
 private:
 
+  const IndexSet* _indexSet;
   MultiDomainIntersectionIterator _multiDomainIterator;
-  mutable IntersectionType _intersection;
 
 };
 
-template<typename GridImp>
-class LeafIntersectionIteratorWrapper :
-    public IntersectionIteratorWrapper<GridImp,
-				       LeafIntersectionIteratorWrapper<GridImp>,
-                                       typename GridImp::Traits::LeafIndexSet,
-				       typename GridImp::MultiDomainGrid::Traits::LeafIntersectionIterator,
-				       typename GridImp::Traits::LeafIntersection>
-{
-
-  template<typename, typename, typename, typename, typename>
-  friend class IntersectionIteratorWrapper;
-
-  template<int, int, typename>
-  friend class EntityWrapper;
-
-  template<typename>
-  friend class SubDomainGrid;
-
-  template<typename, PartitionIteratorType>
-  friend class LeafGridView;
-
-
-  typedef typename GridImp::MultiDomainGrid::Traits::LeafIntersectionIterator MultiDomainIntersectionIterator;
-  typedef typename GridImp::Traits::LeafIntersection Intersection;
-
-  typedef IntersectionIteratorWrapper<GridImp,
-				      LeafIntersectionIteratorWrapper<GridImp>,
-                                      typename GridImp::Traits::LeafIndexSet,
-				      MultiDomainIntersectionIterator,
-				      Intersection> Base;
-
-  LeafIntersectionIteratorWrapper(const GridImp& grid, const MultiDomainIntersectionIterator& multiDomainIterator) :
-    Base(grid.leafIndexSet(),multiDomainIterator)
-  {}
-
-};
-
-
-template<typename GridImp>
-class LevelIntersectionIteratorWrapper :
-    public IntersectionIteratorWrapper<GridImp,
-				       LevelIntersectionIteratorWrapper<GridImp>,
-                                       typename GridImp::Traits::LevelIndexSet,
-				       typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator,
-				       typename GridImp::Traits::LevelIntersection>
-
-{
-
-  template<typename, typename, typename, typename, typename>
-  friend class IntersectionIteratorWrapper;
-
-  template<int, int, typename>
-  friend class EntityWrapper;
-
-  template<typename>
-  friend class SubDomainGrid;
-
-  template<typename, PartitionIteratorType>
-  friend class LevelGridView;
-
-
-  typedef typename GridImp::MultiDomainGrid::Traits::LevelIntersectionIterator MultiDomainIntersectionIterator;
-  typedef typename GridImp::Traits::LevelIntersection Intersection;
-
-  typedef IntersectionIteratorWrapper<GridImp,
-				      LevelIntersectionIteratorWrapper<GridImp>,
-                                      typename GridImp::Traits::LevelIndexSet,
-				      MultiDomainIntersectionIterator,
-				      Intersection> Base;
-
-  LevelIntersectionIteratorWrapper(const GridImp& grid, int level, const MultiDomainIntersectionIterator& multiDomainIterator) :
-    Base(grid.levelIndexSet(level),multiDomainIterator)
-  {}
-
-};
 
 } // namespace subdomain
 

@@ -46,8 +46,8 @@ class AllInterfacesController
   template<typename Iterator>
   bool calculateInterfacingSubDomains(Iterator& it)
   {
-    const typename Iterator::HostIntersectionIterator::Intersection::EntityPointer outside = it._hostIntersectionIterator->outside();
-    const SubDomainSet& subDomains2 = it._gridView.indexSet().subDomainsForHostEntity(*outside);
+    const typename Iterator::HostIntersectionIterator::Intersection::Entity outside = it._hostIntersectionIterator->outside();
+    const SubDomainSet& subDomains2 = it._gridView.indexSet().subDomainsForHostEntity(outside);
     _interfacingSubDomains1.difference(*_subDomains1,subDomains2);
     _interfacingSubDomains2.difference(subDomains2,*_subDomains1);
     _subDomain1Iterator = _interfacingSubDomains1.begin();

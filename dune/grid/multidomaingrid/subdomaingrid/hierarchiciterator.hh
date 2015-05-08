@@ -1,48 +1,77 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HIERARCHICITERATOR_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HIERARCHICITERATOR_HH
 
-#include <dune/grid/multidomaingrid/entity.hh>
-
 namespace Dune {
 
 namespace mdgrid {
 
 namespace subdomain {
 
+template<int,int,typename>
+class EntityWrapper;
+
+template<int,typename>
+class EntityPointerWrapper;
+
 template<typename GridImp>
-class HierarchicIteratorWrapper :
-    public EntityPointerWrapper<0,GridImp>
+class HierarchicIteratorWrapper
 {
 
   template< int cd, class Grid, class IteratorImp >
-  friend class ::Dune::EntityIterator;
+  friend class Dune::EntityIterator;
 
   template<int, int, typename>
-  friend class MakeableEntityWrapper;
+  friend class EntityWrapper;
 
   template<int, int, typename>
   friend class EntityWrapper;
 
   template<typename, typename>
-  friend class ::Dune::EntityPointer;
+  friend class Dune::EntityPointer;
 
-  typedef typename GridImp::MDGridType::Traits::template Codim<0>::Entity::HierarchicIterator MultiDomainHierarchicIterator;
-  typedef typename GridImp::Traits::LevelIndexSet IndexSet;
+  using MultiDomainIterator = typename GridImp::MultiDomainGrid::template Codim<0>::Entity::HierarchicIterator;
 
-  explicit HierarchicIteratorWrapper(const GridImp& grid, const MultiDomainHierarchicIterator& multiDomainIterator, const MultiDomainHierarchicIterator& multiDomainEnd) :
-    EntityPointerWrapper<0,GridImp>(grid,multiDomainIterator),
-    _grid(grid),
-    _multiDomainIterator(multiDomainIterator),
-    _multiDomainEnd(multiDomainEnd)
+public:
+
+  static const int codimension = 0;
+
+  using EntityWrapper        = Dune::mdgrid::subdomain::EntityWrapper<0,GridImp::dimension,GridImp>;
+  using Entity               = typename GridImp::template Codim<0>::Entity;
+  using EntityPointerWrapper = Dune::mdgrid::subdomain::EntityPointerWrapper<0,GridImp>;
+  using EntityPointer        = typename GridImp::template Codim<0>::EntityPointer;
+
+
+  HierarchicIteratorWrapper()
+    : _grid(nullptr)
+  {}
+
+  HierarchicIteratorWrapper(
+    const GridImp* grid,
+    const MultiDomainIterator& multiDomainIterator,
+    const MultiDomainIterator& multiDomainEnd
+    )
+    : _grid(grid)
+    , _multiDomainIterator(multiDomainIterator)
+    , _multiDomainEnd(multiDomainEnd)
   {
     incrementToNextValidPosition();
   }
 
+  bool equals(const HierarchicIteratorWrapper& r) const
+  {
+    return _grid == r._grid && _multiDomainIterator == r._multiDomainIterator;
+  }
+
+  Entity dereference() const
+  {
+    return {EntityWrapper(_grid,*_multiDomainIterator)};
+  }
+
   void incrementToNextValidPosition() {
-    while(_multiDomainIterator != _multiDomainEnd && !_grid.containsMultiDomainEntity(*_multiDomainIterator)) {
-      ++_multiDomainIterator;
-    }
-    this->_entityWrapper.reset(_multiDomainIterator);
+    while(_multiDomainIterator != _multiDomainEnd && !_grid->containsMultiDomainEntity(*_multiDomainIterator))
+      {
+        ++_multiDomainIterator;
+      }
   }
 
   void increment() {
@@ -50,17 +79,32 @@ class HierarchicIteratorWrapper :
     incrementToNextValidPosition();
   }
 
-  HierarchicIteratorWrapper& operator=(const HierarchicIteratorWrapper& rhs) {
-    assert(_grid == rhs._grid);
-    _multiDomainIterator = rhs._multiDomainIterator;
-    _multiDomainEnd = rhs._multiDomainEnd;
-    static_cast<EntityPointerWrapper<0,GridImp>&>(*this) = static_cast<const EntityPointerWrapper<0,GridImp>&>(rhs);
-    return *this;
+public:
+
+  // TODO: Remove after 2.4
+  operator EntityPointerWrapper() const
+  {
+    return EntityPointerWrapper(dereference());
   }
 
-  const GridImp& _grid;
-  MultiDomainHierarchicIterator _multiDomainIterator;
-  MultiDomainHierarchicIterator _multiDomainEnd;
+  // TODO: Remove after 2.4
+  operator EntityPointer() const
+  {
+    return {dereference()};
+  }
+
+  // TODO: Remove after 2.4
+  bool equals(const EntityPointerWrapper& r) const
+  {
+    return _grid == r._grid && _multiDomainIterator == r._multiDomainEntityPointer;
+  }
+
+
+private:
+
+  const GridImp* _grid;
+  MultiDomainIterator _multiDomainIterator;
+  MultiDomainIterator _multiDomainEnd;
 
 };
 

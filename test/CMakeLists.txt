@@ -105,14 +105,9 @@ endforeach()
 
 add_mdgrid_test(NAME iterateallinterfaces COMMAND iterateallinterfaces 3)
 add_mdgrid_test(NAME multidomain-leveliterator-bug)
-add_mdgrid_test(NAME profilerepartitioning)
-set_target_properties(profilerepartitioning
-  PROPERTIES COMPILE_FLAGS "-DGRIDDIM=2 -DYASPGRID")
 add_mdgrid_test(NAME testadaptation)
 add_mdgrid_test(NAME testintersectionconversion)
 add_mdgrid_test(NAME testintersectiongeometrytypes)
 add_mdgrid_test(NAME testlargedomainnumbers)
-set_target_properties(testlargedomainnumbers
-  PROPERTIES COMPILE_FLAGS "-DGRIDDIM=2 -DYASPGRID")
 add_mdgrid_test(NAME testparallel COMMAND testparallel "5" "1")
 add_mdgrid_test(NAME testpartitioning)

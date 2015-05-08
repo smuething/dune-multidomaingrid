@@ -82,48 +82,46 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
 
   grid.startSubDomainMarking();
 
-  for (auto it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
+  for (const auto& cell : elements(mdgv))
     {
-      if (it->partitionType() != Dune::InteriorEntity)
+      if (cell.partitionType() != Dune::InteriorEntity)
         continue;
       SubDomainIndex subdomain = 0;
-      if (it->geometry().center()[0] > 0.5)
+      if (cell.geometry().center()[0] > 0.5)
         subdomain += 1;
-      if (it->geometry().center()[1] > 0.5)
+      if (cell.geometry().center()[1] > 0.5)
         subdomain += 2;
-      grid.addToSubDomain(subdomain,*it);
-      if (it->geometry().center()[1] > 0.5)
-        grid.addToSubDomain(4,*it);
-      if (it->geometry().center()[0] > 0.5)
-        grid.addToSubDomain(5,*it);
-      if (it->geometry().center()[0] > 0.5 && it->geometry().center()[1] > 0.5)
-        grid.addToSubDomain(6,*it);
-      if (it->geometry().center()[0] > 0.5 && it->geometry().center()[1] < 0.5)
-        grid.addToSubDomain(7,*it);
+      grid.addToSubDomain(subdomain,cell);
+      if (cell.geometry().center()[1] > 0.5)
+        grid.addToSubDomain(4,cell);
+      if (cell.geometry().center()[0] > 0.5)
+        grid.addToSubDomain(5,cell);
+      if (cell.geometry().center()[0] > 0.5 && cell.geometry().center()[1] > 0.5)
+        grid.addToSubDomain(6,cell);
+      if (cell.geometry().center()[0] > 0.5 && cell.geometry().center()[1] < 0.5)
+        grid.addToSubDomain(7,cell);
     }
 
   grid.preUpdateSubDomains();
   grid.updateSubDomains();
   grid.postUpdateSubDomains();
 
-  for (auto it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
+  for (const auto& cell : elements(mdgv))
     {
-      std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(*it) << "  " << it->geometry().center()
+      std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(cell) << "  " << cell.geometry().center()
                 << " subdomains:";
-      auto end = mdgv.indexSet().subDomains(*it).end();
-      for (auto sdit = mdgv.indexSet().subDomains(*it).begin(); sdit != end; ++sdit)
-        std::cout << " " << *sdit;
+      for (auto subdomain : mdgv.indexSet().subDomains(cell))
+        std::cout << " " << subdomain;
       std::cout << std::endl;
     }
 
   std::cout << std::endl;
-  for (auto it = mdgv.template begin<dim>(); it != mdgv.template end<dim>(); ++it)
+  for (const auto& vertex : vertices(mdgv))
     {
-      std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(*it) << "  " << it->geometry().center()
+      std::cout << mpihelper.rank() << ": " << std::setw(2) << mdgv.indexSet().index(vertex) << "  " << vertex.geometry().center()
                 << " subdomains:";
-      auto end = mdgv.indexSet().subDomains(*it).end();
-      for (auto sdit = mdgv.indexSet().subDomains(*it).begin(); sdit != end; ++sdit)
-        std::cout << " " << *sdit;
+      for (auto subdomain : mdgv.indexSet().subDomains(vertex))
+        std::cout << " " << subdomain;
       std::cout << std::endl;
     }
 
@@ -151,12 +149,10 @@ void testGrid(HostGrid& hostgrid, std::string prefix, Dune::MPIHelper& mpihelper
       sdgrid.communicate(nodedatahandle,Dune::InteriorBorder_All_Interface,Dune::ForwardCommunication);
 
       bool dummy = false;
-      typedef typename SDGV::template Codim<0>::Iterator Iterator;
-      for (Iterator it = sdgv.template begin<0>(); it != sdgv.template end<0>(); ++it)
+      for (const auto& cell : elements(sdgv))
         {
-          typedef typename SDGV::IntersectionIterator IIterator;
-          for (IIterator iit = sdgv.ibegin(*it); iit != sdgv.iend(*it); ++iit)
-            dummy |= iit->boundary() || iit->neighbor();
+          for (const auto& intersection : intersections(sdgv,cell))
+            dummy |= intersection.boundary() || intersection.neighbor();
         }
 
       std::stringstream sstr;
@@ -179,12 +175,21 @@ int main(int argc, char** argv)
     const int dim = 2;
     Dune::MPIHelper& mpihelper = Dune::MPIHelper::instance(argc,argv);
 
+    std::size_t N = 32;
+    std::size_t overlap = 1;
+
     if (argc < 2)
-    {
-      std::cerr << "Usage: " << argv[0] <<
-        " <number of elements per dim> <overlap>" << std::endl;
-      exit(1);
-    }
+      {
+        std::cerr << "Usage: " << argv[0] <<
+          " <number of elements per dim> <overlap>" << std::endl;
+        std::cerr << std::endl
+                  << "defaulting to " << N << " " << overlap << std::endl;
+      }
+    else
+      {
+        N = atoi(argv[1]);
+        overlap = atoi(argv[2]);
+      }
 
     /* helper code for attaching debugger
     if (mpihelper.rank() == 0)
@@ -199,10 +204,10 @@ int main(int argc, char** argv)
     {
       const Dune::FieldVector<double,dim> h(1.0);
       Dune::array<int,dim> s;
-      std::fill(s.begin(), s.end(), atoi(argv[1]));
+      std::fill(s.begin(), s.end(), N);
       std::bitset<dim> p(false);
       typedef Dune::YaspGrid<dim> HostGrid;
-      HostGrid hostgrid(h,s,p,atoi(argv[2]));
+      HostGrid hostgrid(h,s,p,overlap);
 
       testGrid(hostgrid,"YaspGrid_2",mpihelper);
     }

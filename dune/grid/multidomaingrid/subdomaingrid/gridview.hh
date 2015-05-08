@@ -10,22 +10,19 @@ namespace mdgrid {
 
 namespace subdomain {
 
-template<typename>
-class LevelIntersectionIteratorWrapper;
-
-template<typename>
-class LeafIntersectionIteratorWrapper;
+template<typename,typename,typename>
+class IntersectionIteratorWrapper;
 
 template<typename GridImp, PartitionIteratorType pitype>
 class LevelGridView
   : public DefaultLevelGridView<GridImp,pitype>
 {
 
-  typedef DefaultLevelGridView<GridImp,pitype> BaseT;
+  using BaseT = DefaultLevelGridView<GridImp,pitype>;
 
 public:
 
-  typedef typename BaseT::IntersectionIterator IntersectionIterator;
+  using typename BaseT::IntersectionIterator;
 
   LevelGridView(const GridImp& grid, int level)
     : BaseT(grid,level)
@@ -33,12 +30,26 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelGridView(entity.level()).ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return IntersectionIteratorWrapper<
+      const GridImp,
+      typename BaseT::IndexSet,
+      typename GridImp::MultiDomainGrid::LevelGridView::IntersectionIterator
+      >(
+        &this->indexSet(),
+        this->grid()._grid.levelGridView(entity.level()).ibegin(GridImp::getRealImplementation(entity).multiDomainEntity())
+        );
   }
 
   IntersectionIterator iend(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LevelIntersectionIteratorWrapper<const GridImp>(this->grid(),entity.level(),this->grid()._grid.levelGridView(entity.level()).iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return IntersectionIteratorWrapper<
+      const GridImp,
+      typename BaseT::IndexSet,
+      typename GridImp::MultiDomainGrid::LevelGridView::IntersectionIterator
+      >(
+        &this->indexSet(),
+        this->grid()._grid.levelGridView(entity.level()).iend(GridImp::getRealImplementation(entity).multiDomainEntity())
+        );
   }
 
 };
@@ -47,7 +58,7 @@ template<typename GridImp, PartitionIteratorType pitype>
 struct LevelGridViewTraits
   : public DefaultLevelGridViewTraits<GridImp,pitype>
 {
-  typedef LevelGridView<GridImp,pitype> GridViewImp;
+  using GridViewImp = LevelGridView<GridImp,pitype>;
 };
 
 
@@ -57,11 +68,11 @@ class LeafGridView
   : public DefaultLeafGridView<GridImp,pitype>
 {
 
-  typedef DefaultLeafGridView<GridImp,pitype> BaseT;
+  using BaseT = DefaultLeafGridView<GridImp,pitype>;
 
 public:
 
-  typedef typename BaseT::IntersectionIterator IntersectionIterator;
+  using typename BaseT::IntersectionIterator;
 
   LeafGridView(const GridImp& grid)
     : BaseT(grid)
@@ -69,12 +80,26 @@ public:
 
   IntersectionIterator ibegin(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.leafGridView().ibegin(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return IntersectionIteratorWrapper<
+      const GridImp,
+      typename BaseT::IndexSet,
+      typename GridImp::MultiDomainGrid::LeafGridView::IntersectionIterator
+      >(
+        &this->indexSet(),
+        this->grid()._grid.leafGridView().ibegin(GridImp::getRealImplementation(entity).multiDomainEntity())
+        );
   }
 
   IntersectionIterator iend(const typename BaseT::template Codim<0>::Entity& entity) const
   {
-    return LeafIntersectionIteratorWrapper<const GridImp>(this->grid(),this->grid()._grid.leafGridView().iend(*GridImp::getRealImplementation(entity).multiDomainEntityPointer()));
+    return IntersectionIteratorWrapper<
+      const GridImp,
+      typename BaseT::IndexSet,
+      typename GridImp::MultiDomainGrid::LeafGridView::IntersectionIterator
+      >(
+        &this->indexSet(),
+        this->grid()._grid.leafGridView().iend(GridImp::getRealImplementation(entity).multiDomainEntity())
+        );
   }
 
 };
@@ -83,7 +108,7 @@ template<typename GridImp, PartitionIteratorType pitype>
 struct LeafGridViewTraits
   : public DefaultLeafGridViewTraits<GridImp,pitype>
 {
-  typedef LeafGridView<GridImp,pitype> GridViewImp;
+  using GridViewImp = LeafGridView<GridImp,pitype>;
 };
 
 } // namespace subdomain

@@ -10,6 +10,8 @@
 #include <dune/grid/common/indexidset.hh>
 #include <dune/grid/multidomaingrid/utility.hh>
 
+#include <type_traits>
+
 namespace Dune {
 
 namespace mdgrid {
@@ -33,21 +35,18 @@ class IndexSetWrapper :
   template<typename MDGrid>
   friend class SubDomainGrid;
 
-  template<int, PartitionIteratorType, typename>
-  friend class LeafIteratorWrapper;
-
-  template<int, PartitionIteratorType, typename>
-  friend class LevelIteratorWrapper;
-
-  template<typename, typename, typename, typename>
+  template<typename, typename, typename>
   friend class IntersectionWrapper;
+
+  template<typename, typename, int, PartitionIteratorType, typename>
+  friend class IteratorWrapper;
 
   typedef IndexSetWrapper<GridImp,MDIndexSet> ThisType;
 
-  typedef typename remove_const<GridImp>::type::HostGridType HostGrid;
-  typedef typename remove_const<GridImp>::type::MDGridType MDGrid;
+  typedef typename std::remove_const<GridImp>::type::HostGridType HostGrid;
+  typedef typename std::remove_const<GridImp>::type::MDGridType MDGrid;
 
-  typedef typename remove_const<GridImp>::type::ctype ctype;
+  typedef typename std::remove_const<GridImp>::type::ctype ctype;
 
 public:
 
