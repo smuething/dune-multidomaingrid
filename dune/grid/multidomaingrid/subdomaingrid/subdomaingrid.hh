@@ -792,7 +792,7 @@ private:
     std::size_t size(const Entity& e) const
     {
       if (_grid.containsHostEntity(e))
-        return _impl.size(*_grid.subDomainEntityPointer(*_grid._grid.wrapHostEntity(e)));
+        return _impl.size(_grid.subDomainEntity(_grid._grid.wrapHostEntity(e)));
       else
         return 0;
     }
@@ -801,14 +801,14 @@ private:
     void gather(MessageBufferImp& buf, const Entity& e) const
     {
       if (_grid.containsHostEntity(e))
-        _impl.gather(buf,*_grid.subDomainEntityPointer(*_grid._grid.wrapHostEntity(e)));
+        _impl.gather(buf,_grid.subDomainEntity(_grid._grid.wrapHostEntity(e)));
     }
 
     template<typename MessageBufferImp, typename Entity>
     void scatter(MessageBufferImp& buf, const Entity& e, std::size_t n)
     {
       if (_grid.containsHostEntity(e))
-        _impl.scatter(buf,*_grid.subDomainEntityPointer(*_grid._grid.wrapHostEntity(e)),n);
+        _impl.scatter(buf,_grid.subDomainEntity(_grid._grid.wrapHostEntity(e)),n);
     }
 
     DataHandleWrapper(Impl& impl, const SubDomainGrid<MDGrid>& grid)
