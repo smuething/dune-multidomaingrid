@@ -8,57 +8,45 @@
 #include <dune/grid/multidomaingrid.hh>
 #include "output.hh"
 
+template<typename MultiDomainGridTraits>
+void run_test(MultiDomainGridTraits traits, int sdsize)
+{
+  typedef Dune::YaspGrid<2> GridType;
+  Dune::FieldVector<double,2> L(1.0);
+  std::array<int,2> n{{32,32}};
+  GridType wgrid(L,n);
+  typedef Dune::MultiDomainGrid<GridType,MultiDomainGridTraits> Grid;
+  Grid grid(wgrid,traits,false);
+  grid.globalRefine(2);
+  typedef typename Grid::LeafGridView GridView;
+  GridView gv = grid.leafGridView();
+  grid.startSubDomainMarking();
+  typename GridView::IndexSet::IndexType sd=0;
+  int c = 0;
+  for (const auto& cell : elements(gv)) {
+    if (c++ == sdsize) {
+      ++sd;
+      c = 0;
+    }
+    grid.addToSubDomain(sd,cell);
+  }
+  std::cout << "Number of subdomains: " << sd + 1 << std::endl;
+  grid.preUpdateSubDomains();
+  grid.updateSubDomains();
+  grid.postUpdateSubDomains();
+  vtkOut(gv,"largedomainnumbers_leafGridView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
+}
+
 
 int main(int argc, char** argv) {
   try {
     Dune::MPIHelper::instance(argc,argv);
-    typedef Dune::YaspGrid<2> GridType;
-    Dune::FieldVector<double,2> L(1.0);
-    std::array<int,2> n{{1,1}};
-    GridType wgrid(L,n);
-    typedef Dune::MultiDomainGrid<GridType,Dune::mdgrid::ArrayBasedTraits<GridType::dimension,1,65536> > Grid;
-    Grid grid(wgrid,false);
-    //typedef Dune::mdgrid::DynamicSubDomainCountTraits<GridType::dimension,1> MDGridTraits;
-    //typedef Dune::MultiDomainGrid<GridType,MDGridTraits> Grid;
-    //MDGridTraits md_grid_traits(65536);
-    //Grid grid(wgrid,md_grid_traits,false);
-    grid.globalRefine(8);
-    typedef Grid::LeafGridView GridView;
-    GridView gv = grid.leafGridView();
-    typedef GridView::Codim<0>::Iterator Iterator;
-    typedef GridView::Codim<2>::Iterator VIterator;
-    typedef GridView::Codim<0>::Entity Entity;
-    typedef GridView::Codim<0>::Geometry Geometry;
-    grid.startSubDomainMarking();
-    GridView::IndexSet::IndexType sd=0;
-    int c = 0;
-    const int sdsize = atoi(argv[1]);
-    for (Iterator it = gv.begin<0>(); it != gv.end<0>(); ++it, ++c) {
-     if (c == sdsize) {
-        ++sd;
-        c = 0;
-      }
-      const Entity& e = *it;
-      grid.addToSubDomain(sd,e);
-    }
-    std::cout << "Number of subdomains: " << sd + 1 << std::endl;
-    grid.preUpdateSubDomains();
-    grid.updateSubDomains();
-    grid.postUpdateSubDomains();
 
-    const Grid::SubDomainGrid& sd0 = grid.subDomain(0);
-    vtkOut(gv,"largedomainnumbers_leafGridView",grid.leafSubDomainInterfaceBegin(0,1),grid.leafSubDomainInterfaceEnd(0,1));
+    const int sdsize = argc > 1 ? atoi(argv[1]) : 10;
 
-    //vtkOut2(grid.subDomain(0).leafGridView(),"subdomain0");
-    //vtkOut2(grid.subDomain(1).leafGridView(),"subdomain1");
+    run_test(Dune::mdgrid::ArrayBasedTraits<2,1,65536>(),sdsize);
+    run_test(Dune::mdgrid::DynamicSubDomainCountTraits<2,1>(65536),sdsize);
 
-    /*for (int i = 0; i <= 2; ++i) {
-      std::cout << "codim " << i << ":";
-      for (int s = 0; s <= 2; ++s) {
-	std::cout << " " << is.size(i,s);
-      }
-      std::cout << std::endl;
-      }*/
   } catch (Dune::Exception& e) {
     std::cout << e << std::endl;
   }
