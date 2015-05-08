@@ -2,7 +2,7 @@
 
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/uggrid.hh>
-#include <dune/grid/io/file/gmshreader.hh>
+#include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/multidomaingrid.hh>
 #include <iostream>
 #include <cassert>
@@ -15,14 +15,13 @@ void run_test(HostGrid& hostgrid)
   MDGrid mdgrid(hostgrid,true);
 
   typedef typename MDGrid::LeafGridView MDGV;
-  typedef typename MDGV::template Codim<0>::Iterator Iterator;
 
   MDGV mdgv = mdgrid.leafGridView();
 
   mdgrid.startSubDomainMarking();
 
-  for(Iterator it = mdgv.template begin<0>(); it != mdgv.template end<0>(); ++it)
-      mdgrid.addToSubDomain(0,*it);
+  for(const auto& cell : elements(mdgv))
+      mdgrid.addToSubDomain(0,cell);
 
   mdgrid.preUpdateSubDomains();
   mdgrid.updateSubDomains();
@@ -32,30 +31,24 @@ void run_test(HostGrid& hostgrid)
   const SDGrid& sdgrid = mdgrid.subDomain(0);
   typename SDGrid::LeafGridView sdgv = sdgrid.leafGridView();
 
-  const typename SDGrid::LeafGridView::template Codim<0>::Iterator endit = sdgv.template end<0>();
-  for (typename SDGrid::LeafGridView::template Codim<0>::Iterator it = sdgv.template begin<0>();
-       it != endit;
-       ++it)
+  for (const auto& cell : elements(sdgv))
     {
-      it->geometry();
-      it->geometryInFather();
-      const typename MDGrid::LeafGridView::template Codim<0>::Entity& e = sdgrid.multiDomainEntity(*it);
-      e.geometry();
-      e.geometryInFather();
+      cell.geometry();
+      cell.geometryInFather();
+      const typename MDGrid::LeafGridView::template Codim<0>::Entity& mde = sdgrid.multiDomainEntity(cell);
+      mde.geometry();
+      mde.geometryInFather();
 
-      const typename SDGrid::LeafGridView::IntersectionIterator endiit = sdgv.iend(*it);
-      for (typename SDGrid::LeafGridView::IntersectionIterator iit = sdgv.ibegin(*it);
-           iit != endiit;
-           ++iit)
+      for (const auto& intersection : intersections(sdgv,cell))
         {
-          iit->geometry();
-          iit->geometryInInside();
-          if (iit->neighbor())
-            iit->geometryInOutside();
-          const typename MDGrid::LeafGridView::Intersection& is1 = sdgrid.multiDomainIntersection(*iit);
+          intersection.geometry();
+          intersection.geometryInInside();
+          if (intersection.neighbor())
+            intersection.geometryInOutside();
+          const typename MDGrid::LeafGridView::Intersection& is1 = sdgrid.multiDomainIntersection(intersection);
           is1.geometry();
           is1.geometryInInside();
-          if (iit->neighbor())
+          if (intersection.neighbor())
             is1.geometryInOutside();
         }
     }
@@ -65,6 +58,9 @@ void run_test(HostGrid& hostgrid)
 int main(int argc, char** argv)
 {
   try {
+
+    Dune::MPIHelper::instance(argc,argv);
+
     {
       Dune::FieldVector<double,2> L(1.0);
       Dune::array<int,2> s = {{2, 2}};
@@ -77,7 +73,16 @@ int main(int argc, char** argv)
 #if HAVE_UG
     {
       typedef Dune::UGGrid<2> HostGrid;
-      Dune::shared_ptr<HostGrid> gridptr(Dune::GmshReader<HostGrid>::read("simple.msh",true));
+      Dune::FieldVector<double,2> lower_left(0.0);
+      Dune::FieldVector<double,2> upper_right(1.0);
+      std::array<unsigned int,2> elements = {{8,8}};
+      Dune::shared_ptr<HostGrid> gridptr(
+        Dune::StructuredGridFactory<HostGrid>::createSimplexGrid(
+          lower_left,
+          upper_right,
+          elements
+          )
+        );
       run_test(*gridptr);
     }
 #endif
@@ -91,10 +96,10 @@ int main(int argc, char** argv)
   }
   catch (std::exception &e){
     std::cerr << "std reported error: " << e.what() << std::endl;
-    return 1;
+    return 2;
   }
   catch (...){
     std::cerr << "Unknown exception thrown!" << std::endl;
-    return 1;
+    return 3;
   }
 }
