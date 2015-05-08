@@ -29,7 +29,9 @@ set(EXTRA_DIST
   README.md
   README.GIT.md
   RELEASE_NOTES.md
-)
+  )
+
+dune_enable_all_packages(VERBOSE)
 
 add_subdirectory("doc")
 add_subdirectory("dune")
