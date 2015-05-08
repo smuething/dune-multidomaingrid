@@ -5,10 +5,10 @@
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/multidomaingrid.hh>
 
-#include <dune/grid/test/gridcheck.cc>
-#include <dune/grid/test/checkcommunicate.cc>
-#include <dune/grid/test/checkgeometryinfather.cc>
-#include <dune/grid/test/checkintersectionit.cc>
+#include <dune/grid/test/gridcheck.hh>
+#include <dune/grid/test/checkcommunicate.hh>
+#include <dune/grid/test/checkgeometryinfather.hh>
+#include <dune/grid/test/checkintersectionit.hh>
 
 int rank;
 
