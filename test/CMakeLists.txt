@@ -54,6 +54,55 @@ function(add_mdgrid_test)
     )
 endfunction()
 
+
+# grid checks
+#
+# build separate checks for each dimension, MultiDomainGrid / SubDomainGrid
+# and for configurations with and without checking of deprecated APIs
+#
+# All of these tests are expected to run without generating any warnings, so
+# they use -Werror to fail in that case.
+#
+foreach(dimsize IN ITEMS "1;64" "2;16" "3;4")
+  list(GET dimsize 0 dim)
+  list(GET dimsize 1 size)
+
+  foreach(gridtype IN ITEMS multidomaingrid subdomaingrid)
+
+    set(normaltest "test-wrapper-${dim}d-${gridtype}")
+    set(deprecatedtest "test-wrapper-${dim}d-${gridtype}-deprecated-api")
+
+    add_mdgrid_test(
+      NAME ${normaltest}
+      SOURCES test-wrapper.cc
+      COMPILE_DEFINITIONS
+      DISABLE_DEPRECATED_METHOD_CHECK=1
+      "CHECK_DIMENSION=${dim}"
+      "CHECK_GRIDSIZE=${size}"
+      "CHECK_$<UPPER_CASE:${gridtype}>"
+      COMPILE_OPTIONS
+      -Werror
+      -UNDEBUG # always compile with assertions enabled
+      )
+
+    add_mdgrid_test(
+      NAME ${deprecatedtest}
+      SOURCES test-wrapper.cc
+      COMPILE_DEFINITIONS
+      "CHECK_DIMENSION=${dim}"
+      "CHECK_GRIDSIZE=${size}"
+      "CHECK_$<UPPER_CASE:${gridtype}>"
+      COMPILE_OPTIONS
+      -Werror
+      -Wno-deprecated-declarations # suppress deprecation warnings (otherwise -Werror will cause failures)
+      -UNDEBUG                     # always compile with assertions enabled
+      )
+
+  endforeach()
+
+endforeach()
+
+
 add_mdgrid_test(NAME iterateallinterfaces COMMAND iterateallinterfaces 3)
 add_mdgrid_test(NAME multidomain-leveliterator-bug)
 add_mdgrid_test(NAME profilerepartitioning)
@@ -67,4 +116,3 @@ set_target_properties(testlargedomainnumbers
   PROPERTIES COMPILE_FLAGS "-DGRIDDIM=2 -DYASPGRID")
 add_mdgrid_test(NAME testparallel COMMAND testparallel "5" "1")
 add_mdgrid_test(NAME testpartitioning)
-add_mdgrid_test(NAME test-wrapper)
