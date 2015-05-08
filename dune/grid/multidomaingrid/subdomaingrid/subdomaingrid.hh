@@ -694,7 +694,7 @@ public:
         typename GridImp::LeafGridView::IndexSet,
         typename MDGrid::LeafGridView::IntersectionIterator
         >(
-          &this->leaGridView().indexSet(),
+          &this->leafGridView().indexSet(),
           it->secondMultiDomainIntersectionIterator()
           );
   }
