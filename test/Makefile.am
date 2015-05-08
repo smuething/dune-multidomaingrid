@@ -4,12 +4,35 @@ include $(top_srcdir)/am/global-rules
 
 EXTRA_DIST = CMakeLists.txt
 
-check_PROGRAMS = test-wrapper testpartitioning testlargedomainnumbers testadaptation profilerepartitioning iterateallinterfaces testparallel
+check_PROGRAMS = \
+  test-wrapper-multidomaingrid \
+  test-wrapper-subdomaingrid \
+  testpartitioning \
+  testlargedomainnumbers \
+  testadaptation \
+  profilerepartitioning \
+  iterateallinterfaces \
+  testparallel
 
-test_wrapper_SOURCES = test-wrapper.cc
-test_wrapper_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS)
-test_wrapper_LDFLAGS = $(ALL_PKG_LDFLAGS)
-test_wrapper_LIBS = $(ALL_PKG_LIBS)
+test_wrapper_multidomaingrid_SOURCES = test-wrapper.cc
+test_wrapper_multidomaingrid_CXXFLAGS = \
+  $(AM_CXXFLAGS) \
+  $(ALL_PKG_CPPFLAGS) \
+  -DCHECK_DIMENSION=2 \
+  -DCHECK_GRIDSIZE=16 \
+  -DCHECK_MULTIDOMAINGRID
+test_wrapper_multidomaingrid_LDFLAGS = $(ALL_PKG_LDFLAGS)
+test_wrapper_multidomaingrid_LIBS = $(ALL_PKG_LIBS)
+
+test_wrapper_subdomaingrid_SOURCES = test-wrapper.cc
+test_wrapper_subdomaingrid_CXXFLAGS = \
+  $(AM_CXXFLAGS) \
+  $(ALL_PKG_CPPFLAGS) \
+  -DCHECK_DIMENSION=2 \
+  -DCHECK_GRIDSIZE=16 \
+  -DCHECK_SUBDOMAINGRID
+test_wrapper_subdomaingrid_LDFLAGS = $(ALL_PKG_LDFLAGS)
+test_wrapper_subdomaingrid_LIBS = $(ALL_PKG_LIBS)
 
 testpartitioning_SOURCES = testpartitioning.cc
 testpartitioning_CXXFLAGS = $(AM_CXXFLAGS) $(ALL_PKG_CPPFLAGS)

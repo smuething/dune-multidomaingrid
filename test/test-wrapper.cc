@@ -13,14 +13,14 @@
 int rank;
 
 template <int dim>
-void check_grid() {
+void check_grid(std::size_t cells_per_dim) {
 
   typedef Dune::YaspGrid<dim> HostGrid;
   Dune::FieldVector<typename HostGrid::ctype,dim> lengths(1.0);
   for (unsigned int i = 0; i < dim; i++)
     lengths[i] = i + 1;
   Dune::array<int,dim> elements;
-  std::fill(elements.begin(), elements.end(), 5);
+  std::fill(elements.begin(), elements.end(), cells_per_dim);
   HostGrid wgrid(lengths, elements);
 
   typedef Dune::MultiDomainGrid<HostGrid,Dune::mdgrid::FewSubDomainsTraits<dim,4> > MDGrid;
@@ -58,6 +58,8 @@ void check_grid() {
   grid.updateSubDomains();
   grid.postUpdateSubDomains();
 
+#if CHECK_MULTIDOMAINGRID
+
   // check communication interface
   checkCommunication(grid,-1,Dune::dvverb);
   for(unsigned int l=0; l<=grid.maxLevel(); ++l)
@@ -68,6 +70,10 @@ void check_grid() {
   // check the intersection iterator and the geometries it returns
   checkIntersectionIterator(grid);
 
+#endif // CHECK_MULTIDOMAINGRID
+
+#if CHECK_SUBDOMAINGRID
+
   gridcheck(grid.subDomain(0));
   checkGeometryInFather(grid.subDomain(0));
   checkIntersectionIterator(grid.subDomain(0));
@@ -75,6 +81,9 @@ void check_grid() {
   gridcheck(grid.subDomain(1));
   checkGeometryInFather(grid.subDomain(1));
   checkIntersectionIterator(grid.subDomain(1));
+
+#endif // CHECK_SUBDOMAINGRID
+
 }
 
 int main (int argc , char **argv) {
@@ -82,9 +91,7 @@ int main (int argc , char **argv) {
 
     Dune::MPIHelper::instance(argc,argv);
 
-    check_grid<1>();
-    check_grid<2>();
-    check_grid<3>();
+    check_grid<CHECK_DIMENSION>(CHECK_GRIDSIZE);
 
   } catch (Dune::Exception &e) {
     std::cerr << e << std::endl;
