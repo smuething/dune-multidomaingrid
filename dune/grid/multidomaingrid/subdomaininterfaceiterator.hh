@@ -133,7 +133,7 @@ private:
 
   void findInverseHostIntersection() const {
     assert(_hostIntersectionIterator->neighbor());
-    _inverseHostIntersection = _hostGridView.ibegin(*_hostIntersectionIterator->outside());
+    _inverseHostIntersection = _hostGridView.ibegin(_hostIntersectionIterator->outside());
     while (_hostIntersectionIterator->inside() != _inverseHostIntersection->outside()) {
       ++_inverseHostIntersection;
     }
@@ -156,13 +156,13 @@ public:
   /*@{*/
 
   //! Returns an EntityPointer to the corresponding cell in the first subdomain.
-  EntityPointer firstCell() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->inside());
+  Entity firstCell() const {
+    return EntityWrapper<0,GridImp::dimension,GridImp>(_hostIntersectionIterator->inside());
   }
 
   //! Returns an EntityPointer to the corresponding cell in the second subdomain.
-  EntityPointer secondCell() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->outside());
+  Entity secondCell() const {
+    return EntityWrapper<0,GridImp::dimension,GridImp>(_hostIntersectionIterator->outside());
   }
 
   //! Returns the local geometry in the corresponding cell of the first subdomain.
@@ -237,13 +237,13 @@ public:
   /*@{*/
 
   //! Returns an EntityPointer to the corresponding cell in the first subdomain.
-  EntityPointer inside() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->inside());
+  Entity inside() const {
+    return EntityWrapper<0,GridImp::dimension,GridImp>(_hostIntersectionIterator->inside());
   }
 
   //! Returns an EntityPointer to the corresponding cell in the second subdomain.
-  EntityPointer outside() const {
-    return EntityPointerWrapper<0,GridImp>(_hostIntersectionIterator->outside());
+  Entity outside() const {
+    return EntityWrapper<0,GridImp::dimension,GridImp>(_hostIntersectionIterator->outside());
   }
 
   //! Returns true if this intersection is conforming.
