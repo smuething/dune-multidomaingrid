@@ -1,6 +1,5 @@
 set(tests
   multidomain-leveliterator-bug
-  profilerepartitioning
   testadaptation
   testintersectionconversion
   testintersectiongeometrytypes
@@ -20,7 +19,6 @@ add_executable(iterateallinterfaces EXCLUDE_FROM_ALL iterateallinterfaces.cc)
 add_test(NAME iterateallinterfaces
   COMMAND iterateallinterfaces "3")
 add_executable(multidomain-leveliterator-bug EXCLUDE_FROM_ALL multidomain-leveliterator-bug.cc)
-add_executable(profilerepartitioning EXCLUDE_FROM_ALL profilerepartitioning.cc)
 set_target_properties(profilerepartitioning
   PROPERTIES COMPILE_FLAGS "-DGRIDDIM=2 -DYASPGRID")
 add_executable(testadaptation EXCLUDE_FROM_ALL testadaptation.cc)
