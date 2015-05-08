@@ -14,7 +14,7 @@ class EntityWrapper;
 
 template<typename GridImp,
          typename IndexSet,
-         typename MultiDomainIntersection
+         typename MultiDomainIntersection_
          >
 class IntersectionWrapper {
 
@@ -30,11 +30,12 @@ class IntersectionWrapper {
   template<typename MDGrid>
   friend class SubDomainGrid;
 
-  using EntityPointer    = typename GridImp::Traits::template Codim<0>::EntityPointer;
-  using Entity           = typename GridImp::Traits::template Codim<0>::Entity;
-  using Geometry         = typename GridImp::Traits::template Codim<1>::Geometry;
-  using LocalGeometry    = typename GridImp::Traits::template Codim<1>::LocalGeometry;
-  using EntityWrapper    = Dune::mdgrid::subdomain::EntityWrapper<0,GridImp::dimension,GridImp>;
+  using MultiDomainIntersection = MultiDomainIntersection_;
+  using EntityPointer           = typename GridImp::Traits::template Codim<0>::EntityPointer;
+  using Entity                  = typename GridImp::Traits::template Codim<0>::Entity;
+  using Geometry                = typename GridImp::Traits::template Codim<1>::Geometry;
+  using LocalGeometry           = typename GridImp::Traits::template Codim<1>::LocalGeometry;
+  using EntityWrapper           = Dune::mdgrid::subdomain::EntityWrapper<0,GridImp::dimension,GridImp>;
 
   static const int dimension = GridImp::dimension;
   static const int dimensionworld = GridImp::dimensionworld;
