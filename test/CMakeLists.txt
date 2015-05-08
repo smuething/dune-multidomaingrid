@@ -103,7 +103,3 @@ install(FILES output.hh
 foreach(_test ${tests})
   add_test(${_test} ${_test})
 endforeach()
-
-foreach(_test ${all_tests})
-  target_link_libraries(${_test} ${DUNE_LIBS})
-endforeach()
