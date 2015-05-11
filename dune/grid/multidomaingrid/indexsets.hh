@@ -832,7 +832,6 @@ private:
 
     this->communicateSubDomainSelection();
 
-    HostEntityIterator end = _hostGridView.template end<0>();
     typename Containers<0>::IndexMap& im = indexMap<0>();
     typename Containers<0>::SizeMap& sm = sizeMap<0>();
     for (const auto& he : elements(_hostGridView)) {
@@ -861,7 +860,6 @@ private:
 
   void updateLevelIndexSet() {
     const HostIndexSet& his = _hostGridView.indexSet();
-    HostEntityIterator end = _hostGridView.template end<0>();
     typename Containers<0>::IndexMap& im = indexMap<0>();
     typename Containers<0>::SizeMap& sm = sizeMap<0>();
 
