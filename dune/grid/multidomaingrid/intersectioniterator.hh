@@ -20,7 +20,7 @@ class IntersectionIteratorWrapper {
   template<class, class>
   friend class Dune::Intersection;
 
-  template<typename,typename,typename,typename,typename>
+  template<typename,typename,typename>
   friend class subdomain::IntersectionIteratorWrapper;
 
   template<typename,PartitionIteratorType>

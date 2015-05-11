@@ -318,10 +318,10 @@ private:
   template<typename,typename,typename,typename>
   friend class SubDomainInterface;
 
-  template<typename,typename,typename,typename,typename>
+  template<typename,typename,typename>
   friend class subdomain::IntersectionIteratorWrapper;
 
-  template<typename,typename,typename,typename>
+  template<typename,typename,typename>
   friend class subdomain::IntersectionWrapper;
 
   template<typename,PartitionIteratorType>
