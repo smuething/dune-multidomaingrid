@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <map>
+#include <numeric>
+
 #include <dune/grid/common/mcmgmapper.hh>
 #include <dune/geometry/referenceelements.hh>
 
