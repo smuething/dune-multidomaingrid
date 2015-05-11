@@ -23,7 +23,7 @@ public:
   using EntityWrapper        = Dune::mdgrid::EntityWrapper<0,GridImp::dimension,GridImp>;
   using EntityPointerWrapper = Dune::mdgrid::EntityPointerWrapper<0,GridImp>;
   using EntityPointer        = typename GridImp::template Codim<0>::EntityPointer;
-  using HostIterator         = typename GridImp::HostGridType::HierarchicIterator;
+  using HostIterator         = typename GridImp::HostGrid::HierarchicIterator;
 
   HierarchicIteratorWrapper() = default;
 

@@ -124,7 +124,7 @@ class LeafSubDomainInterfaceIterator :
 
   typedef SubDomainInterfaceIterator<GridImp,
                                      typename GridImp::LeafGridView,
-                                     typename GridImp::HostGridType::LeafGridView,
+                                     typename GridImp::HostGrid::LeafGridView,
                                      Controller
                                      > Base;
 
@@ -159,7 +159,7 @@ class LevelSubDomainInterfaceIterator :
 
   typedef SubDomainInterfaceIterator<GridImp,
                                      typename GridImp::LevelGridView,
-                                     typename GridImp::HostGridType::LevelGridView,
+                                     typename GridImp::HostGrid::LevelGridView,
                                      Controller
                                      > Base;
 

@@ -37,8 +37,8 @@ public:
 
   using Entity            = typename GridImp::template Codim<codim>::Entity;
   using EntityWrapper     = Dune::mdgrid::EntityWrapper<codim,dim,GridImp>;
-  using HostEntityPointer = typename GridImp::HostGridType::Traits::template Codim<codim>::EntityPointer;
-  using HostEntity        = typename GridImp::HostGridType::Traits::template Codim<codim>::Entity;
+  using HostEntityPointer = typename GridImp::HostGrid::Traits::template Codim<codim>::EntityPointer;
+  using HostEntity        = typename GridImp::HostGrid::Traits::template Codim<codim>::Entity;
 
   EntityPointerWrapper() = default;
 

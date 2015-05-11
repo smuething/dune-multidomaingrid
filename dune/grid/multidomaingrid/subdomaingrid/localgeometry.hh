@@ -31,7 +31,7 @@ private:
 
   typedef FieldVector<ctype,coorddimension> GlobalCoords;
   typedef FieldVector<ctype,mydimension> LocalCoords;
-  typedef typename GridImp::HostGridType::Traits::template Codim<dimension-mydim>::LocalGeometry HostLocalGeometry; //TODO: fix this
+  typedef typename GridImp::HostGrid::Traits::template Codim<dimension-mydim>::LocalGeometry HostLocalGeometry; //TODO: fix this
 
 public:
 

@@ -139,7 +139,7 @@ public:
       using Entity        = Dune::Entity<cd, dim, const Grid, EntityWrapper>;
       using EntityPointer = Dune::EntityPointer<const Grid, EntityPointerWrapper<cd,const Grid> >;
 
-      using EntitySeed    = EntitySeedWrapper<typename MDGrid::HostGridType::template Codim<cd>::EntitySeed>;
+      using EntitySeed    = EntitySeedWrapper<typename MDGrid::HostGrid::template Codim<cd>::EntitySeed>;
 
       template <PartitionIteratorType pitype>
       struct Partition
@@ -185,18 +185,18 @@ public:
       const Grid,
       IdSetWrapper<
         const Grid,
-        typename MDGrid::HostGridType::Traits::GlobalIdSet
+        typename MDGrid::HostGrid::Traits::GlobalIdSet
         >,
-      typename MDGrid::HostGridType::Traits::GlobalIdSet::IdType
+      typename MDGrid::HostGrid::Traits::GlobalIdSet::IdType
       >;
 
     using LocalIdSet = IdSet<
       const Grid,
       IdSetWrapper<
         const Grid,
-        typename MDGrid::HostGridType::Traits::LocalIdSet
+        typename MDGrid::HostGrid::Traits::LocalIdSet
         >,
-      typename MDGrid::HostGridType::Traits::LocalIdSet::IdType
+      typename MDGrid::HostGrid::Traits::LocalIdSet::IdType
       >;
 
     using CollectiveCommunication = typename MDGrid::CollectiveCommunication;
@@ -279,9 +279,9 @@ private:
 
   typedef IndexSetWrapper<const SubDomainGrid<MDGrid>, typename MDGrid::LeafIndexSetImp> LeafIndexSetImp;
 
-  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGridType::Traits::GlobalIdSet> GlobalIdSetImp;
+  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGrid::Traits::GlobalIdSet> GlobalIdSetImp;
 
-  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGridType::Traits::LocalIdSet> LocalIdSetImp;
+  typedef IdSetWrapper<const SubDomainGrid<MDGrid>, typename HostGrid::Traits::LocalIdSet> LocalIdSetImp;
 
 public:
 

@@ -516,7 +516,7 @@ public:
   typename Traits::template Codim<codim>::LevelIterator lbegin(int level) const {
     return {
       IteratorWrapper<
-        typename HostGridType::LevelGridView,
+        typename HostGrid::LevelGridView,
         codim,
         All_Partition,
         const GridImp
@@ -528,7 +528,7 @@ public:
   typename Traits::template Codim<codim>::LevelIterator lend(int level) const {
     return {
       IteratorWrapper<
-        typename HostGridType::LevelGridView,
+        typename HostGrid::LevelGridView,
         codim,
         All_Partition,
         const GridImp
@@ -540,7 +540,7 @@ public:
   typename Traits::template Codim<codim>::template Partition<pitype>::LevelIterator lbegin(int level) const {
     return {
       IteratorWrapper<
-        typename HostGridType::LevelGridView,
+        typename HostGrid::LevelGridView,
         codim,
         pitype,
         const GridImp
@@ -552,7 +552,7 @@ public:
   typename Traits::template Codim<codim>::template Partition<pitype>::LevelIterator lend(int level) const {
     return {
       IteratorWrapper<
-        typename HostGridType::LevelGridView,
+        typename HostGrid::LevelGridView,
         codim,
         pitype,
         const GridImp
@@ -564,7 +564,7 @@ public:
   typename Traits::template Codim<codim>::LeafIterator leafbegin() const {
     return {
       IteratorWrapper<
-        typename HostGridType::LeafGridView,
+        typename HostGrid::LeafGridView,
         codim,
         All_Partition,
         const GridImp
@@ -576,7 +576,7 @@ public:
   typename Traits::template Codim<codim>::LeafIterator leafend() const {
     return {
       IteratorWrapper<
-        typename HostGridType::LeafGridView,
+        typename HostGrid::LeafGridView,
         codim,
         All_Partition,
         const GridImp
@@ -588,7 +588,7 @@ public:
   typename Traits::template Codim<codim>::template Partition<pitype>::LeafIterator leafbegin() const {
     return {
       IteratorWrapper<
-        typename HostGridType::LeafGridView,
+        typename HostGrid::LeafGridView,
         codim,
         pitype,
         const GridImp
@@ -600,7 +600,7 @@ public:
   typename Traits::template Codim<codim>::template Partition<pitype>::LeafIterator leafend() const {
     return {
       IteratorWrapper<
-        typename HostGridType::LeafGridView,
+        typename HostGrid::LeafGridView,
         codim,
         pitype,
         const GridImp

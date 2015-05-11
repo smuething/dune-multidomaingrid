@@ -84,7 +84,7 @@ class EntityWrapperBase
 protected:
 
   using MultiDomainEntity = typename GridImp::MultiDomainGrid::Traits::template Codim<codim>::Entity;
-  using HostEntity        = typename GridImp::HostGridType::Traits::template Codim<codim>::Entity;
+  using HostEntity        = typename GridImp::HostGrid::Traits::template Codim<codim>::Entity;
 
 public:
 
