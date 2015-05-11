@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
     return 3;
   }
 #else
-  std::cerr << "You need dune-ALUGrid to run this test." << std::endl;
+  std::cerr << "You need UGGrid to run this test." << std::endl;
   return 77;
-#endif // HAVE_DUNE_ALUGRID
+#endif // HAVE_UG
 }
