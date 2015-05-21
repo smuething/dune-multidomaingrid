@@ -6,6 +6,7 @@
 #include <dune/grid/multidomaingrid/hostgridaccessor.hh>
 
 #include <dune/grid/multidomaingrid/subdomaingrid/intersectioniterator.hh>
+#include "intersection.hh"
 
 namespace Dune {
 

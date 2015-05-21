@@ -5,6 +5,8 @@
 
 #include <dune/grid/common/gridenums.hh>
 
+#include "entity.hh"
+
 namespace Dune {
 
 namespace mdgrid {

@@ -3,6 +3,8 @@
 
 #include <dune/grid/common/intersectioniterator.hh>
 
+#include "intersection.hh"
+
 namespace Dune {
 
 namespace mdgrid {
