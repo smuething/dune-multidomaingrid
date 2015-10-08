@@ -3,6 +3,7 @@
 
 #include <dune/grid/common/entity.hh>
 #include <dune/grid/common/gridenums.hh>
+#include <dune/common/version.hh>
 
 namespace Dune {
 
@@ -178,6 +179,12 @@ public:
     return _hostEntityPointer->template count<cc>();
   }
 
+#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+  int subEntities(int cc) const {
+    return _hostEntityPointer->subEntities(cc);
+  }
+#endif
+
   Geometry geometry() const {
     return Geometry(_hostEntityPointer->geometry());
   }
@@ -270,6 +277,12 @@ public:
   int count() const {
     return _hostEntityPointer->template count<cc>();
   }
+
+#if DUNE_VERSION_NEWER(DUNE_GRID, 2, 4)
+  int subEntities(int cc) const {
+    return _hostEntityPointer->subEntities(cc);
+  }
+#endif
 
   template<int cc>
   typename GridImp::template Codim<cc>::EntityPointer subEntity(int i) const {

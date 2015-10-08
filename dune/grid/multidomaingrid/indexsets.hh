@@ -21,6 +21,7 @@
 #include <boost/swap.hpp>
 
 #include <dune/common/shared_ptr.hh>
+#include <dune/common/version.hh>
 #include <dune/grid/common/exceptions.hh>
 #include <dune/grid/common/indexidset.hh>
 
@@ -237,7 +238,11 @@ T& rw(const T& t) {
 template<typename GridImp, typename HostGridViewType>
 class IndexSetWrapper :
     public Dune::IndexSet<GridImp,IndexSetWrapper<GridImp,HostGridViewType>,
-                          typename HostGridViewType::IndexSet::IndexType>
+                          typename HostGridViewType::IndexSet::IndexType
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+                          , typename HostGridViewType::IndexSet::Types
+#endif
+                         >
 {
 
   template<typename, typename>
@@ -275,6 +280,9 @@ public:
 
 
   typedef typename HostIndexSet::IndexType IndexType;
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+  typedef typename HostIndexSet::Types Types;
+#endif
   static const int dimension = remove_const<GridImp>::type::dimension;
   static const std::size_t maxSubDomains = SubDomainSet::maxSize;
 
@@ -383,6 +391,12 @@ public:
     IndexType r = _hostGridView.indexSet().subIndex(_grid.hostEntity(e),i,codim);
     return r;
   }
+
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+  Types types (int codim) const {
+    return _hostGridView.indexSet().types(codim);
+  }
+#endif
 
   //! Returns a list of all geometry types with codimension codim contained in the grid.
   const std::vector<GeometryType>& geomTypes(int codim) const {

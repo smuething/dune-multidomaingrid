@@ -9,6 +9,7 @@
 #include <tuple>
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
+#include <dune/common/version.hh>
 #include <dune/grid/common/indexidset.hh>
 #include <dune/grid/multidomaingrid/utility.hh>
 
@@ -57,6 +58,9 @@ public:
   typedef SubDomainIndex SubDomainIndexType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   typedef SubDomainIndex SubDomainType DUNE_DEPRECATED_MSG("Use SubDomainIndex instead.");
   typedef typename MDIndexSet::IndexType IndexType;
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+  typedef typename MDIndexSet::Types Types;
+#endif
   static const int dimension = remove_const<GridImp>::type::dimension;
   //typedef typename SubDomainSet::DomainType DomainType;
   //static const std::size_t maxSubDomains = MDGrid::MDGridTraits::template Codim
@@ -85,6 +89,12 @@ public:
   IndexType subIndex(const Codim0Entity& e, int i, unsigned int codim) const {
     return _mdIndexSet.subIndex(_grid.domain(),_grid.multiDomainEntity(e),i,codim);
   }
+
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+  Types types (int codim) const {
+    return _mdIndexSet.types(codim);
+  }
+#endif
 
   const std::vector<GeometryType>& geomTypes(int codim) const {
     return _mdIndexSet.geomTypesForSubDomain(_grid.domain(),codim);

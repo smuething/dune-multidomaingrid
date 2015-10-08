@@ -2,6 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_LOCALGEOMETRY_HH
 
 #include <dune/grid/common/geometry.hh>
+#include <dune/common/version.hh>
 
 namespace Dune {
 
@@ -103,6 +104,7 @@ private:
 } // namespace mdgrid
 
 
+#if !DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
 namespace FacadeOptions {
 
 template< int mydim, int coorddim, class GridImp >
@@ -112,6 +114,7 @@ struct StoreGeometryReference< mydim, coorddim, GridImp, mdgrid::subdomain::Loca
 };
 
 } // namespace FacadeOptions
+#endif
 
 } // namespace Dune
 

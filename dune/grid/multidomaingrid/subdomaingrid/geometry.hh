@@ -2,6 +2,7 @@
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_GEOMETRY_HH
 
 #include <dune/grid/common/geometry.hh>
+#include <dune/common/version.hh>
 
 namespace Dune {
 
@@ -78,12 +79,20 @@ public:
     return _hostGeometry.center();
   }
 
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+  const JacobianTransposed
+#else
   const JacobianTransposed&
+#endif
   jacobianTransposed(const LocalCoords& local) const {
     return _hostGeometry.jacobianTransposed(local);
   }
 
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
+  const JacobianInverseTransposed
+#else
   const JacobianInverseTransposed&
+#endif
   jacobianInverseTransposed(const LocalCoords& local) const {
     return _hostGeometry.jacobianInverseTransposed(local);
   }
@@ -103,6 +112,7 @@ private:
 } // namespace mdgrid
 
 
+#if !DUNE_VERSION_NEWER(DUNE_COMMON, 2, 4)
 namespace FacadeOptions {
 
 template< int mydim, int coorddim, class GridImp >
@@ -112,6 +122,7 @@ struct StoreGeometryReference< mydim, coorddim, GridImp, mdgrid::subdomain::Geom
 };
 
 } // namespace FacadeOptions
+#endif
 
 } // namespace Dune
 
