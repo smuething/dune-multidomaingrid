@@ -81,7 +81,7 @@ foreach(dimsize IN ITEMS "1;64" "2;16" "3;4")
       "CHECK_GRIDSIZE=${size}"
       "CHECK_$<UPPER_CASE:${gridtype}>"
       COMPILE_OPTIONS
-      -Werror
+      # -Werror
       -UNDEBUG # always compile with assertions enabled
       )
 
@@ -93,7 +93,7 @@ foreach(dimsize IN ITEMS "1;64" "2;16" "3;4")
       "CHECK_GRIDSIZE=${size}"
       "CHECK_$<UPPER_CASE:${gridtype}>"
       COMPILE_OPTIONS
-      -Werror
+      # -Werror
       -Wno-deprecated-declarations # suppress deprecation warnings (otherwise -Werror will cause failures)
       -UNDEBUG                     # always compile with assertions enabled
       )
