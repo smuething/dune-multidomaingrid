@@ -8,7 +8,7 @@ Copyright holders
  Time Frame | Name
 ------------|---------------------------------
  2013--2014 | Christoph Grüninger
- 2009--2014 | Steffen Müthing
+ 2009--2015 | Steffen Müthing
  2010       | Oliver Sander
 
 

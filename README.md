@@ -10,8 +10,8 @@ own right.
 Version
 -------
 
-This is version 2.4-dev of MultiDomainGrid. It is compatible with the 2.4-git
-development series of the DUNE core modules. The versioning scheme of MultiDomainGrid
+This is version 2.4.0 of MultiDomainGrid. It is compatible with the 2.4.0
+release of the DUNE core modules. The versioning scheme of MultiDomainGrid
 has recently been synchronized to that of the core modules to make it easier for users
 to find a compatible release for their DUNE distribution.
 
@@ -81,10 +81,10 @@ Dependencies
 
 dune-multidomaingrid depends on the following software packages:
 
-* [DUNE core libraries][2] (dune-common, dune-geometry, dune-grid) version 2.4-git,
+* [DUNE core libraries][2] (dune-common, dune-geometry, dune-grid) version 2.4.0,
   and their respective dependencies.
 
-* The [dune-typetree][7] library, version 2.4-git.
+* The [dune-typetree][7] library, version 2.4.0.
 
 * MultiDomain's compiler requirements differ slightly from the underlying DUNE
   libraries: We require at least GCC 4.7 in C++11 mode. MultiDomainGrid should

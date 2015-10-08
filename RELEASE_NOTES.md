@@ -1,7 +1,7 @@
 MultiDomainGrid
 ===============
 
-This is the 2.4-dev branch of MultiDomainGrid, a meta grid build on top of the
+This is the 2.4.0 release of MultiDomainGrid, a meta grid build on top of the
 [DUNE][1] grid interface. See the file README for further details including
 license information.
 
@@ -18,7 +18,7 @@ Changes
 
 * Bump compiler requirements to GCC 4.7.
 
-* Compatiblity with DUNE 2.4-git.
+* Compatiblity with DUNE 2.4.0.
 
 * New implementation of per-codim data containers on top of std::tuple.
 
@@ -26,6 +26,21 @@ Changes
 
 * New dependency on TypeTree for tuple iteration infrastructure.
 
+* Copyable entities and intersections as required by dune-grid 2.4.0. Apart from
+  the new API presented to the user, there are two important additional consequences:
+
+  * The characteristics of the performance overhead of using MultiDomainGrid are different:
+    Initial measurements show that using just a MultiDomainGrid is slightly slower than
+    before (about 5-10%), but when stacking multiple meta grids is much less problematic.
+
+  * The underlying host grid of a MultiDomainGrid must have been ported to the new copyable
+    entity and intersection APIs. Unported grids will cause compilation errors. Apart from
+    the old ALUGrid bindings (which are deprecated in DUNE 2.4), all important grids have
+    been ported for the 2.4 release.
+
+* Relesae history
+
+  * `2.4.0-rc1` Initial release candidate.
 
 ### MultiDomainGrid 2.3
 
