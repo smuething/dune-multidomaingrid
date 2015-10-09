@@ -1159,6 +1159,8 @@ private:
     return Implementation(iit);
   }
 
+public:
+
   template<typename Entity>
   typename Traits::template Codim<Entity::codimension>::Entity wrapHostEntity(const Entity& e) const {
     return wrapHostEntity<Entity::codimension>(e);
@@ -1169,6 +1171,8 @@ private:
   {
     return {EntityWrapper<codim,dimension,const GridImp>(e)};
   }
+
+private:
 
 
   template<typename Impl>
