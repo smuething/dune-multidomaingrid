@@ -1,11 +1,13 @@
 #include "config.h"
 
+#include <cassert>
+#include <iostream>
+#include <memory>
+
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/uggrid.hh>
 #include <dune/grid/utility/structuredgridfactory.hh>
 #include <dune/grid/multidomaingrid.hh>
-#include <iostream>
-#include <cassert>
 
 template<typename HostGrid>
 void run_test(HostGrid& hostgrid)
@@ -63,7 +65,7 @@ int main(int argc, char** argv)
 
     {
       Dune::FieldVector<double,2> L(1.0);
-      Dune::array<int,2> s = {{2, 2}};
+      std::array<int,2> s = {{2, 2}};
 
       typedef Dune::YaspGrid<2> HostGrid;
       HostGrid hostgrid(L,s);
@@ -76,7 +78,7 @@ int main(int argc, char** argv)
       Dune::FieldVector<double,2> lower_left(0.0);
       Dune::FieldVector<double,2> upper_right(1.0);
       std::array<unsigned int,2> elements = {{8,8}};
-      Dune::shared_ptr<HostGrid> gridptr(
+      std::shared_ptr<HostGrid> gridptr(
         Dune::StructuredGridFactory<HostGrid>::createSimplexGrid(
           lower_left,
           upper_right,

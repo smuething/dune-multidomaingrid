@@ -1,10 +1,10 @@
 #ifndef DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HH
 #define DUNE_MULTIDOMAINGRID_SUBDOMAINGRID_HH
 
+#include <memory>
 #include <string>
 
 #include <dune/common/exceptions.hh>
-#include <dune/common/shared_ptr.hh>
 
 #include <dune/grid/multidomaingrid/hostgridaccessor.hh>
 #include <dune/grid/multidomaingrid/subdomainset.hh>
@@ -738,7 +738,7 @@ private:
   GlobalIdSetImp _globalIdSet;
   LocalIdSetImp _localIdSet;
   LeafIndexSetImp _leafIndexSet;
-  mutable std::vector<Dune::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
+  mutable std::vector<std::shared_ptr<LevelIndexSetImp> > _levelIndexSets;
 
   SubDomainGrid(MDGrid& grid, SubDomainIndex subDomain) :
     _grid(grid),

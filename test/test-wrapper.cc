@@ -35,7 +35,7 @@ void check_grid(std::size_t cells_per_dim) {
   Dune::FieldVector<typename HostGrid::ctype,dim> lengths(1.0);
   for (unsigned int i = 0; i < dim; i++)
     lengths[i] = i + 1;
-  Dune::array<int,dim> elements;
+  std::array<int,dim> elements;
   std::fill(elements.begin(), elements.end(), cells_per_dim);
   HostGrid wgrid(lengths, elements);
 

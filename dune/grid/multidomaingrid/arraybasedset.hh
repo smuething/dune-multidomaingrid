@@ -10,7 +10,6 @@
 #include <type_traits>
 #include <strings.h>
 
-#include <dune/common/typetraits.hh>
 #include <dune/common/exceptions.hh>
 
 namespace Dune {

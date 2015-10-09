@@ -14,7 +14,7 @@ int main (int argc, char *argv[])
     // set up grid
     typedef Dune::YaspGrid<dim> GridType;
     Dune::FieldVector<double,dim> upperRight(1);
-    Dune::array<int,2> elements = {{1, 1}};
+    std::array<int,2> elements = {{1, 1}};
     GridType grid(upperRight, elements);
 
     // set up MultiDomainGrid: a single subdomain

@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 
     {
       const Dune::FieldVector<double,dim> h(1.0);
-      Dune::array<int,dim> s;
+      std::array<int,dim> s;
       std::fill(s.begin(), s.end(), N);
       std::bitset<dim> p(false);
       typedef Dune::YaspGrid<dim> HostGrid;

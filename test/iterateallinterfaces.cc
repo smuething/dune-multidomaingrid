@@ -109,7 +109,7 @@ int main(int argc, char** argv)
       refinement = atoi(argv[1]);
 
     Dune::FieldVector<double,2> L(1.0);
-    Dune::array<int,2> s = {{2, 2}};
+    std::array<int,2> s = {{2, 2}};
 
     typedef Dune::YaspGrid<2> HostGrid;
     HostGrid hostgrid(L,s);
