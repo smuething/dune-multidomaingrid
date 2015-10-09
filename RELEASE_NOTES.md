@@ -42,7 +42,7 @@ Changes
     It has been replaced by the method `wrapHostEntity()` which takes a reference to a host entity
     and returns a MultiDomainGrid entity.
 
-* Relesae history
+* Release history
 
   * `2.4.0-rc1` Initial release candidate.
 
