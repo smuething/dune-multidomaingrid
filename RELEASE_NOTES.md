@@ -27,7 +27,7 @@ Changes
 * New dependency on TypeTree for tuple iteration infrastructure.
 
 * Copyable entities and intersections as required by dune-grid 2.4.0. Apart from
-  the new API presented to the user, there are two important additional consequences:
+  the new API presented to the user, there are some important additional consequences:
 
   * The characteristics of the performance overhead of using MultiDomainGrid are different:
     Initial measurements show that using just a MultiDomainGrid is slightly slower than
@@ -38,7 +38,11 @@ Changes
     the old ALUGrid bindings (which are deprecated in DUNE 2.4), all important grids have
     been ported for the 2.4 release.
 
-* Relesae history
+  * The method `multiDomainEntityPointer()` has been removed from the `MultiDomainGrid` class.
+    It has been replaced by the method `wrapHostEntity()` which takes a reference to a host entity
+    and returns a MultiDomainGrid entity.
+
+* Release history
 
   * `2.4.0-rc1` Initial release candidate.
 
