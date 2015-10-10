@@ -33,6 +33,9 @@ set(EXTRA_DIST
 
 dune_enable_all_packages(VERBOSE)
 
+# disable the upstream testing magic
+set(DUNE_TEST_MAGIC OFF)
+
 add_subdirectory("doc")
 add_subdirectory("dune")
 add_subdirectory("m4")
