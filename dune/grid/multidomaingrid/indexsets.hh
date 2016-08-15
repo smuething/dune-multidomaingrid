@@ -920,11 +920,11 @@ private:
     typedef typename MapEntry<0>::SubDomainSet& DomainSet;
 
     const HostEntity& _he;
-    const DomainSet& _domains;
+    DomainSet& _domains;
     const HostIndexSet& _his;
     const ReferenceElement<ctype,dimension>& _refEl;
 
-    markSubIndices(const HostEntity& he, const DomainSet& domains, const HostIndexSet& his, const ReferenceElement<ctype,dimension>& refEl) :
+    markSubIndices(const HostEntity& he, DomainSet& domains, const HostIndexSet& his, const ReferenceElement<ctype,dimension>& refEl) :
       _he(he),
       _domains(domains),
       _his(his),
