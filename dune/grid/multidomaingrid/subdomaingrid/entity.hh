@@ -413,16 +413,16 @@ public:
     return false;
   }
 
-private:
-
-  const GridImp& _grid;
-  MultiDomainEntityPointer _multiDomainEntityPointer;
-
   const EntityWrapper& operator=(const EntityWrapper& rhs) {
     assert(_grid == rhs._grid);
     reset(rhs._multiDomainEntityPointer);
     return *this;
   }
+
+private:
+
+  const GridImp& _grid;
+  MultiDomainEntityPointer _multiDomainEntityPointer;
 
   template<typename MultiDomainIteratorOrEntityPointer>
   void reset(const MultiDomainIteratorOrEntityPointer& multiDomainEntityPointer) {
